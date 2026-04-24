@@ -33,7 +33,7 @@ export default async function LoginPage({
 
       <div className="relative max-w-md mx-auto px-4">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2 text-center">
-          Logga in på <span className="gradient-text">Merca</span>
+          Logga in på <span className="gradient-text">Bilskrotscentralen</span>
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)] text-center mb-8">
           Välj portal och ange dina uppgifter.
@@ -102,18 +102,6 @@ export default async function LoginPage({
           >
             Logga in →
           </button>
-
-          <div className="pt-4 border-t border-[var(--color-dark-500)] text-xs text-[var(--color-text-muted)] leading-relaxed">
-            <div className="font-semibold text-[var(--color-text-secondary)] mb-1">
-              Demo-konton
-            </div>
-            <div>
-              Kund: <code className="text-[var(--color-brand-orange-light)]">kund</code> / <code className="text-[var(--color-brand-orange-light)]">kund123</code>
-            </div>
-            <div>
-              Admin: <code className="text-[var(--color-brand-orange-light)]">admin</code> / <code className="text-[var(--color-brand-orange-light)]">admin123</code>
-            </div>
-          </div>
         </form>
       </div>
     </section>

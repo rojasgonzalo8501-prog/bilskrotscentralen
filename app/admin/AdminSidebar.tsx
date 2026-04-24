@@ -61,11 +61,10 @@ export default function AdminSidebar({
     <aside className="w-16 lg:w-60 shrink-0 border-r border-[var(--color-dark-500)] bg-[var(--color-dark-800)] flex flex-col">
       {/* Logo */}
       <div className="h-16 flex items-center px-4 border-b border-[var(--color-dark-500)]">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[var(--color-brand-orange)] to-[var(--color-brand-orange-light)] flex items-center justify-center font-black text-white text-sm shrink-0">
-          M
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Bilskrotscentralen" className="w-9 h-9 object-contain shrink-0" />
         <div className="ml-3 hidden lg:block">
-          <div className="font-bold text-sm leading-none tracking-tight">MERCA</div>
+          <div className="font-bold text-sm leading-none tracking-tight">BILSKROTSCENTRALEN</div>
           <div className="text-[10px] uppercase tracking-widest text-[var(--color-text-muted)] mt-1">
             {role === "superadmin" ? "Super Admin" : "Admin"}
           </div>
