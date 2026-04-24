@@ -45,9 +45,6 @@ next-env.d.ts
 # Agent skills (local tools)
 /.agents/
 
-# Embedded git repos
-/data/codelist/
-
 # SQLite dev database
 dev.db
 dev.db-shm
