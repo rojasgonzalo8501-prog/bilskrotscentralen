@@ -12,7 +12,6 @@ function makeClient(): PrismaClient {
     return new PrismaClient({ adapter: new PrismaPg(pool) });
   }
 
-  // Local dev — SQLite (optional dependency)
   try {
     const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
     return new PrismaClient({
@@ -23,8 +22,13 @@ function makeClient(): PrismaClient {
   }
 }
 
-export const db = globalForPrisma.prisma ?? makeClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = db;
-}
+// Lazy proxy — only creates the real client on first property access (not at import time)
+export const db = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    if (!globalForPrisma.prisma) {
+      globalForPrisma.prisma = makeClient();
+    }
+    const val = (globalForPrisma.prisma as any)[prop];
+    return typeof val === "function" ? val.bind(globalForPrisma.prisma) : val;
+  },
+});
