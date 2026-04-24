@@ -55,10 +55,16 @@ model Vehicle {
   status      VehicleStatus @default(DISMANTLING)
   notes       String?
 
+  /// True for historical donor cars that exist only to give parts their
+  /// brand/model/year provenance. Adam's active dismantling workload
+  /// (shown in /admin/bilar) is donorOnly=false.
+  donorOnly   Boolean  @default(false)
+
   parts       Part[]
 
   @@index([brandSlug])
   @@index([status])
+  @@index([donorOnly])
 }
 
 enum VehicleStatus {

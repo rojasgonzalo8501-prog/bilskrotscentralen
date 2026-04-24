@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function BilarPage() {
   const vehicles = await db.vehicle.findMany({
+    where: { donorOnly: false },
     orderBy: { arrivedAt: "desc" },
     include: { _count: { select: { parts: true } } },
   });

@@ -47,6 +47,7 @@ export type VehicleMinAggregateOutputType = {
   arrivedAt: Date | null
   status: $Enums.VehicleStatus | null
   notes: string | null
+  donorOnly: boolean | null
 }
 
 export type VehicleMaxAggregateOutputType = {
@@ -61,6 +62,7 @@ export type VehicleMaxAggregateOutputType = {
   arrivedAt: Date | null
   status: $Enums.VehicleStatus | null
   notes: string | null
+  donorOnly: boolean | null
 }
 
 export type VehicleCountAggregateOutputType = {
@@ -75,6 +77,7 @@ export type VehicleCountAggregateOutputType = {
   arrivedAt: number
   status: number
   notes: number
+  donorOnly: number
   _all: number
 }
 
@@ -99,6 +102,7 @@ export type VehicleMinAggregateInputType = {
   arrivedAt?: true
   status?: true
   notes?: true
+  donorOnly?: true
 }
 
 export type VehicleMaxAggregateInputType = {
@@ -113,6 +117,7 @@ export type VehicleMaxAggregateInputType = {
   arrivedAt?: true
   status?: true
   notes?: true
+  donorOnly?: true
 }
 
 export type VehicleCountAggregateInputType = {
@@ -127,6 +132,7 @@ export type VehicleCountAggregateInputType = {
   arrivedAt?: true
   status?: true
   notes?: true
+  donorOnly?: true
   _all?: true
 }
 
@@ -228,6 +234,7 @@ export type VehicleGroupByOutputType = {
   arrivedAt: Date
   status: $Enums.VehicleStatus
   notes: string | null
+  donorOnly: boolean
   _count: VehicleCountAggregateOutputType | null
   _avg: VehicleAvgAggregateOutputType | null
   _sum: VehicleSumAggregateOutputType | null
@@ -265,6 +272,7 @@ export type VehicleWhereInput = {
   arrivedAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
   status?: Prisma.EnumVehicleStatusFilter<"Vehicle"> | $Enums.VehicleStatus
   notes?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  donorOnly?: Prisma.BoolFilter<"Vehicle"> | boolean
   parts?: Prisma.PartListRelationFilter
 }
 
@@ -280,6 +288,7 @@ export type VehicleOrderByWithRelationInput = {
   arrivedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  donorOnly?: Prisma.SortOrder
   parts?: Prisma.PartOrderByRelationAggregateInput
 }
 
@@ -298,6 +307,7 @@ export type VehicleWhereUniqueInput = Prisma.AtLeast<{
   arrivedAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
   status?: Prisma.EnumVehicleStatusFilter<"Vehicle"> | $Enums.VehicleStatus
   notes?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  donorOnly?: Prisma.BoolFilter<"Vehicle"> | boolean
   parts?: Prisma.PartListRelationFilter
 }, "id" | "stockNumber">
 
@@ -313,6 +323,7 @@ export type VehicleOrderByWithAggregationInput = {
   arrivedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  donorOnly?: Prisma.SortOrder
   _count?: Prisma.VehicleCountOrderByAggregateInput
   _avg?: Prisma.VehicleAvgOrderByAggregateInput
   _max?: Prisma.VehicleMaxOrderByAggregateInput
@@ -335,6 +346,7 @@ export type VehicleScalarWhereWithAggregatesInput = {
   arrivedAt?: Prisma.DateTimeWithAggregatesFilter<"Vehicle"> | Date | string
   status?: Prisma.EnumVehicleStatusWithAggregatesFilter<"Vehicle"> | $Enums.VehicleStatus
   notes?: Prisma.StringNullableWithAggregatesFilter<"Vehicle"> | string | null
+  donorOnly?: Prisma.BoolWithAggregatesFilter<"Vehicle"> | boolean
 }
 
 export type VehicleCreateInput = {
@@ -349,6 +361,7 @@ export type VehicleCreateInput = {
   arrivedAt?: Date | string
   status?: $Enums.VehicleStatus
   notes?: string | null
+  donorOnly?: boolean
   parts?: Prisma.PartCreateNestedManyWithoutVehicleInput
 }
 
@@ -364,6 +377,7 @@ export type VehicleUncheckedCreateInput = {
   arrivedAt?: Date | string
   status?: $Enums.VehicleStatus
   notes?: string | null
+  donorOnly?: boolean
   parts?: Prisma.PartUncheckedCreateNestedManyWithoutVehicleInput
 }
 
@@ -379,6 +393,7 @@ export type VehicleUpdateInput = {
   arrivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  donorOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parts?: Prisma.PartUpdateManyWithoutVehicleNestedInput
 }
 
@@ -394,6 +409,7 @@ export type VehicleUncheckedUpdateInput = {
   arrivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  donorOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   parts?: Prisma.PartUncheckedUpdateManyWithoutVehicleNestedInput
 }
 
@@ -409,6 +425,7 @@ export type VehicleCreateManyInput = {
   arrivedAt?: Date | string
   status?: $Enums.VehicleStatus
   notes?: string | null
+  donorOnly?: boolean
 }
 
 export type VehicleUpdateManyMutationInput = {
@@ -423,6 +440,7 @@ export type VehicleUpdateManyMutationInput = {
   arrivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  donorOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type VehicleUncheckedUpdateManyInput = {
@@ -437,6 +455,7 @@ export type VehicleUncheckedUpdateManyInput = {
   arrivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  donorOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type VehicleCountOrderByAggregateInput = {
@@ -451,6 +470,7 @@ export type VehicleCountOrderByAggregateInput = {
   arrivedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  donorOnly?: Prisma.SortOrder
 }
 
 export type VehicleAvgOrderByAggregateInput = {
@@ -469,6 +489,7 @@ export type VehicleMaxOrderByAggregateInput = {
   arrivedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  donorOnly?: Prisma.SortOrder
 }
 
 export type VehicleMinOrderByAggregateInput = {
@@ -483,6 +504,7 @@ export type VehicleMinOrderByAggregateInput = {
   arrivedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  donorOnly?: Prisma.SortOrder
 }
 
 export type VehicleSumOrderByAggregateInput = {
@@ -532,6 +554,7 @@ export type VehicleCreateWithoutPartsInput = {
   arrivedAt?: Date | string
   status?: $Enums.VehicleStatus
   notes?: string | null
+  donorOnly?: boolean
 }
 
 export type VehicleUncheckedCreateWithoutPartsInput = {
@@ -546,6 +569,7 @@ export type VehicleUncheckedCreateWithoutPartsInput = {
   arrivedAt?: Date | string
   status?: $Enums.VehicleStatus
   notes?: string | null
+  donorOnly?: boolean
 }
 
 export type VehicleCreateOrConnectWithoutPartsInput = {
@@ -576,6 +600,7 @@ export type VehicleUpdateWithoutPartsInput = {
   arrivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  donorOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type VehicleUncheckedUpdateWithoutPartsInput = {
@@ -590,6 +615,7 @@ export type VehicleUncheckedUpdateWithoutPartsInput = {
   arrivedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  donorOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -635,6 +661,7 @@ export type VehicleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   arrivedAt?: boolean
   status?: boolean
   notes?: boolean
+  donorOnly?: boolean
   parts?: boolean | Prisma.Vehicle$partsArgs<ExtArgs>
   _count?: boolean | Prisma.VehicleCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["vehicle"]>
@@ -651,6 +678,7 @@ export type VehicleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   arrivedAt?: boolean
   status?: boolean
   notes?: boolean
+  donorOnly?: boolean
 }, ExtArgs["result"]["vehicle"]>
 
 export type VehicleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -665,6 +693,7 @@ export type VehicleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   arrivedAt?: boolean
   status?: boolean
   notes?: boolean
+  donorOnly?: boolean
 }, ExtArgs["result"]["vehicle"]>
 
 export type VehicleSelectScalar = {
@@ -679,9 +708,10 @@ export type VehicleSelectScalar = {
   arrivedAt?: boolean
   status?: boolean
   notes?: boolean
+  donorOnly?: boolean
 }
 
-export type VehicleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "stockNumber" | "brandSlug" | "model" | "vehicleCode" | "year" | "vin" | "registration" | "arrivedAt" | "status" | "notes", ExtArgs["result"]["vehicle"]>
+export type VehicleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "stockNumber" | "brandSlug" | "model" | "vehicleCode" | "year" | "vin" | "registration" | "arrivedAt" | "status" | "notes" | "donorOnly", ExtArgs["result"]["vehicle"]>
 export type VehicleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   parts?: boolean | Prisma.Vehicle$partsArgs<ExtArgs>
   _count?: boolean | Prisma.VehicleCountOutputTypeDefaultArgs<ExtArgs>
@@ -721,6 +751,12 @@ export type $VehiclePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     arrivedAt: Date
     status: $Enums.VehicleStatus
     notes: string | null
+    /**
+     * True for historical donor cars that exist only to give parts their
+     * brand/model/year provenance. Adam's active dismantling workload
+     * (shown in /admin/bilar) is donorOnly=false.
+     */
+    donorOnly: boolean
   }, ExtArgs["result"]["vehicle"]>
   composites: {}
 }
@@ -1156,6 +1192,7 @@ export interface VehicleFieldRefs {
   readonly arrivedAt: Prisma.FieldRef<"Vehicle", 'DateTime'>
   readonly status: Prisma.FieldRef<"Vehicle", 'VehicleStatus'>
   readonly notes: Prisma.FieldRef<"Vehicle", 'String'>
+  readonly donorOnly: Prisma.FieldRef<"Vehicle", 'Boolean'>
 }
     
 

@@ -104,7 +104,8 @@ export const VehicleScalarFieldEnum = {
   registration: 'registration',
   arrivedAt: 'arrivedAt',
   status: 'status',
-  notes: 'notes'
+  notes: 'notes',
+  donorOnly: 'donorOnly'
 } as const
 
 export type VehicleScalarFieldEnum = (typeof VehicleScalarFieldEnum)[keyof typeof VehicleScalarFieldEnum]
