@@ -1,0 +1,4 @@
+sku,vehicleStockNumber,partCode,name,position,oeNumber,priceSek,condition,status,notes
+M-2024-0142-A47,M-2024-0142,1020,Strålkastare vänster,9,A2128203961,2800,USED_GOOD,AVAILABLE,Hyllplats A47
+M-2024-0142-B12,M-2024-0142,4001,Luftfjädringsstrut fram,9,A2123203138,4500,USED_GOOD,AVAILABLE,Funktionstestad
+M-2024-0143-A03,M-2024-0143,2020,Turbo,0,36012378,3200,USED_GOOD,AVAILABLE,

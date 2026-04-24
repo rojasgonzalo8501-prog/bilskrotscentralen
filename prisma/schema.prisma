@@ -1,0 +1,314 @@
+// Merca Skroten — inventory schema
+// First slice: vehicles (donor cars), parts, images, and import audit trail.
+// E-commerce (orders, customers, payments) deliberately deferred until we
+// have real inventory loaded and Adam has signed off on the data shape.
+//
+// Codes (brandSlug, partCode, vehicleCode) reference the Bildelsbasen
+// codelist in data/codelist/. We store them as plain strings rather than
+// foreign keys so the codelist can update independently of the database.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A platform user — admin, superadmin, or customer account.
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  name         String
+  email        String?
+  role         UserRole @default(ADMIN)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  CUSTOMER
+}
+
+/// A donor vehicle being dismantled or already dismantled.
+/// All parts in inventory must reference one of these.
+model Vehicle {
+  id          String   @id @default(cuid())
+  /// Internal stock number Adam uses (e.g. "M-2024-0142")
+  stockNumber String   @unique
+  /// Bildelsbasen brand slug, e.g. "mercedes-benz"
+  brandSlug   String
+  /// Free-text model name, e.g. "E220 CDI" (Adam's wording, not codelist)
+  model       String
+  /// Bildelsbasen vehicle_code if known, e.g. "5612" for E-klass W212
+  vehicleCode String?
+  year        Int?
+  vin         String?
+  /// Plate when it arrived (may be removed/scrapped)
+  registration String?
+  arrivedAt   DateTime @default(now())
+  status      VehicleStatus @default(DISMANTLING)
+  notes       String?
+
+  parts       Part[]
+
+  @@index([brandSlug])
+  @@index([status])
+}
+
+enum VehicleStatus {
+  DISMANTLING  // currently being taken apart
+  DISMANTLED   // all sellable parts cataloged
+  SCRAPPED     // shell sent to scrap
+}
+
+/// An individual part for sale, taken from a Vehicle.
+model Part {
+  id          String   @id @default(cuid())
+  /// Internal SKU Adam assigns (e.g. "M-2024-0142-A47")
+  sku         String   @unique
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  /// Bildelsbasen part_code (e.g. "1020" = STRÅLKASTARE)
+  partCode    String?
+  /// Free-text name when partCode doesn't capture it
+  name        String
+  /// Position code from Bildelsbasen position.txt (0–45)
+  position    Int?
+
+  /// Manufacturer OE/part number, e.g. "A2123203138"
+  oeNumber    String?
+
+  priceSek    Int?
+  condition   PartCondition @default(USED_GOOD)
+  status      PartStatus    @default(AVAILABLE)
+
+  /// Adam's free-text notes (location in lager, defects, etc.)
+  notes       String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  images      PartImage[]
+  orderItems  OrderItem[]
+
+  @@index([vehicleId])
+  @@index([partCode])
+  @@index([status])
+  @@index([oeNumber])
+}
+
+enum PartCondition {
+  NEW
+  USED_LIKE_NEW
+  USED_GOOD
+  USED_OK
+  USED_POOR
+}
+
+enum PartStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  WITHDRAWN
+}
+
+/// Image attached to a part. URL can be a local /uploads/ path or external CDN.
+model PartImage {
+  id        String  @id @default(cuid())
+  partId    String
+  part      Part    @relation(fields: [partId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  sortOrder Int     @default(0)
+
+  @@index([partId])
+}
+
+/// A customer order placed through the webshop.
+model Order {
+  id          String   @id @default(cuid())
+  orderNumber String   @unique   // e.g. "MS-2024-0001"
+
+  // Customer details
+  email       String
+  phone       String?
+  firstName   String
+  lastName    String
+  address     String
+  postalCode  String
+  city        String
+  country     String  @default("SE")
+
+  // Financials (öre not used — whole SEK)
+  subtotalSek Int
+  shippingSek Int     @default(0)
+  vatSek      Int
+  totalSek    Int
+
+  // Payment
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(PENDING)
+  klarnaOrderId            String?
+  swishPaymentRequestToken String?
+
+  status   OrderStatus @default(PENDING)
+  notes    String?
+
+  items    OrderItem[]
+  invoices Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+enum PaymentMethod {
+  KLARNA
+  SWISH
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING     // waiting for payment
+  CONFIRMED   // payment received
+  PROCESSING  // being packed
+  SHIPPED     // sent to customer
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  partId   String
+  part     Part   @relation(fields: [partId], references: [id])
+
+  // Snapshots so order stays correct if part is edited later
+  partSku  String
+  partName String
+  priceSek Int
+  quantity Int    @default(1)
+
+  @@index([orderId])
+  @@index([partId])
+}
+
+/// A customer invoice — can be auto-generated from a paid Order or created manually.
+model Invoice {
+  id            String        @id @default(cuid())
+  /// Sequential invoice number starting at 11101 (continues Adam's existing sequence)
+  invoiceNumber Int           @unique
+
+  /// Optional link to the webshop order that triggered this invoice
+  orderId       String?
+  order         Order?        @relation(fields: [orderId], references: [id])
+
+  // ── Customer ──────────────────────────────────────────────────
+  customerName    String
+  customerEmail   String?
+  customerPhone   String?
+  customerAddress String?
+  customerPostal  String?
+  customerCity    String?
+  customerOrgNr   String?       // Köparens Org. nr
+  customerRef     String?       // Er referens
+  note            String?       // Anmärkning
+  reqNumber       String?       // Rekv. nr
+
+  // ── Invoice meta ──────────────────────────────────────────────
+  invoiceDate   DateTime      @default(now())
+  dueDate       DateTime
+  paymentTerms  Int           @default(10)  // days
+  writtenBy     String?       @default("Adam")
+  isExport      Boolean       @default(false)
+
+  // ── Extra fees (SEK, whole numbers) ───────────────────────────
+  expeditionFee Int           @default(0)   // Expeditionsavgift
+  shippingFee   Int           @default(0)   // Frakt
+
+  // ── Totals ────────────────────────────────────────────────────
+  subtotalSek   Int           @default(0)
+  vatSek        Int           @default(0)
+  totalSek      Int           @default(0)
+
+  // ── Status ────────────────────────────────────────────────────
+  status        InvoiceStatus @default(DRAFT)
+  sentAt        DateTime?
+  paidAt        DateTime?
+
+  items         InvoiceItem[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+  @@index([invoiceDate])
+  @@index([orderId])
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+/// A single line on an invoice.
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  /// Swedish VAT/tax category:
+  /// M = Vinstmarginalbeskattning (used goods, 0% VAT shown)
+  /// A = Försäljning 25% (standard 25% VAT)
+  /// O = Försäljning 0% (export / 0% VAT)
+  taxCode     String  @default("A")
+
+  description String          // Reservdel / free-text description
+  year        String?         // År (year of donor car)
+  carMake     String?         // Bilanmärkning (make of donor car)
+  itemType    String?         // Typ column (B, etc.)
+  quantity    Int     @default(1)
+  unitPriceSek Int            // A-pris
+  vatPercent  Int     @default(25)  // %
+  amountSek   Int             // Belopp = unitPriceSek × quantity
+
+  sortOrder   Int     @default(0)
+
+  @@index([invoiceId])
+}
+
+/// Audit trail for every CSV/XLSX upload — what was imported, by whom, and how.
+model ImportBatch {
+  id           String   @id @default(cuid())
+  filename     String
+  /// "vehicles" or "parts"
+  kind         String
+  rowsTotal    Int
+  rowsImported Int
+  rowsSkipped  Int
+  errors       String?  // JSON-encoded list of {row, message}
+  createdAt    DateTime @default(now())
+}

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /admin
+Disallow: /konto/
+Disallow: /konto
+Disallow: /api/
+
+Sitemap: https://bilskrotscentralen.se/sitemap.xml

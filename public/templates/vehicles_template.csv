@@ -1,0 +1,3 @@
+stockNumber,brandSlug,model,vehicleCode,year,vin,registration,arrivedAt,status,notes
+M-2024-0142,mercedes-benz,E220 CDI,5612,2014,WDB2120061B123456,ABC123,2024-09-15,DISMANTLING,Bra skick - frontskada
+M-2024-0143,volvo,V70 D5,,2008,YV1SW61T481234567,DEF456,2024-09-20,DISMANTLED,Komplett demonterad
