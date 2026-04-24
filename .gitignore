@@ -58,3 +58,11 @@ dev.db-wal
 
 # Fuse hidden files
 .fuse_hidden*
+
+# Supabase temp files
+/supabase/.temp/
+
+# Claude/agent skills
+/.claude/
+/skills/
+/skills-lock.json
