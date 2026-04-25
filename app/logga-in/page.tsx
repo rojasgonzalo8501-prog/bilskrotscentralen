@@ -5,25 +5,24 @@ import { loginAction } from "./actions";
 
 export const metadata: Metadata = {
   title: "Logga in",
-  description:
-    "Logga in på Bilskrotscentralen — välj mellan kundportal och adminportal.",
+  description: "Logga in på Bilskrotscentralen.",
 };
 
-type SearchParams = Promise<{ fel?: string; portal?: string }>;
+type SearchParams = Promise<{ fel?: string }>;
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  // Already logged in? Send them where they belong.
   const session = await getSession();
   if (session) {
-    redirect(session.role === "admin" ? "/admin" : "/konto");
+    redirect(
+      ["admin", "superadmin"].includes(session.role) ? "/admin" : "/konto"
+    );
   }
 
-  const { fel, portal } = await searchParams;
-  const activePortal = portal === "admin" ? "admin" : "customer";
+  const { fel } = await searchParams;
   const hasError = fel === "1";
 
   return (
@@ -36,32 +35,13 @@ export default async function LoginPage({
           Logga in på <span className="gradient-text">Bilskrotscentralen</span>
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)] text-center mb-8">
-          Välj portal och ange dina uppgifter.
+          Ange dina uppgifter för att fortsätta.
         </p>
 
-        {/* Portal toggle */}
-        <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] mb-6">
-          <PortalTab
-            label="Kundportal"
-            sub="För dig som handlar"
-            active={activePortal === "customer"}
-            href="/logga-in?portal=customer"
-          />
-          <PortalTab
-            label="Adminportal"
-            sub="Endast personal"
-            active={activePortal === "admin"}
-            href="/logga-in?portal=admin"
-          />
-        </div>
-
-        {/* Login form */}
         <form
           action={loginAction}
           className="glass rounded-2xl p-6 sm:p-8 space-y-4"
         >
-          <input type="hidden" name="portal" value={activePortal} />
-
           {hasError && (
             <div className="rounded-lg border border-[var(--color-error)]/40 bg-[var(--color-error)]/10 px-4 py-3 text-sm text-[var(--color-error)]">
               Fel användarnamn eller lösenord. Försök igen.
@@ -77,7 +57,6 @@ export default async function LoginPage({
               name="username"
               required
               autoComplete="username"
-              placeholder={activePortal === "admin" ? "admin" : "kund"}
               className="w-full px-4 py-3 bg-[var(--color-dark-800)] border border-[var(--color-dark-500)] rounded-xl text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-brand-orange)] focus:ring-1 focus:ring-[var(--color-brand-orange)] transition-all"
             />
           </div>
@@ -105,37 +84,5 @@ export default async function LoginPage({
         </form>
       </div>
     </section>
-  );
-}
-
-function PortalTab({
-  label,
-  sub,
-  active,
-  href,
-}: {
-  label: string;
-  sub: string;
-  active: boolean;
-  href: string;
-}) {
-  return (
-    <a
-      href={href}
-      className={`rounded-lg px-4 py-3 text-center transition-all ${
-        active
-          ? "bg-[var(--color-brand-orange)] text-white shadow-lg"
-          : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-      }`}
-    >
-      <div className="text-sm font-bold">{label}</div>
-      <div
-        className={`text-[10px] uppercase tracking-wider ${
-          active ? "text-white/80" : "text-[var(--color-text-muted)]"
-        }`}
-      >
-        {sub}
-      </div>
-    </a>
   );
 }
