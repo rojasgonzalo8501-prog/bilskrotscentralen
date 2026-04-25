@@ -26,11 +26,18 @@ export default async function LoginPage({
   const hasError = fel === "1";
 
   return (
-    <section className="relative min-h-[calc(100vh-4rem)] overflow-hidden pt-10 pb-20">
-      <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-dark-900)] via-[#0f0d1a] to-[var(--color-dark-900)]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[var(--color-brand-orange)] opacity-[0.05] rounded-full blur-[120px]" />
+    <section className="relative min-h-[calc(100vh-4rem)] overflow-hidden pt-10 pb-20 flex items-center">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/verkstad-hero.jpeg"
+        alt=""
+        aria-hidden
+        className="absolute inset-0 w-full h-full object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-dark-900)]/90 via-[var(--color-dark-900)]/85 to-[var(--color-dark-900)]/95" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[var(--color-brand-orange)] opacity-[0.07] rounded-full blur-[120px]" />
 
-      <div className="relative max-w-md mx-auto px-4">
+      <div className="relative max-w-md mx-auto px-4 w-full">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2 text-center">
           Logga in på <span className="gradient-text">Bilskrotscentralen</span>
         </h1>
