@@ -6,6 +6,7 @@ import {
   getBrand,
   getModelsForBrand,
 } from "@/lib/codelist";
+import { BreadcrumbJsonLd } from "@/components/JsonLd";
 
 /* ─── Static generation ────────────────────────────────────────────── */
 
@@ -28,8 +29,9 @@ export async function generateMetadata({
   const brand = getBrand(slug);
   if (!brand) return {};
   return {
-    title: `${brand.name} bildelar — ${brand.modelCount} modeller i lager`,
-    description: `Begagnade ${brand.name}-delar till rätt pris. Bläddra ${brand.modelCount} modeller. Fri frakt över 500 kr · Garanti · Leverans 1–3 dagar.`,
+    title: `${brand.name} bildelar i Enköping — ${brand.modelCount} modeller i lager`,
+    description: `Begagnade ${brand.name}-reservdelar från auktoriserad bildemontering i Enköping. ${brand.modelCount} modeller i lager. Leverans till Uppsala, Västerås, Stockholm och hela Mälardalen. Garanti · 1–3 dagar.`,
+    alternates: { canonical: `/bildelar/marken/${brand.slug}` },
   };
 }
 
@@ -49,8 +51,16 @@ export default async function BrandPage({
 
   return (
     <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Hem", url: "/" },
+          { name: "Bildelar", url: "/bildelar" },
+          { name: brand.name, url: `/bildelar/marken/${brand.slug}` },
+        ]}
+      />
       {/* ─── HERO ─── */}
       <section className="relative overflow-hidden pt-10 pb-12">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/motor.jpeg" alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/80" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[var(--color-brand-orange)] opacity-[0.05] rounded-full blur-[120px]" />

@@ -5,6 +5,9 @@ import Image from "next/image";
 import { db } from "@/lib/db";
 import { getBrand } from "@/lib/codelist";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { BreadcrumbJsonLd, ProductJsonLd } from "@/components/JsonLd";
+
+const SITE_URL = "https://bilskrotscentralen.se";
 
 function waText(partName: string, sku: string, prefix: string): string {
   const name = partName.length > 60 ? partName.slice(0, 60) + "…" : partName;
@@ -21,15 +24,25 @@ export async function generateMetadata({
   const { slug } = await params;
   const part = await db.part.findUnique({
     where: { sku: slug },
-    include: { vehicle: true },
+    include: { vehicle: true, images: { take: 1, orderBy: { sortOrder: "asc" } } },
   });
   if (!part) return { title: "Delen hittades inte" };
   const brand = getBrand(part.vehicle.brandSlug);
+  const title = `${part.name} — ${brand?.name ?? part.vehicle.brandSlug} ${part.vehicle.model}${part.vehicle.year ? ` ${part.vehicle.year}` : ""}`;
+  const description = `${part.name} till ${brand?.name ?? ""} ${part.vehicle.model}${
+    part.vehicle.year ? ` ${part.vehicle.year}` : ""
+  }${part.oeNumber ? ` (OE ${part.oeNumber})` : ""}. ${part.priceSek?.toLocaleString("sv-SE") ?? "Pris på förfrågan"} kr · Begagnad originaldel från Bilskrotscentralen i Enköping · Garanti · Leverans 1–3 dagar i hela Sverige.`;
   return {
-    title: `${part.name} — ${brand?.name ?? part.vehicle.brandSlug} ${part.vehicle.model}`,
-    description: `${part.name} till ${brand?.name ?? ""} ${part.vehicle.model}${
-      part.vehicle.year ? ` ${part.vehicle.year}` : ""
-    }. ${part.priceSek?.toLocaleString("sv-SE") ?? "—"} kr · Garanti · Leverans 1–3 dagar.`,
+    title,
+    description,
+    alternates: { canonical: `/bildelar/${part.sku}` },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `${SITE_URL}/bildelar/${part.sku}`,
+      images: part.images?.[0]?.url ? [{ url: part.images[0].url, alt: part.name }] : undefined,
+    },
   };
 }
 
@@ -46,9 +59,35 @@ export default async function PartPage({
   if (!part) notFound();
 
   const brand = getBrand(part.vehicle.brandSlug);
+  const partUrl = `${SITE_URL}/bildelar/${part.sku}`;
+  const breadcrumbs = [
+    { name: "Hem", url: "/" },
+    { name: "Bildelar", url: "/bildelar" },
+    { name: brand?.name ?? part.vehicle.brandSlug, url: `/bildelar/marken/${part.vehicle.brandSlug}` },
+    { name: part.name, url: `/bildelar/${part.sku}` },
+  ];
 
   return (
     <section className="max-w-6xl mx-auto px-4 pt-10 pb-20">
+      <ProductJsonLd
+        product={{
+          name: part.name,
+          sku: part.sku,
+          description: part.notes ?? undefined,
+          imageUrl: part.images[0]?.url
+            ? part.images[0].url.startsWith("http")
+              ? part.images[0].url
+              : `${SITE_URL}${part.images[0].url}`
+            : undefined,
+          brandName: brand?.name ?? part.vehicle.brandSlug,
+          vehicle: { model: part.vehicle.model, year: part.vehicle.year },
+          priceSek: part.priceSek,
+          available: part.status === "AVAILABLE",
+          url: partUrl,
+          oeNumber: part.oeNumber,
+        }}
+      />
+      <BreadcrumbJsonLd items={breadcrumbs} />
       {/* Breadcrumb */}
       <nav className="text-xs text-[var(--color-text-muted)] mb-6 flex items-center gap-2 flex-wrap">
         <Link href="/" className="hover:text-[var(--color-brand-orange)]">Hem</Link>
@@ -148,7 +187,7 @@ export default async function PartPage({
             </>
           )}
 
-          <div className="mt-8 grid grid-cols-2 gap-4 text-sm">
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
             <Spec label="OE-nummer" value={part.oeNumber ?? "—"} />
             <Spec label="Skick" value={conditionLabel(part.condition)} />
             <Spec label="Demonterad ur" value={`${brand?.name ?? part.vehicle.brandSlug} ${part.vehicle.model}`} />
@@ -158,7 +197,7 @@ export default async function PartPage({
           </div>
 
           {/* Trust */}
-          <div className="mt-8 p-4 rounded-xl bg-[var(--color-dark-800)] border border-[var(--color-dark-500)] grid grid-cols-2 gap-3 text-sm">
+          <div className="mt-8 p-4 rounded-xl bg-[var(--color-dark-800)] border border-[var(--color-dark-500)] grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-sm">
             <div className="flex items-center gap-2">🛡️ <span>Garanti på alla delar</span></div>
             <div className="flex items-center gap-2">🚚 <span>Leverans 1–3 dagar</span></div>
             <a

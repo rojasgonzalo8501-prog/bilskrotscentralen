@@ -1,5 +1,7 @@
 import { MetadataRoute } from "next";
 import { db } from "@/lib/db";
+import { CATEGORIES } from "@/lib/categories";
+import { getBrands } from "@/lib/codelist";
 
 const BASE = "https://bilskrotscentralen.se";
 
@@ -12,6 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/nya-bildelar`,            priority: 0.8,  changeFrequency: "daily"   },
     { url: `${BASE}/mercedes`,                priority: 0.9,  changeFrequency: "weekly"  },
     { url: `${BASE}/mercedes/luftfjadring`,   priority: 0.8,  changeFrequency: "weekly"  },
+    { url: `${BASE}/bilrutor`,                priority: 0.7,  changeFrequency: "monthly" },
     { url: `${BASE}/skrota-bilen`,            priority: 0.8,  changeFrequency: "monthly" },
     { url: `${BASE}/verkstad`,                priority: 0.7,  changeFrequency: "monthly" },
     { url: `${BASE}/eftersok`,                priority: 0.7,  changeFrequency: "monthly" },
@@ -24,6 +27,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/integritetspolicy`,       priority: 0.4,  changeFrequency: "yearly"  },
   ];
 
+  const categoryRoutes: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
+    url: `${BASE}/bildelar/kategorier/${c.slug}`,
+    priority: 0.7,
+    changeFrequency: "weekly" as const,
+  }));
+
+  const brandRoutes: MetadataRoute.Sitemap = getBrands().map((b) => ({
+    url: `${BASE}/bildelar/marken/${b.slug}`,
+    priority: 0.7,
+    changeFrequency: "weekly" as const,
+  }));
+
   // Dynamic part pages
   let partRoutes: MetadataRoute.Sitemap = [];
   try {
@@ -34,12 +49,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     partRoutes = parts.map((p) => ({
       url: `${BASE}/bildelar/${p.sku}`,
       lastModified: p.updatedAt,
-      priority: 0.7,
+      priority: 0.6,
       changeFrequency: "weekly" as const,
     }));
   } catch {
     // DB unavailable at build time — skip dynamic routes
   }
 
-  return [...staticRoutes, ...partRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...brandRoutes, ...partRoutes];
 }

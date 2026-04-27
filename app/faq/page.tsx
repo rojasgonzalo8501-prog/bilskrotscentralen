@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FaqJsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
   title: "Vanliga frågor (FAQ) — Bilskrotscentralen i Sverige AB",
   description:
     "Svar på de vanligaste frågorna om begagnade bildelar, garanti, retur, leverans, betalning och bilskrotning hos Bilskrotscentralen i Sverige AB.",
+  alternates: { canonical: "/faq" },
 };
 
 const FAQ_GROUPS: { title: string; items: { q: string; a: string }[] }[] = [
@@ -154,9 +156,12 @@ const FAQ_GROUPS: { title: string; items: { q: string; a: string }[] }[] = [
 ];
 
 export default function FAQPage() {
+  const allFaqs = FAQ_GROUPS.flatMap((g) => g.items.map((i) => ({ question: i.q, answer: i.a })));
   return (
     <>
+      <FaqJsonLd items={allFaqs} />
       <section className="relative overflow-hidden pt-10 pb-12">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/diagnos.jpeg" alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/80" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[var(--color-brand-orange)] opacity-[0.05] rounded-full blur-[120px]" />

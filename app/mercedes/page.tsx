@@ -86,19 +86,19 @@ export default async function MercedesPage() {
             därför hittar du delar ingen annan har, till priser ingen annan kan matcha.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-10">
-            <a href="/mercedes/luftfjadring" className="btn-primary text-base px-6 py-3 rounded-xl">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 mb-10">
+            <a href="/mercedes/luftfjadring" className="btn-primary text-base px-6 py-3 rounded-xl text-center">
               🔧 Luftfjädring →
             </a>
-            <Link href="/bildelar?marke=mercedes-benz" className="btn-secondary text-base px-6 py-3 rounded-xl">
+            <Link href="/bildelar?marke=mercedes-benz" className="btn-secondary text-base px-6 py-3 rounded-xl text-center">
               Alla Mercedes-delar
             </Link>
-            <a href="/eftersok" className="btn-secondary text-base px-6 py-3 rounded-xl">
+            <a href="/eftersok" className="btn-secondary text-base px-6 py-3 rounded-xl text-center">
               Hitta en del åt mig
             </a>
           </div>
 
-          <div className="flex justify-center gap-8 sm:gap-12 text-center">
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-3 sm:gap-x-8 lg:gap-x-12 text-center">
             {[
               { value: mercCount, label: "Mercedes-delar" },
               { value: "40 år", label: "MB-erfarenhet" },

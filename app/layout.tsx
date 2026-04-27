@@ -1,33 +1,75 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { getSession } from "@/lib/auth";
 import { CartProvider } from "@/components/CartContext";
 import Header from "@/components/Header";
+import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#ea580c",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://bilskrotscentralen.se"),
   title: {
-    default: "Bilskrotscentralen — Bildelar till rätt pris | Mercedes-specialist sedan 1984",
-    template: "%s | Bilskrotscentralen",
+    default: "Bilskrotscentralen Enköping — Begagnade bildelar | Mercedes-specialist sedan 1984",
+    template: "%s | Bilskrotscentralen Enköping",
   },
   description:
-    "Sveriges mest pålitliga källa för begagnade bildelar. Mercedes-specialist med 40 års erfarenhet. 30 000+ delar i lager. Fri frakt över 500 kr.",
+    "Bildemontering i Enköping med 30 000+ begagnade bildelar i lager. Mercedes-specialist sedan 1984. Fri hämtning av skrotbilar i Mälardalen — Uppsala, Västerås, Stockholm, Eskilstuna. Garanti, Klarna & Swish.",
   keywords: [
-    "bildelar",
-    "begagnade bildelar",
+    "bildelar Enköping",
+    "begagnade bildelar Mälardalen",
     "Mercedes bildelar",
     "luftfjädring Mercedes",
-    "bilskrot",
-    "bildemontering",
-    "Enköping",
-    "Mälardalen",
+    "bilskrot Enköping",
+    "bildemontering Enköping",
+    "skrota bilen Uppsala",
+    "skrota bilen Västerås",
+    "skrota bilen Stockholm",
+    "reservdelar Mercedes-Benz",
   ],
+  alternates: {
+    canonical: "/",
+    languages: { "sv-SE": "/" },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
   openGraph: {
-    title: "Bilskrotscentralen — Bildelar till rätt pris",
-    description: "30 000+ bildelar i lager. Mercedes-specialist sedan 1984. Fri frakt, Klarna/Swish.",
+    title: "Bilskrotscentralen Enköping — Bildelar till rätt pris",
+    description: "30 000+ begagnade bildelar i lager. Mercedes-specialist sedan 1984. Fri hämtning i hela Mälardalen.",
     type: "website",
     locale: "sv_SE",
-    images: [{ url: "/images/mercedes-hero.jpeg", width: 1200, height: 630, alt: "Bilskrotscentralen bildemontering" }],
+    siteName: "Bilskrotscentralen",
+    url: "https://bilskrotscentralen.se",
+    images: [{ url: "/images/mercedes-hero.jpeg", width: 1200, height: 630, alt: "Bilskrotscentralen bildemontering Enköping" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bilskrotscentralen Enköping — Bildelar till rätt pris",
+    description: "30 000+ begagnade bildelar. Mercedes-specialist sedan 1984. Fri hämtning i Mälardalen.",
+    images: ["/images/mercedes-hero.jpeg"],
+  },
+  applicationName: "Bilskrotscentralen",
+  authors: [{ name: "Bilskrotscentralen i Sverige AB" }],
+  creator: "Bilskrotscentralen i Sverige AB",
+  publisher: "Bilskrotscentralen i Sverige AB",
+  category: "Bildemontering",
+  formatDetection: {
+    telephone: true,
+    address: true,
+    email: true,
   },
 };
 
@@ -48,6 +90,10 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+        <link rel="canonical" href="https://bilskrotscentralen.se" />
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
+        <LocalBusinessJsonLd />
       </head>
       <body className="antialiased">
         <CartProvider>
@@ -64,8 +110,8 @@ export default async function RootLayout({
 function Footer() {
   return (
     <footer className="border-t border-[var(--color-dark-500)] bg-[var(--color-dark-900)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">

@@ -63,6 +63,7 @@ export default function AdminSidebar({
 
   // Close drawer on route change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     setOpen(false);
   }, [path]);
 

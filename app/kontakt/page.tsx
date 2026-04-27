@@ -63,7 +63,7 @@ export default function KontaktPage() {
           />
         </div>
 
-        <div className="mt-12 glass rounded-2xl p-8">
+        <div className="mt-12 glass rounded-2xl p-6 sm:p-8">
           <h2 className="text-xl font-bold mb-4">Öppettider</h2>
           <table className="w-full text-sm">
             <tbody className="text-[var(--color-text-secondary)]">
@@ -81,6 +81,34 @@ export default function KontaktPage() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Google Maps embed */}
+        <div className="mt-12">
+          <h2 className="text-xl font-bold mb-4">Hitta hit</h2>
+          <div className="rounded-2xl overflow-hidden border border-[var(--color-dark-500)] aspect-[4/3] sm:aspect-[16/9]">
+            <iframe
+              src="https://www.google.com/maps?q=Magasingatan+2,+749+35+Enk%C3%B6ping&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              title="Bilskrotscentralen, Magasingatan 2, Enköping"
+            />
+          </div>
+          <p className="text-xs text-[var(--color-text-muted)] mt-3">
+            Bilskrotscentralen i Sverige AB · Magasingatan 2, 749 35 Enköping ·{" "}
+            <a
+              href="https://maps.google.com/?q=Magasingatan+2+Enk%C3%B6ping"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--color-brand-orange)] hover:underline"
+            >
+              Öppna i Google Maps →
+            </a>
+          </p>
         </div>
       </section>
     </>

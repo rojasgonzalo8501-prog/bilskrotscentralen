@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CATEGORIES, getAllCategorySlugs, getCategory } from "@/lib/categories";
 import { db } from "@/lib/db";
 import { getBrand } from "@/lib/codelist";
+import { BreadcrumbJsonLd } from "@/components/JsonLd";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +21,9 @@ export async function generateMetadata({
   const cat = getCategory(kategori);
   if (!cat) return {};
   return {
-    title: `${cat.name} — begagnade bildelar`,
-    description: `${cat.name}: ${cat.blurb} ${cat.estimatedCount.toLocaleString("sv-SE")} delar i lager.`,
+    title: `${cat.name} — begagnade bildelar i Enköping`,
+    description: `${cat.name}: ${cat.blurb} ${cat.estimatedCount.toLocaleString("sv-SE")} delar i lager hos Bilskrotscentralen i Enköping. Leverans till Uppsala, Västerås, Stockholm och hela Mälardalen.`,
+    alternates: { canonical: `/bildelar/kategorier/${cat.slug}` },
   };
 }
 
@@ -48,7 +50,16 @@ export default async function CategoryPage({
 
   return (
     <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Hem", url: "/" },
+          { name: "Bildelar", url: "/bildelar" },
+          { name: "Kategorier", url: "/bildelar/kategorier" },
+          { name: cat.name, url: `/bildelar/kategorier/${cat.slug}` },
+        ]}
+      />
       <section className="relative overflow-hidden pt-10 pb-12">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/motor.jpeg" alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/80" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[var(--color-brand-orange)] opacity-[0.05] rounded-full blur-[120px]" />
