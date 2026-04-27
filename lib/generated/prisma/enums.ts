@@ -50,7 +50,8 @@ export type PartStatus = (typeof PartStatus)[keyof typeof PartStatus]
 
 export const PaymentMethod = {
   KLARNA: 'KLARNA',
-  SWISH: 'SWISH'
+  SWISH: 'SWISH',
+  NETS_EASY: 'NETS_EASY'
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

@@ -59,6 +59,7 @@ export type OrderMinAggregateOutputType = {
   paymentStatus: $Enums.PaymentStatus | null
   klarnaOrderId: string | null
   swishPaymentRequestToken: string | null
+  netsPaymentId: string | null
   status: $Enums.OrderStatus | null
   notes: string | null
   createdAt: Date | null
@@ -84,6 +85,7 @@ export type OrderMaxAggregateOutputType = {
   paymentStatus: $Enums.PaymentStatus | null
   klarnaOrderId: string | null
   swishPaymentRequestToken: string | null
+  netsPaymentId: string | null
   status: $Enums.OrderStatus | null
   notes: string | null
   createdAt: Date | null
@@ -109,6 +111,7 @@ export type OrderCountAggregateOutputType = {
   paymentStatus: number
   klarnaOrderId: number
   swishPaymentRequestToken: number
+  netsPaymentId: number
   status: number
   notes: number
   createdAt: number
@@ -150,6 +153,7 @@ export type OrderMinAggregateInputType = {
   paymentStatus?: true
   klarnaOrderId?: true
   swishPaymentRequestToken?: true
+  netsPaymentId?: true
   status?: true
   notes?: true
   createdAt?: true
@@ -175,6 +179,7 @@ export type OrderMaxAggregateInputType = {
   paymentStatus?: true
   klarnaOrderId?: true
   swishPaymentRequestToken?: true
+  netsPaymentId?: true
   status?: true
   notes?: true
   createdAt?: true
@@ -200,6 +205,7 @@ export type OrderCountAggregateInputType = {
   paymentStatus?: true
   klarnaOrderId?: true
   swishPaymentRequestToken?: true
+  netsPaymentId?: true
   status?: true
   notes?: true
   createdAt?: true
@@ -312,6 +318,7 @@ export type OrderGroupByOutputType = {
   paymentStatus: $Enums.PaymentStatus
   klarnaOrderId: string | null
   swishPaymentRequestToken: string | null
+  netsPaymentId: string | null
   status: $Enums.OrderStatus
   notes: string | null
   createdAt: Date
@@ -360,6 +367,7 @@ export type OrderWhereInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFilter<"Order"> | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.StringNullableFilter<"Order"> | string | null
   swishPaymentRequestToken?: Prisma.StringNullableFilter<"Order"> | string | null
+  netsPaymentId?: Prisma.StringNullableFilter<"Order"> | string | null
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   notes?: Prisma.StringNullableFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
@@ -387,6 +395,7 @@ export type OrderOrderByWithRelationInput = {
   paymentStatus?: Prisma.SortOrder
   klarnaOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   swishPaymentRequestToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  netsPaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -417,6 +426,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   paymentStatus?: Prisma.EnumPaymentStatusFilter<"Order"> | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.StringNullableFilter<"Order"> | string | null
   swishPaymentRequestToken?: Prisma.StringNullableFilter<"Order"> | string | null
+  netsPaymentId?: Prisma.StringNullableFilter<"Order"> | string | null
   status?: Prisma.EnumOrderStatusFilter<"Order"> | $Enums.OrderStatus
   notes?: Prisma.StringNullableFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
@@ -444,6 +454,7 @@ export type OrderOrderByWithAggregationInput = {
   paymentStatus?: Prisma.SortOrder
   klarnaOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   swishPaymentRequestToken?: Prisma.SortOrderInput | Prisma.SortOrder
+  netsPaymentId?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -477,6 +488,7 @@ export type OrderScalarWhereWithAggregatesInput = {
   paymentStatus?: Prisma.EnumPaymentStatusWithAggregatesFilter<"Order"> | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   swishPaymentRequestToken?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  netsPaymentId?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   status?: Prisma.EnumOrderStatusWithAggregatesFilter<"Order"> | $Enums.OrderStatus
   notes?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
@@ -502,6 +514,7 @@ export type OrderCreateInput = {
   paymentStatus?: $Enums.PaymentStatus
   klarnaOrderId?: string | null
   swishPaymentRequestToken?: string | null
+  netsPaymentId?: string | null
   status?: $Enums.OrderStatus
   notes?: string | null
   createdAt?: Date | string
@@ -529,6 +542,7 @@ export type OrderUncheckedCreateInput = {
   paymentStatus?: $Enums.PaymentStatus
   klarnaOrderId?: string | null
   swishPaymentRequestToken?: string | null
+  netsPaymentId?: string | null
   status?: $Enums.OrderStatus
   notes?: string | null
   createdAt?: Date | string
@@ -556,6 +570,7 @@ export type OrderUpdateInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -583,6 +598,7 @@ export type OrderUncheckedUpdateInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -610,6 +626,7 @@ export type OrderCreateManyInput = {
   paymentStatus?: $Enums.PaymentStatus
   klarnaOrderId?: string | null
   swishPaymentRequestToken?: string | null
+  netsPaymentId?: string | null
   status?: $Enums.OrderStatus
   notes?: string | null
   createdAt?: Date | string
@@ -635,6 +652,7 @@ export type OrderUpdateManyMutationInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -660,6 +678,7 @@ export type OrderUncheckedUpdateManyInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -685,6 +704,7 @@ export type OrderCountOrderByAggregateInput = {
   paymentStatus?: Prisma.SortOrder
   klarnaOrderId?: Prisma.SortOrder
   swishPaymentRequestToken?: Prisma.SortOrder
+  netsPaymentId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -717,6 +737,7 @@ export type OrderMaxOrderByAggregateInput = {
   paymentStatus?: Prisma.SortOrder
   klarnaOrderId?: Prisma.SortOrder
   swishPaymentRequestToken?: Prisma.SortOrder
+  netsPaymentId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -742,6 +763,7 @@ export type OrderMinOrderByAggregateInput = {
   paymentStatus?: Prisma.SortOrder
   klarnaOrderId?: Prisma.SortOrder
   swishPaymentRequestToken?: Prisma.SortOrder
+  netsPaymentId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -826,6 +848,7 @@ export type OrderCreateWithoutItemsInput = {
   paymentStatus?: $Enums.PaymentStatus
   klarnaOrderId?: string | null
   swishPaymentRequestToken?: string | null
+  netsPaymentId?: string | null
   status?: $Enums.OrderStatus
   notes?: string | null
   createdAt?: Date | string
@@ -852,6 +875,7 @@ export type OrderUncheckedCreateWithoutItemsInput = {
   paymentStatus?: $Enums.PaymentStatus
   klarnaOrderId?: string | null
   swishPaymentRequestToken?: string | null
+  netsPaymentId?: string | null
   status?: $Enums.OrderStatus
   notes?: string | null
   createdAt?: Date | string
@@ -894,6 +918,7 @@ export type OrderUpdateWithoutItemsInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -920,6 +945,7 @@ export type OrderUncheckedUpdateWithoutItemsInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -946,6 +972,7 @@ export type OrderCreateWithoutInvoicesInput = {
   paymentStatus?: $Enums.PaymentStatus
   klarnaOrderId?: string | null
   swishPaymentRequestToken?: string | null
+  netsPaymentId?: string | null
   status?: $Enums.OrderStatus
   notes?: string | null
   createdAt?: Date | string
@@ -972,6 +999,7 @@ export type OrderUncheckedCreateWithoutInvoicesInput = {
   paymentStatus?: $Enums.PaymentStatus
   klarnaOrderId?: string | null
   swishPaymentRequestToken?: string | null
+  netsPaymentId?: string | null
   status?: $Enums.OrderStatus
   notes?: string | null
   createdAt?: Date | string
@@ -1014,6 +1042,7 @@ export type OrderUpdateWithoutInvoicesInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1040,6 +1069,7 @@ export type OrderUncheckedUpdateWithoutInvoicesInput = {
   paymentStatus?: Prisma.EnumPaymentStatusFieldUpdateOperationsInput | $Enums.PaymentStatus
   klarnaOrderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   swishPaymentRequestToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  netsPaymentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumOrderStatusFieldUpdateOperationsInput | $Enums.OrderStatus
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1106,6 +1136,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   paymentStatus?: boolean
   klarnaOrderId?: boolean
   swishPaymentRequestToken?: boolean
+  netsPaymentId?: boolean
   status?: boolean
   notes?: boolean
   createdAt?: boolean
@@ -1134,6 +1165,7 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   paymentStatus?: boolean
   klarnaOrderId?: boolean
   swishPaymentRequestToken?: boolean
+  netsPaymentId?: boolean
   status?: boolean
   notes?: boolean
   createdAt?: boolean
@@ -1159,6 +1191,7 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   paymentStatus?: boolean
   klarnaOrderId?: boolean
   swishPaymentRequestToken?: boolean
+  netsPaymentId?: boolean
   status?: boolean
   notes?: boolean
   createdAt?: boolean
@@ -1184,13 +1217,14 @@ export type OrderSelectScalar = {
   paymentStatus?: boolean
   klarnaOrderId?: boolean
   swishPaymentRequestToken?: boolean
+  netsPaymentId?: boolean
   status?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "email" | "phone" | "firstName" | "lastName" | "address" | "postalCode" | "city" | "country" | "subtotalSek" | "shippingSek" | "vatSek" | "totalSek" | "paymentMethod" | "paymentStatus" | "klarnaOrderId" | "swishPaymentRequestToken" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderNumber" | "email" | "phone" | "firstName" | "lastName" | "address" | "postalCode" | "city" | "country" | "subtotalSek" | "shippingSek" | "vatSek" | "totalSek" | "paymentMethod" | "paymentStatus" | "klarnaOrderId" | "swishPaymentRequestToken" | "netsPaymentId" | "status" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   items?: boolean | Prisma.Order$itemsArgs<ExtArgs>
   invoices?: boolean | Prisma.Order$invoicesArgs<ExtArgs>
@@ -1224,6 +1258,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     paymentStatus: $Enums.PaymentStatus
     klarnaOrderId: string | null
     swishPaymentRequestToken: string | null
+    netsPaymentId: string | null
     status: $Enums.OrderStatus
     notes: string | null
     createdAt: Date
@@ -1671,6 +1706,7 @@ export interface OrderFieldRefs {
   readonly paymentStatus: Prisma.FieldRef<"Order", 'PaymentStatus'>
   readonly klarnaOrderId: Prisma.FieldRef<"Order", 'String'>
   readonly swishPaymentRequestToken: Prisma.FieldRef<"Order", 'String'>
+  readonly netsPaymentId: Prisma.FieldRef<"Order", 'String'>
   readonly status: Prisma.FieldRef<"Order", 'OrderStatus'>
   readonly notes: Prisma.FieldRef<"Order", 'String'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>

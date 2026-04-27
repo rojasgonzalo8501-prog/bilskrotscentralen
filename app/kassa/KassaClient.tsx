@@ -5,7 +5,29 @@ import Link from "next/link";
 import { useCart } from "@/components/CartContext";
 import type { Session } from "@/lib/auth";
 
-type PaymentMethod = "KLARNA" | "SWISH";
+type PaymentMethod = "NETS_EASY" | "KLARNA" | "SWISH";
+
+declare global {
+  interface Window {
+    Dibs?: {
+      Checkout: new (opts: {
+        checkoutKey: string;
+        paymentId: string;
+        containerId: string;
+        language?: string;
+      }) => {
+        on: (event: string, cb: (data: unknown) => void) => void;
+      };
+    };
+  }
+}
+
+const NETS_CHECKOUT_JS =
+  (process.env.NEXT_PUBLIC_NETS_EASY_ENV ?? "test").toLowerCase() === "live"
+    ? "https://checkout.dibspayment.eu/checkout.js"
+    : "https://test.checkout.dibspayment.eu/checkout.js";
+
+const NETS_CHECKOUT_KEY = process.env.NEXT_PUBLIC_NETS_EASY_CHECKOUT_KEY ?? "";
 
 interface CustomerForm {
   email: string;
@@ -31,7 +53,7 @@ export function KassaClient({ session }: { session: Session | null }) {
     }
     return EMPTY_FORM;
   });
-  const [method, setMethod] = useState<PaymentMethod>("KLARNA");
+  const [method, setMethod] = useState<PaymentMethod>("NETS_EASY");
   const [step, setStep] = useState<"auth" | "cart" | "info" | "payment">(
     session ? "cart" : "auth"
   );
@@ -41,6 +63,8 @@ export function KassaClient({ session }: { session: Session | null }) {
   const [klarnaSnippet, setKlarnaSnippet] = useState("");
   const [swishOrderNumber, setSwishOrderNumber] = useState("");
   const [swishPending, setSwishPending] = useState(false);
+  const [netsPaymentId, setNetsPaymentId] = useState("");
+  const [netsOrderNumber, setNetsOrderNumber] = useState("");
 
   const shipping = total >= 500 ? 0 : 99;
   const grandTotal = total + shipping;
@@ -73,7 +97,17 @@ export function KassaClient({ session }: { session: Session | null }) {
     };
 
     try {
-      if (method === "KLARNA") {
+      if (method === "NETS_EASY") {
+        const res = await fetch("/api/checkout/nets", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Nets-fel");
+        setNetsPaymentId(data.paymentId);
+        setNetsOrderNumber(data.orderNumber);
+        setStep("payment");
+      } else if (method === "KLARNA") {
         const res = await fetch("/api/checkout/klarna", {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -113,6 +147,41 @@ export function KassaClient({ session }: { session: Session | null }) {
       old.parentNode?.replaceChild(s, old);
     });
   }, [klarnaSnippet]);
+
+  // Nets Easy embedded checkout
+  useEffect(() => {
+    if (!netsPaymentId) return;
+    if (!NETS_CHECKOUT_KEY) {
+      setError("Nets-checkout är inte konfigurerad ännu (saknar publik nyckel).");
+      return;
+    }
+
+    function mount() {
+      if (!window.Dibs) return;
+      const checkout = new window.Dibs.Checkout({
+        checkoutKey: NETS_CHECKOUT_KEY,
+        paymentId: netsPaymentId,
+        containerId: "nets-checkout-container",
+        language: "sv-SE",
+      });
+      checkout.on("payment-completed", () => {
+        clearCart();
+        window.location.href = `/kassa/bekraftelse?nets_payment_id=${netsPaymentId}`;
+      });
+    }
+
+    if (window.Dibs) {
+      mount();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = NETS_CHECKOUT_JS;
+    script.async = true;
+    script.onload = mount;
+    script.onerror = () => setError("Kunde inte ladda Nets-checkout.");
+    document.head.appendChild(script);
+  }, [netsPaymentId, clearCart]);
 
   if (count === 0 && step === "cart") {
     return (
@@ -214,6 +283,23 @@ export function KassaClient({ session }: { session: Session | null }) {
       {/* ─── Payment views ─── */}
       {step === "payment" && (
         <div className="mb-8">
+          {method === "NETS_EASY" && (
+            <div>
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <h2 className="text-lg font-bold">Betala</h2>
+                {netsOrderNumber && (
+                  <span className="text-xs text-[var(--color-text-muted)]">Order #{netsOrderNumber}</span>
+                )}
+              </div>
+              <div
+                id="nets-checkout-container"
+                className="rounded-xl overflow-hidden bg-white min-h-[600px]"
+              />
+              <p className="mt-3 text-xs text-[var(--color-text-muted)] text-center">
+                🔒 Säker betalning via Nets Easy · Kort, Swish, faktura och delbetalning
+              </p>
+            </div>
+          )}
           {method === "KLARNA" && (
             <div>
               <h2 className="text-lg font-bold mb-4">Betala med Klarna</h2>
@@ -281,9 +367,15 @@ export function KassaClient({ session }: { session: Session | null }) {
 
                 <div className="border-t border-[var(--color-dark-500)] pt-5">
                   <h2 className="font-bold text-lg mb-4">Betalningsmetod</h2>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    <PayMethodCard id="KLARNA" active={method === "KLARNA"} onSelect={() => setMethod("KLARNA")} icon="🟡" title="Klarna" desc="Faktura, delbetalning eller kort" />
-                    <PayMethodCard id="SWISH" active={method === "SWISH"} onSelect={() => setMethod("SWISH")} icon="📱" title="Swish" desc="Betala direkt från mobilen" />
+                  <div className="grid sm:grid-cols-1 gap-3">
+                    <PayMethodCard
+                      id="NETS_EASY"
+                      active={method === "NETS_EASY"}
+                      onSelect={() => setMethod("NETS_EASY")}
+                      icon="💳"
+                      title="Kort, Swish & faktura"
+                      desc="Visa, Mastercard, Swish, Klarna faktura och delbetalning — säker checkout via Nets"
+                    />
                   </div>
                 </div>
 
@@ -303,6 +395,7 @@ export function KassaClient({ session }: { session: Session | null }) {
                     className="btn-primary px-8 py-3 flex-1 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {loading ? "Väntar…"
+                      : method === "NETS_EASY" ? "Fortsätt till betalning →"
                       : method === "KLARNA" ? "Fortsätt till Klarna →"
                       : "Skicka Swish-begäran →"}
                   </button>

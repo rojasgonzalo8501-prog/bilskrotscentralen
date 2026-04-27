@@ -163,6 +163,7 @@ model Order {
   paymentStatus PaymentStatus @default(PENDING)
   klarnaOrderId            String?
   swishPaymentRequestToken String?
+  netsPaymentId            String?
 
   status   OrderStatus @default(PENDING)
   notes    String?
@@ -177,11 +178,13 @@ model Order {
   @@index([status])
   @@index([paymentStatus])
   @@index([createdAt])
+  @@index([netsPaymentId])
 }
 
 enum PaymentMethod {
   KLARNA
   SWISH
+  NETS_EASY
 }
 
 enum PaymentStatus {

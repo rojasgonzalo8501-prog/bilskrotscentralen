@@ -160,6 +160,7 @@ export const OrderScalarFieldEnum = {
   paymentStatus: 'paymentStatus',
   klarnaOrderId: 'klarnaOrderId',
   swishPaymentRequestToken: 'swishPaymentRequestToken',
+  netsPaymentId: 'netsPaymentId',
   status: 'status',
   notes: 'notes',
   createdAt: 'createdAt',

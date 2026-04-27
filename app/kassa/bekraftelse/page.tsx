@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { getPayment, isPaymentSuccessful } from "@/lib/nets";
+import { createInvoiceFromOrder } from "@/lib/invoice-utils";
 
 export const metadata: Metadata = {
   title: "Orderbekräftelse — Bilskrotscentralen",
@@ -11,13 +13,14 @@ export const dynamic = "force-dynamic";
 export default async function BekraftelsePage({
   searchParams,
 }: {
-  searchParams: Promise<{ order?: string; klarna_order_id?: string }>;
+  searchParams: Promise<{ order?: string; klarna_order_id?: string; nets_payment_id?: string; paymentId?: string }>;
 }) {
   const params = await searchParams;
   const orderNumber = params.order;
   const klarnaOrderId = params.klarna_order_id;
+  const netsPaymentId = params.nets_payment_id ?? params.paymentId;
 
-  // Look up order by number or by klarna ID
+  // Look up order by number, klarna ID, or nets paymentId
   let order = null;
   if (orderNumber) {
     order = await db.order.findFirst({
@@ -29,6 +32,41 @@ export default async function BekraftelsePage({
       where: { klarnaOrderId },
       include: { items: true },
     });
+  } else if (netsPaymentId) {
+    order = await db.order.findFirst({
+      where: { netsPaymentId },
+      include: { items: true },
+    });
+
+    // If the webhook hasn't fired yet, verify directly against Nets so the
+    // user sees the correct status as soon as the redirect lands.
+    if (order && order.paymentStatus !== "PAID") {
+      try {
+        const remote = await getPayment(netsPaymentId);
+        if (isPaymentSuccessful(remote)) {
+          await db.order.update({
+            where: { id: order.id },
+            data: { paymentStatus: "PAID", status: "CONFIRMED" },
+          });
+          await Promise.all(
+            order.items.map((it) =>
+              db.part.update({ where: { id: it.partId }, data: { status: "RESERVED" } })
+            )
+          );
+          try {
+            await createInvoiceFromOrder(order.id);
+          } catch (e) {
+            console.error("[bekraftelse] invoice creation failed:", e);
+          }
+          order = await db.order.findFirst({
+            where: { id: order.id },
+            include: { items: true },
+          });
+        }
+      } catch (e) {
+        console.error("[bekraftelse] Nets status check failed:", e);
+      }
+    }
   }
 
   if (!order) {
