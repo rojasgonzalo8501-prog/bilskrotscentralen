@@ -21,10 +21,13 @@ export default function Header({ session }: { session: Session | null }) {
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-dark-800)] border-b border-[var(--color-dark-600)] shadow-sm">
       {/* ─── Announcement bar ─── */}
-      <div className="bg-[var(--color-dark-900)] text-[var(--color-text-muted)] text-xs py-1.5 px-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <span>📍 Magasingatan 2, Enköping — Gratis upphämtning i hela Mälardalen</span>
-          <div className="flex gap-4 items-center">
+      <div className="bg-[var(--color-dark-900)] text-[var(--color-text-muted)] text-[11px] sm:text-xs py-1.5 px-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center gap-2">
+          <span className="truncate">
+            <span className="hidden sm:inline">📍 Magasingatan 2, Enköping — Gratis upphämtning i hela Mälardalen</span>
+            <span className="sm:hidden">📍 Enköping — Gratis upphämtning</span>
+          </span>
+          <div className="flex gap-3 sm:gap-4 items-center shrink-0">
             <a href="tel:+46171210002" className="flex items-center gap-1.5 hover:text-[var(--color-brand-orange)] transition-colors">
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
@@ -42,11 +45,12 @@ export default function Header({ session }: { session: Session | null }) {
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <img src="/logo.png" alt="Bilskrotscentralen" className="w-40 h-40 object-contain" />
-          <div className="leading-tight">
-            <div className="font-black text-[var(--color-text-primary)] text-sm tracking-tight">BILSKROTSCENTRALEN</div>
-            <div className="text-xs text-[var(--color-text-muted)]">Bildemontering &amp; Reservdelar</div>
+        <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Bilskrotscentralen" className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 object-contain shrink-0" />
+          <div className="leading-tight min-w-0">
+            <div className="font-black text-[var(--color-text-primary)] text-[11px] sm:text-sm tracking-tight truncate">BILSKROTSCENTRALEN</div>
+            <div className="text-[10px] sm:text-xs text-[var(--color-text-muted)] truncate hidden sm:block">Bildemontering &amp; Reservdelar</div>
           </div>
         </Link>
 

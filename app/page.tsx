@@ -71,7 +71,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ─── HERO — split layout ─── */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden pt-16">
+      <section className="relative min-h-[70vh] sm:min-h-[90vh] flex items-center overflow-hidden pt-12 pb-12 sm:pt-16">
         {/* Background photo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/verkstad-hero.jpeg" alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-center" />
@@ -103,14 +103,14 @@ export default async function HomePage() {
               <HeroSearch popularTerms={popularTerms} />
 
               {/* Quick stats */}
-              <div className="flex gap-6 mt-6">
+              <div className="flex flex-wrap gap-x-4 gap-y-3 sm:gap-6 mt-6">
                 {[
                   { value: "30 000+", label: "Delar i lager" },
                   { value: "40 år",   label: "Erfarenhet" },
                   { value: "1–3 dagar", label: "Leveranstid" },
                 ].map((s) => (
                   <div key={s.label}>
-                    <div className="text-lg font-black text-[var(--color-brand-orange)]">{s.value}</div>
+                    <div className="text-base sm:text-lg font-black text-[var(--color-brand-orange)]">{s.value}</div>
                     <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider">{s.label}</div>
                   </div>
                 ))}
@@ -124,7 +124,7 @@ export default async function HomePage() {
       {/* ─── TRUST BAR ─── */}
       <section className="border-y border-[var(--color-dark-500)] bg-[var(--color-dark-800)]">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2">
+          <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-8 gap-y-1.5">
             {[
               { icon: "🚚", text: "Fri frakt över 500 kr" },
               { icon: "✅", text: "Garanti på alla delar" },
@@ -156,13 +156,13 @@ export default async function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col gap-3">
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     placeholder="Registreringsnummer"
                     className="flex-1 px-4 py-3 bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] rounded-xl text-sm placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-brand-orange)] transition-all"
                   />
-                  <Link href="/skrota-bilen#boka" className="btn-primary px-5 py-3 rounded-xl text-sm whitespace-nowrap inline-flex items-center">
+                  <Link href="/skrota-bilen#boka" className="btn-primary px-5 py-3 rounded-xl text-sm whitespace-nowrap inline-flex items-center justify-center">
                     Boka hämtning
                   </Link>
                 </div>
@@ -229,9 +229,9 @@ export default async function HomePage() {
                 </p>
               </div>
               <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-2 gap-3 mb-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-2">
                   {["Vindruta", "Bakruta", "Sidoruta", "Taklucka"].map((type) => (
-                    <div key={type} className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[var(--color-dark-600)] border border-[var(--color-dark-500)] text-sm font-medium">
+                    <div key={type} className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[var(--color-dark-600)] border border-[var(--color-dark-500)] text-xs sm:text-sm font-medium">
                       <span className="text-[var(--color-brand-orange)]">🪟</span> {type}
                     </div>
                   ))}
@@ -260,7 +260,7 @@ export default async function HomePage() {
               Alla märken →
             </Link>
           </div>
-          <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3">
             {BRANDS.map((brand) => (
               <Link
                 key={brand.slug}

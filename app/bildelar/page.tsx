@@ -108,7 +108,7 @@ export default async function BildelarPage({
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-3">
             Alla <span className="gradient-text">bildelar</span>
           </h1>
-          <p className="text-[var(--color-text-secondary)] text-lg max-w-2xl mb-8">
+          <p className="text-[var(--color-text-secondary)] text-base sm:text-lg max-w-2xl mb-6 sm:mb-8">
             {totalAvailable.toLocaleString("sv-SE")} delar tillgängliga · Begagnade originaldelar
             med garanti.
           </p>
@@ -227,12 +227,12 @@ export default async function BildelarPage({
               aktivMarke={marke}
             />
             {/* Mobile category pills */}
-            <div className="lg:hidden flex gap-2 flex-wrap mb-6">
+            <div className="lg:hidden flex gap-1.5 overflow-x-auto -mx-4 px-4 mb-6 pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {CATEGORIES.map((c) => (
                 <a
                   key={c.slug}
                   href={`/bildelar/kategorier/${c.slug}`}
-                  className="px-3 py-1.5 rounded-full text-sm border border-[var(--color-dark-500)] text-[var(--color-text-secondary)] hover:border-[var(--color-brand-orange)] hover:text-[var(--color-brand-orange)] transition-all"
+                  className="shrink-0 px-3 py-1.5 rounded-full text-xs sm:text-sm border border-[var(--color-dark-500)] text-[var(--color-text-secondary)] hover:border-[var(--color-brand-orange)] hover:text-[var(--color-brand-orange)] transition-all whitespace-nowrap"
                 >
                   {c.icon} {c.name}
                 </a>
