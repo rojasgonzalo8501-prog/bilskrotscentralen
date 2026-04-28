@@ -24,8 +24,8 @@ declare global {
 
 const NETS_CHECKOUT_JS =
   (process.env.NEXT_PUBLIC_NETS_EASY_ENV ?? "test").toLowerCase() === "live"
-    ? "https://checkout.dibspayment.eu/checkout.js"
-    : "https://test.checkout.dibspayment.eu/checkout.js";
+    ? "https://checkout.dibspayment.eu/v1/checkout.js"
+    : "https://test.checkout.dibspayment.eu/v1/checkout.js";
 
 const NETS_CHECKOUT_KEY = process.env.NEXT_PUBLIC_NETS_EASY_CHECKOUT_KEY ?? "";
 

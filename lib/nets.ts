@@ -3,7 +3,7 @@
  *
  * Two products run on the same JSON API:
  *  - Embedded checkout — iframe rendered on bilskrotscentralen.com via
- *    https://test.checkout.dibspayment.eu/checkout.js (or live equivalent).
+ *    https://test.checkout.dibspayment.eu/v1/checkout.js (or live equivalent).
  *  - Hosted payment page — Nets-hosted URL we redirect the customer to.
  *
  * We use embedded for the standard Swedish webshop UX so the customer
@@ -16,8 +16,8 @@
 const TEST_API = "https://test.api.dibspayment.eu";
 const LIVE_API = "https://api.dibspayment.eu";
 
-export const TEST_CHECKOUT_JS = "https://test.checkout.dibspayment.eu/checkout.js";
-export const LIVE_CHECKOUT_JS = "https://checkout.dibspayment.eu/checkout.js";
+export const TEST_CHECKOUT_JS = "https://test.checkout.dibspayment.eu/v1/checkout.js";
+export const LIVE_CHECKOUT_JS = "https://checkout.dibspayment.eu/v1/checkout.js";
 
 function env() {
   return (process.env.NETS_EASY_ENV ?? "test").toLowerCase() === "live"
