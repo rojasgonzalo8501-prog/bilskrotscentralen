@@ -179,7 +179,6 @@ export async function createPayment(input: CreatePaymentInput): Promise<CreatePa
       },
       consumerType: { default: "B2C", supportedTypes: ["B2C"] },
       returnUrl: `${baseUrl}/kassa/bekraftelse?nets_payment_id={paymentId}`,
-      cancelUrl: `${baseUrl}/kassa`,
     },
     notifications: webhooks.length ? { webhooks } : undefined,
     merchantNumber: undefined,
