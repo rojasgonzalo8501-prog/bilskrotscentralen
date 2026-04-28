@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { CATEGORIES } from "@/lib/categories";
 import { getBrands } from "@/lib/codelist";
 
-const BASE = "https://bilskrotscentralen.se";
+const BASE = "https://bilskrotscentralen.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [

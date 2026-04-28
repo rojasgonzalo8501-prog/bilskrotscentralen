@@ -7,4 +7,4 @@ Disallow: /konto/
 Disallow: /konto
 Disallow: /api/
 
-Sitemap: https://bilskrotscentralen.se/sitemap.xml
+Sitemap: https://bilskrotscentralen.com/sitemap.xml

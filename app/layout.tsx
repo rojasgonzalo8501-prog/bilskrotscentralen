@@ -12,7 +12,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://bilskrotscentralen.se"),
+  metadataBase: new URL("https://bilskrotscentralen.com"),
   title: {
     default: "Bilskrotscentralen Enköping — Begagnade bildelar | Mercedes-specialist sedan 1984",
     template: "%s | Bilskrotscentralen Enköping",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "sv_SE",
     siteName: "Bilskrotscentralen",
-    url: "https://bilskrotscentralen.se",
+    url: "https://bilskrotscentralen.com",
     images: [{ url: "/images/mercedes-hero.jpeg", width: 1200, height: 630, alt: "Bilskrotscentralen bildemontering Enköping" }],
   },
   twitter: {
@@ -90,7 +90,7 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
-        <link rel="canonical" href="https://bilskrotscentralen.se" />
+        <link rel="canonical" href="https://bilskrotscentralen.com" />
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <LocalBusinessJsonLd />
@@ -176,7 +176,7 @@ function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-[var(--color-brand-orange)]">✉️</span>
-                <a href="mailto:info@bilskrotscentralen.se" className="hover:text-[var(--color-brand-orange)] transition-colors">info@bilskrotscentralen.se</a>
+                <a href="mailto:info@bilskrotscentralen.com" className="hover:text-[var(--color-brand-orange)] transition-colors">info@bilskrotscentralen.com</a>
               </li>
             </ul>
             <div className="mt-6 flex gap-2 flex-wrap">

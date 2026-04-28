@@ -1,4 +1,4 @@
-const SITE_URL = "https://bilskrotscentralen.se";
+const SITE_URL = "https://bilskrotscentralen.com";
 const PHONE = "+46-171-21002";
 const ADDRESS = {
   streetAddress: "Magasingatan 2",
@@ -27,7 +27,7 @@ export function OrganizationJsonLd() {
     name: "Bilskrotscentralen i Sverige AB",
     url: SITE_URL,
     logo: `${SITE_URL}/logo.png`,
-    email: "info@bilskrotscentralen.se",
+    email: "info@bilskrotscentralen.com",
     telephone: PHONE,
     address: { "@type": "PostalAddress", ...ADDRESS },
     sameAs: [],
@@ -63,7 +63,7 @@ export function LocalBusinessJsonLd() {
       "Auktoriserad bildemontering och bildelsbutik i Enköping. Mercedes-specialist sedan 1984. 30 000+ begagnade bildelar i lager. Fri hämtning av skrotbil i Mälardalen.",
     url: SITE_URL,
     telephone: PHONE,
-    email: "info@bilskrotscentralen.se",
+    email: "info@bilskrotscentralen.com",
     priceRange: "$$",
     currenciesAccepted: "SEK",
     paymentAccepted: "Klarna, Swish, kort, faktura",

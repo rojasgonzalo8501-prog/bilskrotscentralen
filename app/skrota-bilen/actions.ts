@@ -39,9 +39,9 @@ export async function submitSkrotaForm(
   try {
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: "Bilskrotscentralen <noreply@bilskrotscentralen.se>",
-        to:   "info@bilskrotscentralen.se",
-        cc:   ["adam@bilskrotscentralen.se", "gonzalo@bilskrotscentralen.se"],
+        from: "Bilskrotscentralen <noreply@bilskrotscentralen.com>",
+        to:   "info@bilskrotscentralen.com",
+        cc:   ["adam@bilskrotscentralen.com", "gonzalo@bilskrotscentralen.com"],
         subject: `Bokningsförfrågan — ${regnr} (${namn})`,
         html,
       });

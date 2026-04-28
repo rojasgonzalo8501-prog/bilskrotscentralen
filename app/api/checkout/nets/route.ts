@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     const baseUrl =
       process.env.NEXT_PUBLIC_BASE_URL ??
-      `https://${req.headers.get("host") ?? "bilskrotscentralen.se"}`;
+      `https://${req.headers.get("host") ?? "bilskrotscentralen.com"}`;
 
     const orderNumber = await generateOrderNumber();
 

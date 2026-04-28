@@ -145,7 +145,7 @@ const FAQ_GROUPS: { title: string; items: { q: string; a: string }[] }[] = [
     items: [
       {
         q: "Hur når jag er bäst?",
-        a: "Telefon är alltid snabbast: 0171-210 02 (måndag–torsdag 08:00–17:00, fredag 08:00–15:00). Du kan också maila info@bilskrotscentralen.se eller besöka oss på Magasingatan 2 i Enköping.",
+        a: "Telefon är alltid snabbast: 0171-210 02 (måndag–torsdag 08:00–17:00, fredag 08:00–15:00). Du kan också maila info@bilskrotscentralen.com eller besöka oss på Magasingatan 2 i Enköping.",
       },
       {
         q: "Vad gör jag om jag är missnöjd och vi inte kan komma överens?",
@@ -231,7 +231,7 @@ export default function FAQPage() {
           <p className="text-sm text-[var(--color-text-secondary)] mb-4">Vi löser de flesta frågor direkt per telefon.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="tel:017121002" className="btn-primary">📞 0171-210 02</a>
-            <a href="mailto:info@bilskrotscentralen.se" className="btn-secondary">✉ info@bilskrotscentralen.se</a>
+            <a href="mailto:info@bilskrotscentralen.com" className="btn-secondary">✉ info@bilskrotscentralen.com</a>
           </div>
           <p className="text-xs text-[var(--color-text-muted)] mt-3">
             Mån–Tors 08:00–17:00 &nbsp;·&nbsp; Fredagar 08:00–15:00

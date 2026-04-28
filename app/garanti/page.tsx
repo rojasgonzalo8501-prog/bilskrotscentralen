@@ -203,7 +203,7 @@ export default function GarantiPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="tel:017121002" className="btn-primary">📞 0171-210 02</a>
-            <a href="mailto:info@bilskrotscentralen.se" className="btn-secondary">✉️ info@bilskrotscentralen.se</a>
+            <a href="mailto:info@bilskrotscentralen.com" className="btn-secondary">✉️ info@bilskrotscentralen.com</a>
           </div>
           <p className="text-xs text-[var(--color-text-muted)] mt-4">
             Mån–Tors 08:00–17:00 &nbsp;·&nbsp; Fredagar 08:00–15:00

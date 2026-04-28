@@ -34,8 +34,8 @@ export default function Header({ session }: { session: Session | null }) {
               </svg>
               0171-210 02
             </a>
-            <a href="mailto:info@bilskrotscentralen.se" className="hover:text-[var(--color-brand-orange)] transition-colors hidden sm:block">
-              info@bilskrotscentralen.se
+            <a href="mailto:info@bilskrotscentralen.com" className="hover:text-[var(--color-brand-orange)] transition-colors hidden sm:block">
+              info@bilskrotscentralen.com
             </a>
           </div>
         </div>

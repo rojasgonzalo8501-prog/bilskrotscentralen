@@ -21,7 +21,7 @@ export const COMPANY = {
   address: "Magasingatan 2",
   postal: "749 35 ENKÖPING",
   phone: "0171-210 02",
-  email: "info@bilskrotscentralen.se",
+  email: "info@bilskrotscentralen.com",
   bankgiro: "5497-3441",
   iban: "SE6380000830550045518503",
   swift: "SWEDSESS",

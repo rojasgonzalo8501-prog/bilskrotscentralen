@@ -52,9 +52,9 @@ export async function submitBilrutorForm(
   try {
     if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== "re_placeholder") {
       await resend.emails.send({
-        from: "Bilskrotscentralen <noreply@bilskrotscentralen.se>",
-        to:   "info@bilskrotscentralen.se",
-        cc:   ["adam@bilskrotscentralen.se", "gonzalo@bilskrotscentralen.se"],
+        from: "Bilskrotscentralen <noreply@bilskrotscentralen.com>",
+        to:   "info@bilskrotscentralen.com",
+        cc:   ["adam@bilskrotscentralen.com", "gonzalo@bilskrotscentralen.com"],
         replyTo: epost || undefined,
         subject: `Bilruta-förfrågan — ${rutaTyp} · ${regnr} (${namn})`,
         html,

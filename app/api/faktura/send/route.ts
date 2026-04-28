@@ -90,12 +90,12 @@ export async function POST(req: NextRequest) {
   }
 
   const resend = new Resend(apiKey);
-  const fromAddress = process.env.RESEND_FROM_EMAIL ?? `faktura@${process.env.RESEND_FROM_DOMAIN ?? "bilskrotscentralen.se"}`;
+  const fromAddress = process.env.RESEND_FROM_EMAIL ?? `faktura@${process.env.RESEND_FROM_DOMAIN ?? "bilskrotscentralen.com"}`;
 
   const { error: sendError } = await resend.emails.send({
     from: `Bilskrotscentralen i Sverige AB <${fromAddress}>`,
     to: [recipientEmail],
-    bcc: ["adam@bilskrotscentralen.se", "gonzalo@bilskrotscentralen.se"],
+    bcc: ["adam@bilskrotscentralen.com", "gonzalo@bilskrotscentralen.com"],
     replyTo: COMPANY.email,
     subject: `Faktura ${invoice.invoiceNumber} från Bilskrotscentralen i Sverige AB`,
     html: buildEmailHtml(data),

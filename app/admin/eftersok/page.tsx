@@ -27,7 +27,7 @@ export default function EftersokAdminPage() {
         <InfoCard
           icon="📨"
           title="Eftersökningar via e-post"
-          desc="Kunder skickar förfrågningar via formuläret på /eftersok. Dessa hamnar i din inkorg på eftersok@bilskrotscentralen.se."
+          desc="Kunder skickar förfrågningar via formuläret på /eftersok. Dessa hamnar i din inkorg på eftersok@bilskrotscentralen.com."
         />
         <InfoCard
           icon="📞"
@@ -50,7 +50,7 @@ export default function EftersokAdminPage() {
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <a
-            href="mailto:eftersok@bilskrotscentralen.se"
+            href="mailto:eftersok@bilskrotscentralen.com"
             className="btn-primary text-sm px-5"
           >
             Öppna e-post →

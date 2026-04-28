@@ -7,7 +7,7 @@ import { getBrand } from "@/lib/codelist";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { BreadcrumbJsonLd, ProductJsonLd } from "@/components/JsonLd";
 
-const SITE_URL = "https://bilskrotscentralen.se";
+const SITE_URL = "https://bilskrotscentralen.com";
 
 function waText(partName: string, sku: string, prefix: string): string {
   const name = partName.length > 60 ? partName.slice(0, 60) + "…" : partName;

@@ -38,8 +38,8 @@ export default function IntegritetspolicyPage() {
           <DataRow label="Org.nr" value="556634-0815" />
           <DataRow label="Adress" value="Magasingatan 2, 749 35 Enköping" />
           <DataRow label="Telefon" value="0171-210 02" />
-          <DataRow label="E-post" value="info@bilskrotscentralen.se" />
-          <DataRow label="Webbplats" value="www.bilskrotscentralen.se" />
+          <DataRow label="E-post" value="info@bilskrotscentralen.com" />
+          <DataRow label="Webbplats" value="www.bilskrotscentralen.com" />
           <p className="mt-3 text-sm">
             Har du frågor om hur vi behandlar dina personuppgifter eller vill utöva
             dina rättigheter? Kontakta oss via e-post eller telefon ovan.
@@ -152,7 +152,7 @@ export default function IntegritetspolicyPage() {
         <PolicySection number="5" title="Dina rättigheter">
           <p>
             Enligt GDPR har du följande rättigheter avseende dina personuppgifter.
-            Kontakta oss via <a href="mailto:info@bilskrotscentralen.se" className="text-[var(--color-brand-orange)] hover:underline">info@bilskrotscentralen.se</a> eller
+            Kontakta oss via <a href="mailto:info@bilskrotscentralen.com" className="text-[var(--color-brand-orange)] hover:underline">info@bilskrotscentralen.com</a> eller
             telefon för att utöva dem. Vi svarar inom 30 dagar.
           </p>
           <div className="mt-4 space-y-3">
@@ -176,7 +176,7 @@ export default function IntegritetspolicyPage() {
         {/* 6. Cookies */}
         <PolicySection number="6" title="Cookies och spårning">
           <p>
-            Vi använder följande typer av cookies på bilskrotscentralen.se:
+            Vi använder följande typer av cookies på bilskrotscentralen.com:
           </p>
           <div className="mt-3 space-y-3">
             <CookieRow
@@ -232,7 +232,7 @@ export default function IntegritetspolicyPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <a href="tel:017121002" className="btn-secondary">📞 0171-210 02</a>
-          <a href="mailto:info@bilskrotscentralen.se" className="btn-primary">✉ info@bilskrotscentralen.se</a>
+          <a href="mailto:info@bilskrotscentralen.com" className="btn-primary">✉ info@bilskrotscentralen.com</a>
         </div>
       </div>
     </section>

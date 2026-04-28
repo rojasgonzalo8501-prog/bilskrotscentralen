@@ -42,7 +42,7 @@ export default function KopvillkorPage() {
           <InfoBox>
             <strong>Kontaktuppgifter:</strong><br />
             Telefon: 0171-210 02<br />
-            E-post: info@bilskrotscentralen.se<br />
+            E-post: info@bilskrotscentralen.com<br />
             Öppettider: Mån–Tors 08:00–17:00, Fredagar 08:00–15:00<br />
             Besöksadress: Magasingatan 2, 749 35 Enköping
           </InfoBox>
@@ -284,7 +284,7 @@ export default function KopvillkorPage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <a href="tel:017121002" className="btn-primary">📞 0171-210 02</a>
-          <a href="mailto:info@bilskrotscentralen.se" className="btn-secondary">✉ info@bilskrotscentralen.se</a>
+          <a href="mailto:info@bilskrotscentralen.com" className="btn-secondary">✉ info@bilskrotscentralen.com</a>
         </div>
       </div>
     </section>

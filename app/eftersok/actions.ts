@@ -47,9 +47,9 @@ export async function submitEftersok(
   try {
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: "Bilskrotscentralen <noreply@bilskrotscentralen.se>",
-        to:   "eftersok@bilskrotscentralen.se",
-        cc:   ["adam@bilskrotscentralen.se", "gonzalo@bilskrotscentralen.se"],
+        from: "Bilskrotscentralen <noreply@bilskrotscentralen.com>",
+        to:   "eftersok@bilskrotscentralen.com",
+        cc:   ["adam@bilskrotscentralen.com", "gonzalo@bilskrotscentralen.com"],
         replyTo: epost,
         subject: `Eftersökning — ${marke || "okänt märke"} ${modell || ""} (${namn})`,
         html,

@@ -343,11 +343,11 @@ export default async function HomePage() {
                   <div className="font-bold group-hover:text-[var(--color-brand-orange)] transition-colors">0171-210 02</div>
                 </div>
               </a>
-              <a href="mailto:info@bilskrotscentralen.se" className="flex items-center gap-4 p-5 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)]/50 transition-colors group">
+              <a href="mailto:info@bilskrotscentralen.com" className="flex items-center gap-4 p-5 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)]/50 transition-colors group">
                 <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-orange)]/10 flex items-center justify-center text-[var(--color-brand-orange)] text-xl shrink-0">✉️</div>
                 <div>
                   <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mb-0.5">E-post</div>
-                  <div className="font-bold group-hover:text-[var(--color-brand-orange)] transition-colors">info@bilskrotscentralen.se</div>
+                  <div className="font-bold group-hover:text-[var(--color-brand-orange)] transition-colors">info@bilskrotscentralen.com</div>
                 </div>
               </a>
               <a href="https://maps.google.com/?q=Magasingatan+2+Enköping" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-5 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)]/50 transition-colors group">

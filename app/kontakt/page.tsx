@@ -43,8 +43,8 @@ export default function KontaktPage() {
           <ContactCard
             icon="✉️"
             label="E-post"
-            value="info@bilskrotscentralen.se"
-            href="mailto:info@bilskrotscentralen.se"
+            value="info@bilskrotscentralen.com"
+            href="mailto:info@bilskrotscentralen.com"
             note="Svar inom 24 h på vardagar"
           />
           <ContactCard
@@ -57,8 +57,8 @@ export default function KontaktPage() {
           <ContactCard
             icon="💼"
             label="B2B & verkstäder"
-            value="b2b@bilskrotscentralen.se"
-            href="mailto:b2b@bilskrotscentralen.se"
+            value="b2b@bilskrotscentralen.com"
+            href="mailto:b2b@bilskrotscentralen.com"
             note="Volymrabatt och fakturabetalning"
           />
         </div>

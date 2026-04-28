@@ -87,7 +87,7 @@ export default function B2BPage() {
             vi öppnar ett konto inom 24 h.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="mailto:b2b@bilskrotscentralen.se" className="btn-primary">✉️ b2b@bilskrotscentralen.se</a>
+            <a href="mailto:b2b@bilskrotscentralen.com" className="btn-primary">✉️ b2b@bilskrotscentralen.com</a>
             <a href="tel:017121002" className="btn-secondary">📞 0171-210 02</a>
           </div>
         </div>

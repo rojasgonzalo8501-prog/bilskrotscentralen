@@ -2,7 +2,7 @@
  * Nets Easy (Nexi Easy) payment integration.
  *
  * Two products run on the same JSON API:
- *  - Embedded checkout — iframe rendered on bilskrotscentralen.se via
+ *  - Embedded checkout — iframe rendered on bilskrotscentralen.com via
  *    https://test.checkout.dibspayment.eu/checkout.js (or live equivalent).
  *  - Hosted payment page — Nets-hosted URL we redirect the customer to.
  *
