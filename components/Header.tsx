@@ -10,6 +10,7 @@ const NAV = [
   { href: "/mercedes",     label: "Mercedes",     highlight: true },
   { href: "/bilrutor",     label: "Bilrutor",     highlight: false },
   { href: "/skrota-bilen", label: "Skrota bilen" },
+  { href: "/metallinkop",  label: "Metallinköp",  recycle: true },
   { href: "/verkstad",     label: "Verkstad" },
   { href: "/om-oss",       label: "Om oss" },
 ];
@@ -85,16 +86,21 @@ export default function Header({ session }: { session: Session | null }) {
             )}
           </div>
 
-          {NAV.filter(n => !n.dropdown).map(({ href, label, highlight }) => (
-            <a key={href} href={href}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                highlight
-                  ? "text-[var(--color-brand-orange)] hover:bg-[var(--color-dark-700)]"
-                  : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-700)]"
-              }`}>
-              {label}
-            </a>
-          ))}
+          {NAV.filter(n => !n.dropdown).map((n) => {
+            const { href, label } = n;
+            const highlight = "highlight" in n && n.highlight;
+            const recycle = "recycle" in n && n.recycle;
+            const cls = recycle
+              ? "text-emerald-400 hover:bg-[var(--color-dark-700)]"
+              : highlight
+              ? "text-[var(--color-brand-orange)] hover:bg-[var(--color-dark-700)]"
+              : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-700)]";
+            return (
+              <a key={href} href={href} className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${cls}`}>
+                {label}
+              </a>
+            );
+          })}
           {session?.role === "admin" && (
             <a href="/admin" className="px-3 py-2 rounded-md text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-700)] transition-colors">
               Admin
