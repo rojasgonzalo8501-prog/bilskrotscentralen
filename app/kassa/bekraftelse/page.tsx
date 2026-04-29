@@ -3,6 +3,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { getPayment, isPaymentSuccessful } from "@/lib/nets";
 import { createInvoiceFromOrder } from "@/lib/invoice-utils";
+import { sendOrderConfirmationEmail } from "@/lib/order-emails";
 
 export const metadata: Metadata = {
   title: "Orderbekräftelse — Bilskrotscentralen",
@@ -44,20 +45,32 @@ export default async function BekraftelsePage({
       try {
         const remote = await getPayment(netsPaymentId);
         if (isPaymentSuccessful(remote)) {
-          await db.order.update({
-            where: { id: order.id },
+          // Atomic transition: only the caller that flips PENDING→PAID
+          // runs the side-effects (parts/invoice/email). Webhook may race
+          // with this page; whoever wins owns the work.
+          const transition = await db.order.updateMany({
+            where: { id: order.id, paymentStatus: { not: "PAID" } },
             data: { paymentStatus: "PAID", status: "CONFIRMED" },
           });
-          await Promise.all(
-            order.items.map((it) =>
-              db.part.update({ where: { id: it.partId }, data: { status: "RESERVED" } })
-            )
-          );
-          try {
-            await createInvoiceFromOrder(order.id);
-          } catch (e) {
-            console.error("[bekraftelse] invoice creation failed:", e);
+
+          if (transition.count > 0) {
+            await Promise.all(
+              order.items.map((it) =>
+                db.part.update({ where: { id: it.partId }, data: { status: "RESERVED" } })
+              )
+            );
+            try {
+              await createInvoiceFromOrder(order.id);
+            } catch (e) {
+              console.error("[bekraftelse] invoice creation failed:", e);
+            }
+            try {
+              await sendOrderConfirmationEmail(order);
+            } catch (e) {
+              console.error("[bekraftelse] email send failed:", e);
+            }
           }
+
           order = await db.order.findFirst({
             where: { id: order.id },
             include: { items: true },

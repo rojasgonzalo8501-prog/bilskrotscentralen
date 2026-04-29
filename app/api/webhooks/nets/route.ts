@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getPayment, isPaymentSuccessful } from "@/lib/nets";
 import { createInvoiceFromOrder } from "@/lib/invoice-utils";
+import { sendOrderConfirmationEmail } from "@/lib/order-emails";
 
 /**
  * Nets Easy webhook receiver.
@@ -69,10 +70,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, alreadyPaid: true });
     }
 
-    await db.order.update({
-      where: { id: order.id },
+    // Atomic transition guard: only the caller that flips PENDING→PAID
+    // proceeds with side-effects (parts/invoice/email). Webhook + bekraftelse
+    // page can race; this ensures exactly one of them does the work.
+    const transition = await db.order.updateMany({
+      where: { id: order.id, paymentStatus: { not: "PAID" } },
       data: { paymentStatus: "PAID", status: "CONFIRMED" },
     });
+
+    if (transition.count === 0) {
+      // Lost the race to bekraftelse page — that's fine.
+      return NextResponse.json({ ok: true, alreadyHandled: true });
+    }
 
     // Reserve the parts so they don't show as available
     await Promise.all(
@@ -89,6 +98,13 @@ export async function POST(req: NextRequest) {
       await createInvoiceFromOrder(order.id);
     } catch (e) {
       console.error("[nets webhook] invoice creation failed:", e);
+    }
+
+    // Send order confirmation email (non-fatal if it fails)
+    try {
+      await sendOrderConfirmationEmail(order);
+    } catch (e) {
+      console.error("[nets webhook] email send failed:", e);
     }
 
     return NextResponse.json({ ok: true });
