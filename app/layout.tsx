@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import { CartProvider } from "@/components/CartContext";
 import Header from "@/components/Header";
 import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
+import { Analytics } from "@vercel/analytics/next";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -101,6 +102,7 @@ export default async function RootLayout({
           <main>{children}</main>
           <Footer />
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );
