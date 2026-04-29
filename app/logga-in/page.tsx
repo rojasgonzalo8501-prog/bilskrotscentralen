@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { loginAction } from "./actions";
@@ -89,6 +90,16 @@ export default async function LoginPage({
             Logga in →
           </button>
         </form>
+
+        <p className="text-center mt-6 text-xs text-[var(--color-text-muted)]">
+          Saknar du konto?{" "}
+          <Link
+            href="/skapa-konto"
+            className="text-[var(--color-brand-orange)] hover:underline"
+          >
+            Skapa konto
+          </Link>
+        </p>
       </div>
     </section>
   );

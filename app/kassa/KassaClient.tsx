@@ -253,7 +253,7 @@ export function KassaClient({ session }: { session: Session | null }) {
 
           <p className="text-center mt-6 text-xs text-[var(--color-text-muted)]">
             Har du inget konto?{" "}
-            <a href="/logga-in?portal=customer" className="text-[var(--color-brand-orange)] hover:underline">
+            <a href="/skapa-konto?redirect=/kassa" className="text-[var(--color-brand-orange)] hover:underline">
               Skapa konto
             </a>
           </p>
@@ -293,7 +293,7 @@ export function KassaClient({ session }: { session: Session | null }) {
               </div>
               <div
                 id="nets-checkout-container"
-                className="rounded-xl overflow-hidden bg-white min-h-[600px]"
+                className="rounded-xl overflow-hidden bg-white min-h-[900px]"
               />
               <p className="mt-3 text-xs text-[var(--color-text-muted)] text-center">
                 🔒 Säker betalning via Nets Easy · Kort, Swish, faktura och delbetalning

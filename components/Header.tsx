@@ -119,15 +119,32 @@ export default function Header({ session }: { session: Session | null }) {
           <CartButton />
 
           {/* Account */}
-          <a
-            href={session ? (session.role === "admin" ? "/admin" : "/konto") : "/logga-in"}
-            className="hidden sm:flex p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] transition-colors"
-            aria-label={session ? "Mitt konto" : "Logga in"}
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-            </svg>
-          </a>
+          {session ? (
+            <a
+              href={session.role === "admin" ? "/admin" : "/konto"}
+              className="hidden sm:flex p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] transition-colors"
+              aria-label="Mitt konto"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+            </a>
+          ) : (
+            <div className="hidden sm:flex items-center gap-1">
+              <a
+                href="/logga-in"
+                className="px-3 py-2 rounded-lg text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-700)] transition-colors"
+              >
+                Logga in
+              </a>
+              <a
+                href="/skapa-konto"
+                className="px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10 transition-colors"
+              >
+                Skapa konto
+              </a>
+            </div>
+          )}
 
           {/* CTA */}
           <Link href="/skrota-bilen" className="hidden sm:block px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] transition-colors whitespace-nowrap">
@@ -164,6 +181,25 @@ export default function Header({ session }: { session: Session | null }) {
             {session?.role === "admin" && (
               <a href="/admin" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-md text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] hover:text-[var(--color-text-primary)]">Admin</a>
             )}
+
+            {/* Account links */}
+            <div className="mt-2 pt-2 border-t border-[var(--color-dark-600)]">
+              {session ? (
+                <a href={session.role === "admin" ? "/admin" : "/konto"} onClick={() => setMobileOpen(false)} className="block px-3 py-2.5 rounded-md text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)]">
+                  Mitt konto
+                </a>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <a href="/logga-in" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-md text-sm font-medium text-center text-[var(--color-text-secondary)] border border-[var(--color-dark-500)] hover:bg-[var(--color-dark-700)]">
+                    Logga in
+                  </a>
+                  <a href="/skapa-konto" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-md text-sm font-semibold text-center text-white bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)]">
+                    Skapa konto
+                  </a>
+                </div>
+              )}
+            </div>
+
             <Link href="/skrota-bilen" onClick={() => setMobileOpen(false)}
               className="mt-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white text-center bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] transition-colors">
               Skrota bilen gratis
