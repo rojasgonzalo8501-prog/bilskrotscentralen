@@ -39,9 +39,20 @@ export async function POST(req: NextRequest) {
     const net = Math.round(total / 1.25);
     const vat = total - net;
 
+    // Nets validates that the iframe's parent origin matches checkout.url.
+    // We MUST use the actual origin the request came from, otherwise the
+    // payment form silently refuses to render. Order of preference:
+    //   1. Origin header (most accurate — matches the page the user sees)
+    //   2. host header → derived URL
+    //   3. NEXT_PUBLIC_BASE_URL (legacy fallback, can be wrong)
+    //   4. hardcoded production domain
+    const originHeader = req.headers.get("origin");
+    const hostHeader = req.headers.get("host");
     const baseUrl =
+      originHeader ??
+      (hostHeader ? `https://${hostHeader}` : null) ??
       process.env.NEXT_PUBLIC_BASE_URL ??
-      `https://${req.headers.get("host") ?? "bilskrotscentralen.com"}`;
+      "https://bilskrotscentralen.com";
 
     const orderNumber = await generateOrderNumber();
 
