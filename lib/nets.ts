@@ -179,6 +179,14 @@ export async function createPayment(input: CreatePaymentInput): Promise<CreatePa
       },
       consumerType: { default: "B2C", supportedTypes: ["B2C"] },
       returnUrl: `${baseUrl}/kassa/bekraftelse?nets_payment_id={paymentId}`,
+      // Explicitly enable common Swedish methods. Without this, embedded
+      // checkout silently renders nothing if the merchant default isn't set.
+      paymentMethodsConfiguration: [
+        { name: "Visa", enabled: true },
+        { name: "MasterCard", enabled: true },
+        { name: "Swish", enabled: true },
+        { name: "EasyInvoice", enabled: true },
+      ],
     },
     notifications: webhooks.length ? { webhooks } : undefined,
     merchantNumber: undefined,
