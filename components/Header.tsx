@@ -43,15 +43,15 @@ export default function Header({ session }: { session: Session | null }) {
       </div>
 
       {/* ─── Main nav ─── */}
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 h-24 sm:h-28 lg:h-32 flex items-center justify-between gap-4">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
+        <Link href="/" className="flex items-center gap-3 shrink-0 min-w-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Bilskrotscentralen" className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 object-contain shrink-0" />
+          <img src="/logo.png" alt="Bilskrotscentralen" className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 object-contain shrink-0" />
           <div className="leading-tight min-w-0">
-            <div className="font-black text-[var(--color-text-primary)] text-[11px] sm:text-sm tracking-tight truncate">BILSKROTSCENTRALEN</div>
-            <div className="text-[10px] sm:text-xs text-[var(--color-text-muted)] truncate hidden sm:block">Bildemontering &amp; Reservdelar</div>
+            <div className="font-black text-[var(--color-text-primary)] text-sm sm:text-base lg:text-lg tracking-tight truncate">BILSKROTSCENTRALEN</div>
+            <div className="text-xs sm:text-sm text-[var(--color-text-muted)] truncate hidden sm:block">Bildemontering &amp; Reservdelar</div>
           </div>
         </Link>
 
