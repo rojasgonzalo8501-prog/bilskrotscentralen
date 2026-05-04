@@ -25,12 +25,25 @@ export function OrganizationJsonLd() {
     "@type": "Organization",
     "@id": `${SITE_URL}#organization`,
     name: "Bilskrotscentralen i Sverige AB",
+    alternateName: "Bilskrotscentralen Enköping",
     url: SITE_URL,
-    logo: `${SITE_URL}/logo.png`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/logo-square.png`,
+      width: 1024,
+      height: 1024,
+    },
+    image: `${SITE_URL}/logo-square.png`,
     email: "info@bilskrotscentralen.com",
     telephone: PHONE,
     address: { "@type": "PostalAddress", ...ADDRESS },
-    sameAs: [],
+    foundingDate: "1984",
+    sameAs: [
+      // Lägg till när konton finns:
+      // "https://www.facebook.com/bilskrotscentralen",
+      // "https://www.instagram.com/bilskrotscentralen",
+      // "https://g.page/bilskrotscentralen",
+    ],
   });
 }
 
@@ -58,7 +71,7 @@ export function LocalBusinessJsonLd() {
     "@id": `${SITE_URL}#localbusiness`,
     name: "Bilskrotscentralen",
     image: `${SITE_URL}/images/mercedes-hero.jpeg`,
-    logo: `${SITE_URL}/logo.png`,
+    logo: `${SITE_URL}/logo-square.png`,
     description:
       "Auktoriserad bildemontering och bildelsbutik i Enköping. Mercedes-specialist sedan 1984. 30 000+ begagnade bildelar i lager. Fri hämtning av skrotbil i Mälardalen.",
     url: SITE_URL,
