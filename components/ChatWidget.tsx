@@ -22,9 +22,15 @@
 import Script from "next/script";
 import { WhatsAppButton } from "./WhatsAppButton";
 
+// Bilskrotscentralen Tawk.to property — hardcoded so it works without
+// touching Vercel env vars. Env vars override if you later move to a
+// different account.
+const TAWK_PROPERTY =
+  process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID || "69f8724a04aa141c33adf9a5";
+const TAWK_WIDGET =
+  process.env.NEXT_PUBLIC_TAWK_WIDGET_ID || "1jnp7ssu3";
+
 const CRISP_ID = process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID;
-const TAWK_PROPERTY = process.env.NEXT_PUBLIC_TAWK_PROPERTY_ID;
-const TAWK_WIDGET = process.env.NEXT_PUBLIC_TAWK_WIDGET_ID || "default";
 
 export function ChatWidget() {
   // Crisp wins when both are present
