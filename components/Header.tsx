@@ -10,7 +10,6 @@ const NAV = [
   { href: "/mercedes",     label: "Mercedes",     highlight: true },
   { href: "/bilrutor",     label: "Bilrutor",     highlight: false },
   { href: "/skrota-bilen", label: "Skrota bilen" },
-  { href: "/metallinkop",  label: "Metallinköp",  recycle: true },
   { href: "/verkstad",     label: "Verkstad" },
   { href: "/om-oss",       label: "Om oss" },
 ];
