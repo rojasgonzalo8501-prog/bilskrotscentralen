@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
 import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
+import { Plausible } from "@/components/Plausible";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -100,6 +101,7 @@ export default async function RootLayout({
       </head>
       <body className="antialiased">
         <Analytics />
+        <Plausible />
         <CartProvider>
           <Header session={session} />
           <main>{children}</main>
