@@ -59,10 +59,17 @@ function PostNordMark() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="PostNord — leverans i hela Sverige"
-      className="inline-flex items-center h-12 rounded-md bg-[#005CA9] hover:bg-[#004B8A] px-3 transition-colors"
+      className="inline-flex items-center gap-2 h-12 px-4 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors"
     >
-      <span className="font-black text-white text-base tracking-tight leading-none">
-        Post<span className="text-[#FFCC00]">Nord</span>
+      {/* PostNord wordmark — blue with their signature yellow horn accent */}
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path
+          d="M19.5 5.5L13 12l6.5 6.5-2.5 2.5-9-9 9-9 2.5 2.5z"
+          fill="#FFCC00"
+        />
+      </svg>
+      <span className="font-black text-[#005CA9] text-base tracking-tight leading-none">
+        PostNord
       </span>
     </a>
   );
@@ -75,10 +82,13 @@ function DhlMark() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="DHL — leverans"
-      className="inline-flex items-center h-12 rounded-md bg-[#FFCC00] hover:bg-[#F2C200] px-3 transition-colors"
+      className="inline-flex items-center h-12 px-4 rounded-lg bg-white border border-slate-200 hover:border-slate-300 transition-colors"
     >
-      <span className="font-black text-[#D40511] text-2xl tracking-tighter leading-none">
-        DHL
+      {/* DHL canonical: red wordmark on yellow inner pill */}
+      <span className="inline-flex items-center h-7 px-2 rounded bg-[#FFCC00]">
+        <span className="font-black text-[#D40511] text-lg tracking-tighter leading-none">
+          DHL
+        </span>
       </span>
     </a>
   );

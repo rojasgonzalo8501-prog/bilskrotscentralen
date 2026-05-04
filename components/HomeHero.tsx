@@ -33,13 +33,20 @@ const YEARS = Array.from({ length: 30 }, (_, i) => CURRENT_YEAR - i);
 /**
  * Conservative scrap-premium estimator.
  * Returns a [min, max] range in SEK.
+ *
+ * Slider 0 (Gammal/körbar)  → ~3500–4500 kr
+ * Slider 100 (Defekt)       → ~0–500 kr
+ *
+ * The minimum is allowed to bottom out at 0 — at full Defekt we make
+ * no promises about premium, since the car's value at that point is
+ * basically just the metal recycling.
  */
 function estimatePremium(condition: number): [number, number] {
   // condition: 0 = "Gammal" (driveable), 100 = "Defekt"
-  const base = 3500; // SEK center for typical 1.5 ton car
-  const conditionFactor = 1.0 - 0.4 * (condition / 100);
-  const center = Math.round((base * conditionFactor) / 100) * 100;
-  return [Math.max(800, center - 500), Math.min(5000, center + 500)];
+  const base = 4000; // SEK center for a healthy salvage car
+  const factor = 1 - condition / 100; // linear: 1 at 0, 0 at 100
+  const center = Math.round((base * factor) / 100) * 100;
+  return [Math.max(0, center - 500), Math.min(5000, center + 500)];
 }
 
 export function HomeHero({ brands }: Props) {
@@ -118,9 +125,9 @@ export function HomeHero({ brands }: Props) {
   }
 
   return (
-    <section className="relative overflow-hidden bg-slate-50">
-      {/* Blueprint-style background */}
-      <div className="absolute inset-0 opacity-[0.04]" aria-hidden>
+    <section className="relative overflow-hidden bg-slate-900">
+      {/* Hero photo background — Mercedes engine bay */}
+      <div className="absolute inset-0" aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/mercedes-hero.jpeg"
@@ -128,35 +135,39 @@ export function HomeHero({ brands }: Props) {
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
       </div>
+      {/* Soft frosted overlay so the cards stay readable on top */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/85 via-slate-900/75 to-slate-900/85" />
+      {/* Brand-orange glow top-left, emerald glow bottom-right for depth */}
+      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-[var(--color-brand-orange)] opacity-[0.10] blur-[140px]" aria-hidden />
+      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-emerald-500 opacity-[0.08] blur-[120px]" aria-hidden />
       {/* Subtle grid lines for blueprint feel */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.06]"
         aria-hidden
         style={{
           backgroundImage:
-            "linear-gradient(to right, #0f172a 1px, transparent 1px), linear-gradient(to bottom, #0f172a 1px, transparent 1px)",
+            "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-slate-50/90 to-slate-50" />
 
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
         {/* Title */}
         <div className="text-center mb-10 sm:mb-12">
           {/* Green sustainability badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-700 text-xs font-bold uppercase tracking-wider mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-emerald-300 text-xs font-bold uppercase tracking-wider mb-5 backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             ♻️ Sveriges mest hållbara bildemontering
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 uppercase leading-[1.05]">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white uppercase leading-[1.05] drop-shadow-lg">
             Intelligent bildemontering.
             <br />
-            <span className="text-emerald-700">Klimatsmart från start.</span>
+            <span className="text-emerald-400">Klimatsmart från start.</span>
           </h1>
-          <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">
-            Återvunna originaldelar med <strong className="text-slate-900">80 % mindre CO2</strong> än
-            nytillverkat. <strong className="text-slate-900">92 % återvinningsgrad</strong> av
+          <p className="mt-5 text-base sm:text-lg text-slate-200 max-w-2xl mx-auto">
+            Återvunna originaldelar med <strong className="text-white">80 % mindre CO2</strong> än
+            nytillverkat. <strong className="text-white">92 % återvinningsgrad</strong> av
             varje bil. Mercedes-specialist sedan 1984.
           </p>
         </div>
