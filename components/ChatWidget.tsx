@@ -52,17 +52,29 @@ export function ChatWidget() {
   }
 
   if (TAWK_PROPERTY) {
+    // Idempotent loader: bail if Tawk has already been initialised on
+    // the page (prevents double-injection in React StrictMode and
+    // during route transitions). lazyOnload keeps the chat widget out
+    // of the critical render path so it doesn't slow first paint.
     return (
-      <Script id="tawk-chat" strategy="afterInteractive">
+      <Script id="tawk-chat" strategy="lazyOnload">
         {`
-          var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
           (function(){
-            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-            s1.async=true;
-            s1.src='https://embed.tawk.to/${TAWK_PROPERTY}/${TAWK_WIDGET}';
-            s1.charset='UTF-8';
-            s1.setAttribute('crossorigin','*');
-            s0.parentNode.insertBefore(s1,s0);
+            if (window.__tawkLoaded) return;
+            window.__tawkLoaded = true;
+            window.Tawk_API = window.Tawk_API || {};
+            window.Tawk_LoadStart = new Date();
+            var s1 = document.createElement("script");
+            var s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = "https://embed.tawk.to/${TAWK_PROPERTY}/${TAWK_WIDGET}";
+            s1.charset = "UTF-8";
+            s1.setAttribute("crossorigin", "*");
+            if (s0 && s0.parentNode) {
+              s0.parentNode.insertBefore(s1, s0);
+            } else {
+              document.head.appendChild(s1);
+            }
           })();
         `}
       </Script>
