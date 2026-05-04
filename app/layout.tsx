@@ -4,7 +4,7 @@ import { getSession } from "@/lib/auth";
 import { CartProvider } from "@/components/CartContext";
 import Header from "@/components/Header";
 import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 
 export const viewport: Viewport = {
@@ -104,7 +104,7 @@ export default async function RootLayout({
           <Header session={session} />
           <main>{children}</main>
           <Footer />
-          <WhatsAppButton />
+          <ChatWidget />
         </CartProvider>
       </body>
     </html>
