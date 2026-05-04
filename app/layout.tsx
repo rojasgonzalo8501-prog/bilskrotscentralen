@@ -81,9 +81,10 @@ export default async function RootLayout({
   const session = await getSession();
 
   return (
-    <html lang="sv" suppressHydrationWarning>
+    <html lang="sv" className="light" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){if(localStorage.getItem('theme')==='light')document.documentElement.classList.add('light');})();` }} />
+        {/* Default to light theme; only flip to dark when the user explicitly opts in */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.remove('light');})();` }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

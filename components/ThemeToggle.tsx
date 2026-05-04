@@ -13,8 +13,9 @@ function applyTheme(isDark: boolean) {
 
 export default function ThemeToggle() {
   const [dark, setDark] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("theme") !== "light";
+    if (typeof window === "undefined") return false;
+    // Default = light. Only dark when user explicitly opted in.
+    return localStorage.getItem("theme") === "dark";
   });
 
   useEffect(() => {

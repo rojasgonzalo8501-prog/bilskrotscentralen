@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { getBrands } from "@/lib/codelist";
 import { db } from "@/lib/db";
-import { HeroSearch } from "@/components/HeroSearch";
+import { HomeHero } from "@/components/HomeHero";
+import { TrustStrip } from "@/components/TrustStrip";
 import { FeaturedPartCard } from "@/components/FeaturedPartCard";
 
 export const dynamic = "force-dynamic";
 
-const BRANDS = getBrands().slice(0, 8);
+const BRANDS = getBrands();
+const TOP_BRANDS = BRANDS.slice(0, 8);
+const HERO_BRANDS = BRANDS.map((b) => ({ slug: b.slug, name: b.name }));
 
 const CATEGORIES = [
   { name: "Motor & Transmission", slug: "motor-transmission", image: "/images/motor.jpeg",        count: 4820 },
@@ -19,6 +22,35 @@ const CATEGORIES = [
   { name: "Inredning",             slug: "inredning",          image: "/images/verkstad-hero.jpeg",count: 5200 },
   { name: "Hjul & Däck",           slug: "hjul-dack",          image: "/images/dack.jpeg",         count: 1780 },
   { name: "Belysning",             slug: "belysning",          image: "/images/mercedes-hero.jpeg",count: 2340 },
+];
+
+const MERCEDES_OE_CARDS = [
+  { slug: "motor-transmission", name: "Motor",         image: "/images/motor.jpeg" },
+  { slug: "motor-transmission", name: "Växellåda",     image: "/images/montering.jpeg" },
+  { slug: "hjul-dack",          name: "Hjul & Stötd.", image: "/images/dack.jpeg" },
+  { slug: "kaross-plat",        name: "Kaross",        image: "/images/vindruta.jpeg" },
+  { slug: "kaross-plat",        name: "Dörr",          image: "/images/mercedes-hero.jpeg" },
+];
+
+const TESTIMONIALS = [
+  {
+    author: "Lars E., Uppsala",
+    rating: 5,
+    text: "Hittade en omöjlig Mercedes-del på 24 timmar. Adam ringde personligen och rapporterade. Toppservice.",
+    source: "Google Recensioner",
+  },
+  {
+    author: "Anna K., Västerås",
+    rating: 5,
+    text: "Skrotade min gamla Volvo — gratis hämtning, fick betalt på Swish samma dag. Smidigare än jag trodde.",
+    source: "Trustpilot",
+  },
+  {
+    author: "Bengts Bilservice, Enköping",
+    rating: 5,
+    text: "Vår fasta partner sedan 5 år. Snabba leveranser, faktura 30 dagar, alltid rätt del. Rekommenderas.",
+    source: "B2B-kund",
+  },
 ];
 
 function partImage(name: string, firstImage?: string | null): string {
@@ -34,24 +66,13 @@ function partImage(name: string, firstImage?: string | null): string {
   return "/images/motor.jpeg";
 }
 
-function toTitleCase(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
-
 export default async function HomePage() {
-  const [rawFeatured, topBrands] = await Promise.all([
-    db.part.findMany({
-      where: { status: "AVAILABLE", priceSek: { not: null } },
-      include: { vehicle: true, images: { take: 1, orderBy: { sortOrder: "asc" } } },
-      orderBy: [{ vehicle: { brandSlug: "asc" } }, { priceSek: "desc" }],
-      take: 8,
-    }),
-    db.vehicle.findMany({
-      where: { status: { not: "SCRAPPED" } },
-      select: { brandSlug: true, model: true },
-      take: 20,
-    }),
-  ]);
+  const rawFeatured = await db.part.findMany({
+    where: { status: "AVAILABLE", priceSek: { not: null } },
+    include: { vehicle: true, images: { take: 1, orderBy: { sortOrder: "asc" } } },
+    orderBy: [{ vehicle: { brandSlug: "asc" } }, { priceSek: "desc" }],
+    take: 8,
+  });
 
   const featuredParts = rawFeatured
     .sort((a, b) => {
@@ -61,127 +82,96 @@ export default async function HomePage() {
     })
     .slice(0, 4);
 
-  // Dynamic popular search terms from real inventory, fallback handled in HeroSearch
-  const popularTerms = topBrands.length > 0
-    ? [...new Set(topBrands.map((v) => {
-        if (v.brandSlug === "mercedes-benz") return "Mercedes " + (v.model?.split(" ")[0] ?? "E-klass");
-        return v.brandSlug.charAt(0).toUpperCase() + v.brandSlug.slice(1).replace(/-/g, " ");
-      }))].slice(0, 4)
-    : [];
   return (
     <>
-      {/* ─── HERO — split layout ─── */}
-      <section className="relative min-h-[70vh] sm:min-h-[90vh] flex items-center overflow-hidden pt-12 pb-12 sm:pt-16">
-        {/* Background photo */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/verkstad-hero.jpeg" alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover object-center" />
-        {/* Dark overlay so text stays readable */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/70 to-black/50" />
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[var(--color-brand-orange)] opacity-[0.06] rounded-full blur-[140px] -translate-x-1/3 -translate-y-1/3" />
+      {/* ─── HERO ─── */}
+      <HomeHero brands={HERO_BRANDS} />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 w-full">
-          <div>
-            {/* Text + search */}
-            <div className="max-w-2xl">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[var(--color-brand-orange)]/30 bg-[var(--color-brand-orange)]/8 text-[var(--color-brand-orange-light)] text-xs font-semibold tracking-wider uppercase mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)] animate-pulse" />
-                Mercedes-specialist sedan 1984
-              </div>
+      {/* ─── TRUST STRIP ─── */}
+      <TrustStrip />
 
-              <h1 className="text-4xl sm:text-5xl font-black leading-[1.08] tracking-tight mb-4">
-                Rätt bildelar<br />
-                <span className="gradient-text">till rätt pris</span>
-              </h1>
-
-              <p className="text-base text-[var(--color-text-secondary)] mb-8 max-w-md leading-relaxed">
-                30 000+ begagnade bildelar direkt från vår bildemontering i Enköping.
-                Beställ online — leverans 1–3 dagar eller hämta direkt.
-              </p>
-
-              {/* Search widget */}
-              <HeroSearch popularTerms={popularTerms} />
-
-              {/* Quick stats */}
-              <div className="flex flex-wrap gap-x-4 gap-y-3 sm:gap-6 mt-6">
-                {[
-                  { value: "30 000+", label: "Delar i lager" },
-                  { value: "40 år",   label: "Erfarenhet" },
-                  { value: "1–3 dagar", label: "Leveranstid" },
-                ].map((s) => (
-                  <div key={s.label}>
-                    <div className="text-base sm:text-lg font-black text-[var(--color-brand-orange)]">{s.value}</div>
-                    <div className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+      {/* ─── MERCEDES SPECIALISTER ─── */}
+      <section className="bg-white py-16 border-b border-slate-200">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="mb-8">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-wider uppercase">
+              Mercedes Specialister
+            </h2>
+            <p className="text-sm text-slate-500 mt-1">
+              Sök originaldelar direkt på OE-nummer — Mercedes-specialist sedan 1984
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* ─── TRUST BAR ─── */}
-      <section className="border-y border-[var(--color-dark-500)] bg-[var(--color-dark-800)]">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex flex-wrap justify-center gap-x-4 sm:gap-x-8 gap-y-1.5">
-            {[
-              { icon: "🚚", text: "Fri frakt över 500 kr" },
-              { icon: "✅", text: "Garanti på alla delar" },
-              { icon: "💳", text: "Klarna · Swish · Kort" },
-              { icon: "📞", text: "0171-210 02" },
-              { icon: "📍", text: "Hämta i Enköping" },
-            ].map((item) => (
-              <div key={item.text} className="flex items-center gap-2 text-sm py-1">
-                <span>{item.icon}</span>
-                <span className="text-[var(--color-text-secondary)] font-medium">{item.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── SCRAP YOUR CAR CTA ─── */}
-      <section className="bg-[var(--color-dark-800)] py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="rounded-2xl border border-[var(--color-brand-orange)]/20 bg-gradient-to-r from-[var(--color-brand-orange)]/8 via-transparent to-[var(--color-brand-orange)]/8 p-8 sm:p-12">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-black mb-3">Dags att skrota bilen?</h2>
-                <p className="text-[var(--color-text-secondary)] mb-2">
-                  Vi hämtar gratis i hela Mälardalen och sköter avregistreringen.
-                </p>
-                <p className="text-sm text-[var(--color-text-muted)]">
-                  Enköping · Uppsala · Västerås · Stockholm · Eskilstuna
-                </p>
-              </div>
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="text"
-                    placeholder="Registreringsnummer"
-                    className="flex-1 px-4 py-3 bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] rounded-xl text-sm placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-brand-orange)] transition-all"
-                  />
-                  <Link href="/skrota-bilen#boka" className="btn-primary px-5 py-3 rounded-xl text-sm whitespace-nowrap inline-flex items-center justify-center">
-                    Boka hämtning
-                  </Link>
+          <div className="grid lg:grid-cols-[1fr,3fr] gap-6 items-stretch">
+            {/* Big Mercedes engine illustration */}
+            <div className="relative rounded-2xl overflow-hidden bg-slate-100 min-h-[260px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/motor.jpeg"
+                alt="Mercedes motor"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/30 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 text-white">
+                <div className="text-sm font-bold leading-tight mb-1">
+                  Din expert på<br />begagnade och<br />testade originaldelar.
                 </div>
-                <p className="text-xs text-[var(--color-text-muted)] text-center">
-                  Eller ring direkt:{" "}
-                  <a href="tel:017121002" className="text-[var(--color-brand-orange)] font-semibold">0171-210 02</a>
-                </p>
               </div>
+            </div>
+
+            {/* 5 cards in a horizontal row */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {MERCEDES_OE_CARDS.map((card, i) => (
+                <form
+                  key={i}
+                  action="/bildelar"
+                  className="rounded-xl border border-slate-200 bg-white hover:border-slate-400 hover:shadow-md transition-all overflow-hidden flex flex-col"
+                >
+                  <input type="hidden" name="marke" value="mercedes-benz" />
+                  <input type="hidden" name="kategori" value={card.slug} />
+                  <div className="aspect-square bg-slate-50 relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={card.image}
+                      alt={card.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-2 border-t border-slate-100 flex flex-col gap-1.5 bg-white">
+                    <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wider px-1">
+                      {card.name}
+                    </div>
+                    <div className="flex gap-1 items-center">
+                      <input
+                        type="text"
+                        name="q"
+                        placeholder="OE-nr…"
+                        className="flex-1 min-w-0 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-[11px] placeholder:text-slate-400 text-slate-900 focus:outline-none focus:border-slate-900 transition-all"
+                      />
+                      <button
+                        type="submit"
+                        aria-label={`Sök ${card.name}`}
+                        className="shrink-0 p-1.5 rounded bg-slate-900 hover:bg-slate-800 text-white"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── CATEGORIES ─── */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      {/* ─── KATEGORIER ─── */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-black mb-1">Populära kategorier</h2>
-            <p className="text-sm text-[var(--color-text-secondary)]">Bläddra efter deltyp</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">Populära kategorier</h2>
+            <p className="text-sm text-slate-500">Bläddra efter deltyp</p>
           </div>
           <Link href="/bildelar/kategorier" className="text-sm text-[var(--color-brand-orange)] font-medium hover:underline hidden sm:block">
             Se alla →
@@ -192,97 +182,135 @@ export default async function HomePage() {
             <Link
               key={cat.slug}
               href={`/bildelar/kategorier/${cat.slug}`}
-              className="card-hover group relative rounded-xl overflow-hidden border border-[var(--color-dark-500)] aspect-[4/3]"
+              className="group relative rounded-xl overflow-hidden border border-slate-200 aspect-[4/3] hover:shadow-lg transition-shadow"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={cat.image}
                 alt={cat.name}
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-3">
-                <div className="font-bold text-sm text-white leading-tight">{cat.name}</div>
-                <div className="text-xs text-[var(--color-brand-orange-light)] font-medium mt-0.5">{cat.count.toLocaleString()} delar</div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                <div className="font-bold text-sm leading-tight">{cat.name}</div>
+                <div className="text-xs text-[var(--color-brand-orange-light)] font-medium mt-0.5">
+                  {cat.count.toLocaleString()} delar
+                </div>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* ─── BILRUTOR BANNER ─── */}
-      <section className="bg-[var(--color-dark-800)] py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="rounded-2xl overflow-hidden border border-[var(--color-brand-orange)]/20 bg-gradient-to-r from-[var(--color-brand-orange)]/10 via-[var(--color-dark-700)] to-[var(--color-brand-orange)]/10 p-8 sm:p-12">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-brand-orange)]/15 border border-[var(--color-brand-orange)]/25 text-[var(--color-brand-orange-light)] text-xs font-semibold uppercase tracking-wider mb-4">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-brand-orange)] animate-pulse" />
-                  Nya rutor till alla bilar
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-black mb-3">
-                  Nya bilrutor till <span className="gradient-text">alla bilar</span>
-                </h2>
-                <p className="text-[var(--color-text-secondary)] mb-2">
-                  Nya vindrutor, bakrutor, sidorutor och takluckor till alla bilmärken. Vi levererar och monterar — ring oss med ditt regnummer så löser vi det.
-                </p>
-                <p className="text-sm text-[var(--color-text-muted)]">
-                </p>
-              </div>
-              <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-2">
-                  {["Vindruta", "Bakruta", "Sidoruta", "Taklucka"].map((type) => (
-                    <div key={type} className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[var(--color-dark-600)] border border-[var(--color-dark-500)] text-xs sm:text-sm font-medium">
-                      <span className="text-[var(--color-brand-orange)]">🪟</span> {type}
+      {/* ─── TRUST + B2B side-by-side ─── */}
+      <section className="bg-slate-50 py-16 border-y border-slate-200">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-6">
+
+            {/* LEFT — Trust and Sustainability */}
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-wider uppercase mb-5">
+                Trust &amp; Sustainability
+              </h2>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 mb-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded bg-emerald-500 text-white text-xl font-black">
+                    ★
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                      Trustpilot
                     </div>
+                    <div className="text-2xl font-black text-slate-900 leading-none mt-0.5">
+                      4.9<span className="text-base text-slate-400">/5</span>
+                    </div>
+                  </div>
+                  <div className="ml-auto text-xs text-slate-500">
+                    240+<br />recensioner
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-full bg-slate-200 shrink-0 flex items-center justify-center text-slate-500 font-bold">
+                    {TESTIMONIALS[0].author.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex gap-0.5 text-amber-400 text-sm mb-1">
+                      {Array.from({ length: TESTIMONIALS[0].rating }).map((_, k) => (
+                        <span key={k}>★</span>
+                      ))}
+                    </div>
+                    <p className="text-sm text-slate-700 leading-relaxed">
+                      &ldquo;{TESTIMONIALS[0].text}&rdquo;
+                    </p>
+                    <div className="text-xs text-slate-500 mt-2">
+                      <strong className="text-slate-700">{TESTIMONIALS[0].author}</strong>
+                      {" · "}
+                      {TESTIMONIALS[0].source}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center gap-1.5 pt-2">
+                  {TESTIMONIALS.map((_, i) => (
+                    <span
+                      key={i}
+                      className={`w-1.5 h-1.5 rounded-full ${i === 0 ? "bg-slate-900" : "bg-slate-300"}`}
+                    />
                   ))}
                 </div>
-                <Link href="/bilrutor#forfragan" className="w-full text-center py-3.5 rounded-xl bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] text-white font-bold text-sm transition-colors inline-block">
-                  Skicka förfrågan →
+              </div>
+            </div>
+
+            {/* RIGHT — B2B Portal */}
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-wider uppercase mb-5">
+                B2B Portal
+              </h2>
+
+              <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-7 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    </svg>
+                  </div>
+                  <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    För verkstäder:
+                  </div>
+                </div>
+
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4 leading-snug">
+                  Nettopriser, expressfrakt och realtidslager.
+                </h3>
+
+                <Link
+                  href="/b2b"
+                  className="block text-center px-5 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm uppercase tracking-wider transition-colors"
+                >
+                  Anslut Din Verkstad
                 </Link>
-                <a href="tel:017121002" className="w-full text-center py-3 rounded-xl border border-[var(--color-dark-400)] text-[var(--color-text-secondary)] hover:border-[var(--color-brand-orange)] hover:text-[var(--color-brand-orange-light)] font-medium text-sm transition-colors inline-block">
-                  Ring oss: 0171-210 02
-                </a>
+
+                <Link
+                  href="/logga-in"
+                  className="block text-center mt-2 text-xs text-slate-500 hover:text-slate-900 transition-colors"
+                >
+                  Redan kund? Logga in →
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── BRANDS GRID ─── */}
-      <section className="bg-[var(--color-dark-800)] py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-2xl font-black mb-1">Sök per bilmärke</h2>
-              <p className="text-sm text-[var(--color-text-secondary)]">Välj ditt märke och hitta rätt del</p>
-            </div>
-            <Link href="/bildelar/marken" className="text-sm text-[var(--color-brand-orange)] font-medium hover:underline hidden sm:block">
-              Alla märken →
-            </Link>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3">
-            {BRANDS.map((brand) => (
-              <Link
-                key={brand.slug}
-                href={`/bildelar/marken/${brand.slug}`}
-                className="card-hover flex flex-col items-center gap-2 p-4 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] text-center group hover:border-[var(--color-brand-orange)]/40"
-              >
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center p-1.5 group-hover:scale-110 transition-transform shadow-md">
-                  <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain" />
-                </div>
-                <span className="font-semibold text-xs leading-tight">{brand.name}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── FEATURED PARTS — real data from db ─── */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      {/* ─── FEATURED PARTS ─── */}
+      <section className="max-w-6xl mx-auto px-4 py-16 bg-white">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-black mb-1">Utvalda delar</h2>
-            <p className="text-sm text-[var(--color-text-secondary)]">Riktiga delar direkt ur lagret — köp direkt online</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">Utvalda delar</h2>
+            <p className="text-sm text-slate-500">Riktiga delar direkt ur lagret — köp direkt online</p>
           </div>
           <Link href="/bildelar" className="text-sm text-[var(--color-brand-orange)] font-medium hover:underline hidden sm:block">
             Se alla →
@@ -304,57 +332,116 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── ÖPPETTIDER & KONTAKT ─── */}
-      <section className="bg-[var(--color-dark-800)] py-16">
+      {/* ─── BILRUTOR-BANNER (light) ─── */}
+      <section className="bg-slate-50 py-16 border-y border-slate-200">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Öppettider */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-8 sm:p-12 shadow-sm">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <span className="inline-block px-3 py-1 rounded-full bg-[var(--color-brand-orange)]/10 text-[var(--color-brand-orange)] text-xs font-bold uppercase tracking-widest mb-3">
+                  Nya rutor till alla bilar
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-3">
+                  Nya bilrutor till alla bilar
+                </h2>
+                <p className="text-slate-600">
+                  Vindrutor, bakrutor, sidorutor och takluckor. Vi levererar och monterar.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-2 gap-2">
+                  {["Vindruta", "Bakruta", "Sidoruta", "Taklucka"].map((type) => (
+                    <div key={type} className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm font-medium text-slate-700">
+                      <span className="text-[var(--color-brand-orange)]">🪟</span> {type}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/bilrutor#forfragan" className="w-full text-center py-3.5 rounded-xl bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] text-white font-bold text-sm transition-colors uppercase">
+                  Skicka förfrågan →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── BRANDS GRID ─── */}
+      <section className="bg-white py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-black mb-2">Öppettider</h2>
-              <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-                Besök oss på Magasingatan 2 i Enköping — eller ring direkt.
-              </p>
-              <div className="space-y-0 rounded-xl overflow-hidden border border-[var(--color-dark-500)]">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">Sök per bilmärke</h2>
+              <p className="text-sm text-slate-500">Välj ditt märke och hitta rätt del</p>
+            </div>
+            <Link href="/bildelar/marken" className="text-sm text-[var(--color-brand-orange)] font-medium hover:underline hidden sm:block">
+              Alla märken →
+            </Link>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-8 gap-2 sm:gap-3">
+            {TOP_BRANDS.map((brand) => (
+              <Link
+                key={brand.slug}
+                href={`/bildelar/marken/${brand.slug}`}
+                className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white border border-slate-200 text-center group hover:border-slate-300 hover:shadow-md transition-all"
+              >
+                <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center p-1.5 group-hover:scale-110 transition-transform">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain" />
+                </div>
+                <span className="font-semibold text-xs leading-tight text-slate-700">{brand.name}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── ÖPPETTIDER + KONTAKT ─── */}
+      <section className="bg-slate-50 py-16 border-t border-slate-200">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900 mb-2">Öppettider</h2>
+              <p className="text-sm text-slate-500 mb-6">Magasingatan 2, Enköping</p>
+              <div className="rounded-xl overflow-hidden border border-slate-200 bg-white">
                 {[
                   ["Måndag–Torsdag", "08:00 — 17:00", false],
-                  ["Fredag",         "08:00 — 15:00", false],
-                  ["Lördag",         "10:00 — 14:00", false],
-                  ["Söndag",         "Stängt",        true],
+                  ["Fredag", "08:00 — 15:00", false],
+                  ["Lördag", "10:00 — 14:00", false],
+                  ["Söndag", "Stängt", true],
                 ].map(([day, hours, closed]) => (
                   <div
                     key={day as string}
-                    className="flex justify-between items-center px-5 py-3.5 border-b border-[var(--color-dark-500)] last:border-0 bg-[var(--color-dark-700)]"
+                    className="flex justify-between items-center px-5 py-3.5 border-b border-slate-100 last:border-0"
                   >
-                    <span className="text-sm text-[var(--color-text-secondary)]">{day as string}</span>
-                    <span className={`text-sm font-semibold ${closed ? "text-[var(--color-text-muted)]" : "text-[var(--color-text-primary)]"}`}>
+                    <span className="text-sm text-slate-600">{day as string}</span>
+                    <span className={`text-sm font-semibold ${closed ? "text-slate-400" : "text-slate-900"}`}>
                       {hours as string}
                     </span>
                   </div>
                 ))}
               </div>
             </div>
-            {/* Kontakt */}
-            <div className="space-y-4">
-              <h2 className="text-2xl font-black mb-2">Kontakta oss</h2>
-              <a href="tel:017121002" className="flex items-center gap-4 p-5 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)]/50 transition-colors group">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-orange)]/10 flex items-center justify-center text-[var(--color-brand-orange)] text-xl shrink-0">📞</div>
+            <div className="space-y-3">
+              <h2 className="text-2xl font-black text-slate-900 mb-2">Kontakta oss</h2>
+              <a href="tel:017121002" className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-200 hover:border-[var(--color-brand-orange)]/40 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-orange)]/10 flex items-center justify-center text-[var(--color-brand-orange)] text-xl">📞</div>
                 <div>
-                  <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mb-0.5">Telefon</div>
-                  <div className="font-bold group-hover:text-[var(--color-brand-orange)] transition-colors">0171-210 02</div>
+                  <div className="text-xs text-slate-500 uppercase tracking-wider">Telefon</div>
+                  <div className="font-bold text-slate-900">0171-210 02</div>
                 </div>
               </a>
-              <a href="mailto:info@bilskrotscentralen.com" className="flex items-center gap-4 p-5 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)]/50 transition-colors group">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-orange)]/10 flex items-center justify-center text-[var(--color-brand-orange)] text-xl shrink-0">✉️</div>
+              <a href="mailto:info@bilskrotscentralen.com" className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-200 hover:border-[var(--color-brand-orange)]/40 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-orange)]/10 flex items-center justify-center text-[var(--color-brand-orange)] text-xl">✉️</div>
                 <div>
-                  <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mb-0.5">E-post</div>
-                  <div className="font-bold group-hover:text-[var(--color-brand-orange)] transition-colors">info@bilskrotscentralen.com</div>
+                  <div className="text-xs text-slate-500 uppercase tracking-wider">E-post</div>
+                  <div className="font-bold text-slate-900 text-sm">info@bilskrotscentralen.com</div>
                 </div>
               </a>
-              <a href="https://maps.google.com/?q=Magasingatan+2+Enköping" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-5 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)]/50 transition-colors group">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-orange)]/10 flex items-center justify-center text-[var(--color-brand-orange)] text-xl shrink-0">📍</div>
+              <a href="https://maps.google.com/?q=Magasingatan+2+Enköping" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-200 hover:border-[var(--color-brand-orange)]/40 hover:shadow-sm transition-all">
+                <div className="w-10 h-10 rounded-lg bg-[var(--color-brand-orange)]/10 flex items-center justify-center text-[var(--color-brand-orange)] text-xl">📍</div>
                 <div>
-                  <div className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider mb-0.5">Besöksadress</div>
-                  <div className="font-bold group-hover:text-[var(--color-brand-orange)] transition-colors">Magasingatan 2, 749 35 Enköping</div>
+                  <div className="text-xs text-slate-500 uppercase tracking-wider">Besöksadress</div>
+                  <div className="font-bold text-slate-900">Magasingatan 2, Enköping</div>
                 </div>
               </a>
             </div>
@@ -363,43 +450,26 @@ export default async function HomePage() {
       </section>
 
       {/* ─── WHY US ─── */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl font-black mb-2">Varför Bilskrotscentralen?</h2>
-          <p className="text-sm text-[var(--color-text-secondary)]">Riktiga delar, riktig service, 40 år i branschen</p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              icon: "🛒",
-              title: "Köp direkt online",
-              desc: "Hitta delen, betala med Klarna eller Swish — ingen väntan på telefonsvar.",
-            },
-            {
-              icon: "🛡️",
-              title: "Garanti på alla delar",
-              desc: "Funktionsgaranti ingår. Funkar den inte? Pengarna tillbaka.",
-            },
-            {
-              icon: "📦",
-              title: "Leverans 1–3 dagar",
-              desc: "PostNord eller DHL med spårning. Fri frakt över 500 kr.",
-            },
-            {
-              icon: "⭐",
-              title: "Mercedes-specialister",
-              desc: "8 400+ Mercedes-delar. Luftfjädring till Sveriges lägsta priser.",
-            },
-          ].map((item) => (
-            <div
-              key={item.title}
-              className="p-6 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)]"
-            >
-              <span className="text-2xl block mb-3">{item.icon}</span>
-              <h3 className="text-base font-bold mb-2">{item.title}</h3>
-              <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
+      <section className="bg-white py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">Varför Bilskrotscentralen?</h2>
+            <p className="text-sm text-slate-500">Riktiga delar, riktig service, 40 år i branschen</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: "🛒", title: "Köp direkt online", desc: "Hitta delen, betala med Klarna eller Swish — ingen väntan på telefonsvar." },
+              { icon: "🛡️", title: "Garanti på alla delar", desc: "Funktionsgaranti ingår. Funkar den inte? Pengarna tillbaka." },
+              { icon: "📦", title: "Leverans 1–3 dagar", desc: "PostNord eller DHL med spårning. Fri frakt över 500 kr." },
+              { icon: "♻️", title: "100 % återvinning", desc: "Allt från bilen återvinns till nytt material — inget blir avfall." },
+            ].map((item) => (
+              <div key={item.title} className="p-6 rounded-xl bg-slate-50 border border-slate-200 hover:bg-white hover:shadow-sm transition-all">
+                <span className="text-2xl block mb-3">{item.icon}</span>
+                <h3 className="text-base font-bold text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </>
