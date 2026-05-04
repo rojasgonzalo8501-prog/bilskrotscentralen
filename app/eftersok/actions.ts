@@ -22,27 +22,39 @@ export async function submitEftersok(
   const marke   = (formData.get("marke")   as string | null)?.trim() ?? "";
   const modell  = (formData.get("modell")  as string | null)?.trim() ?? "";
   const ar      = (formData.get("ar")      as string | null)?.trim() ?? "";
+  const sku     = (formData.get("sku")     as string | null)?.trim() ?? "";
 
   if (!namn || !telefon || !epost || !del) {
     return { status: "error", message: "Fyll i namn, telefon, e-post och vad du letar efter." };
   }
 
+  // Distinguish a price-on-request inquiry (came from a part page with
+  // an existing SKU) from a generic eftersökning so the inbox sees it.
+  const isPriceInquiry = Boolean(sku);
+  const partUrl = sku ? `https://bilskrotscentralen.com/bildelar/${sku}` : "";
+
   const html = `
-    <h2 style="font-family:sans-serif">Ny eftersökning</h2>
+    <h2 style="font-family:sans-serif">${isPriceInquiry ? "Pris-förfrågan" : "Ny eftersökning"}</h2>
     <table style="font-family:sans-serif;border-collapse:collapse">
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">Namn</td><td>${namn}</td></tr>
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">Telefon</td><td><a href="tel:${telefon}">${telefon}</a></td></tr>
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">E-post</td><td><a href="mailto:${epost}">${epost}</a></td></tr>
+      ${sku ? `<tr><td style="padding:5px 16px 5px 0;font-weight:bold;color:#888">─ Del ─</td><td></td></tr>
+      <tr><td style="padding:5px 16px 5px 0;font-weight:bold">Art.nr</td><td><a href="${partUrl}">${sku}</a></td></tr>` : ""}
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold;color:#888">─ Bilen ─</td><td></td></tr>
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">Regnr</td><td>${regnr || "—"}</td></tr>
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">VIN</td><td>${vin || "—"}</td></tr>
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">Märke</td><td>${marke || "—"}</td></tr>
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">Modell</td><td>${modell || "—"}</td></tr>
       <tr><td style="padding:5px 16px 5px 0;font-weight:bold">År</td><td>${ar || "—"}</td></tr>
-      <tr><td style="padding:5px 16px 5px 0;font-weight:bold;color:#888">─ Del ─</td><td></td></tr>
-      <tr><td style="padding:5px 16px 5px 0;font-weight:bold">Söker</td><td style="white-space:pre-wrap">${del}</td></tr>
+      <tr><td style="padding:5px 16px 5px 0;font-weight:bold;color:#888">─ ${isPriceInquiry ? "Meddelande" : "Söker"} ─</td><td></td></tr>
+      <tr><td style="padding:5px 16px 5px 0;font-weight:bold">${isPriceInquiry ? "Kund skrev" : "Söker"}</td><td style="white-space:pre-wrap">${del}</td></tr>
     </table>
   `;
+
+  const subject = isPriceInquiry
+    ? `Pris-förfrågan — ${sku} (${namn})`
+    : `Eftersökning — ${marke || "okänt märke"} ${modell || ""} (${namn})`;
 
   try {
     if (process.env.RESEND_API_KEY) {
@@ -51,11 +63,11 @@ export async function submitEftersok(
         to:   "eftersok@bilskrotscentralen.com",
         cc:   ["adam@bilskrotscentralen.com", "gonzalo@bilskrotscentralen.com"],
         replyTo: epost,
-        subject: `Eftersökning — ${marke || "okänt märke"} ${modell || ""} (${namn})`,
+        subject,
         html,
       });
     } else {
-      console.log("[eftersok]", { namn, telefon, epost, regnr, vin, marke, modell, ar, del });
+      console.log("[eftersok]", { namn, telefon, epost, regnr, vin, marke, modell, ar, del, sku });
     }
     return { status: "success" };
   } catch (err) {
