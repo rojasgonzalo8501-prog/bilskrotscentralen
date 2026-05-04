@@ -98,7 +98,7 @@ const FAQ_GROUPS: { title: string; items: { q: string; a: string }[] }[] = [
       },
       {
         q: "Hur reklamerar jag en felaktig del?",
-        a: "Ring oss på 0171-210 02 med ditt ordernummer och beskriv felet — skicka gärna bild eller video via SMS/WhatsApp. Vi bedömer ärendet och om garantin gäller skickar vi returinstruktion. Bifoga alltid kvitto. Återbetalning sker inom 30 dagar om ingen likvärdig del finns.",
+        a: "Ring oss på 0171-210 02 med ditt ordernummer och beskriv felet — skicka gärna bild eller video via chatten eller SMS. Vi bedömer ärendet och om garantin gäller skickar vi returinstruktion. Bifoga alltid kvitto. Återbetalning sker inom 30 dagar om ingen likvärdig del finns.",
       },
       {
         q: "Inom vilken tid måste jag reklamera?",

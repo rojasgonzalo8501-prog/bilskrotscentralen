@@ -178,7 +178,7 @@ function OeNumberGuide() {
 
       <h2>Fortfarande osäker?</h2>
       <p>
-        Skicka en bild på delen via WhatsApp så identifierar vi den åt dig. Vi
+        Skicka en bild på delen via chatten så identifierar vi den åt dig. Vi
         har 40 års erfarenhet av just Mercedes — vi känner igen det mesta på
         2 sekunder.
       </p>

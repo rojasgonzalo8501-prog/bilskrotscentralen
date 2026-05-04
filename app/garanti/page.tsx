@@ -100,7 +100,7 @@ export default function GarantiPage() {
             <Step n={1} title="Ring oss på 0171-210 02">
               Kontakta oss per <strong>telefon</strong> (inte e-post) med ditt ordernummer
               och en beskrivning av felet. Har du bild eller video — skicka gärna det i
-              ett SMS eller WhatsApp så kan vi ofta godkänna ärendet direkt.
+              ett SMS eller via chatten så kan vi ofta godkänna ärendet direkt.
             </Step>
             <Step n={2} title="Vi bedömer ärendet">
               Vi går igenom felet och avgör om det täcks av garantin. I de flesta fall

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 const STEPS = [
-  { num: "1", title: "Ring eller boka online", desc: "Kontakta oss via telefon, formulär eller WhatsApp. Vi behöver registreringsnummer och din adress." },
+  { num: "1", title: "Ring eller boka online", desc: "Kontakta oss via telefon, formulär eller chatten. Vi behöver registreringsnummer och din adress." },
   { num: "2", title: "Vi bokar upphämtning", desc: "Vi ordnar en tid som passar dig — ofta inom 1–2 dagar. Ingen kostnad, inga dolda avgifter." },
   { num: "3", title: "Vi hämtar bilen", desc: "Vår chaufför hämtar bilen direkt hos dig. Ha registeringsbevisets del 2 (gult papper) och legitimation redo." },
   { num: "4", title: "Du får skrotningsintyget", desc: "Vi hanterar all administration och du får ett skrotningsintyg. Klart!" },

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { ChatTrigger } from "@/components/ChatTrigger";
 
 export const metadata: Metadata = { title: "Order — Mitt konto" };
 export const dynamic = "force-dynamic";
@@ -191,14 +192,15 @@ export default async function OrderDetailPage({
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link href="/konto/ordrar" className="btn-secondary text-center">← Tillbaka</Link>
-        <a
-          href={`https://wa.me/4617121002?text=${encodeURIComponent(`Hej! Jag har en fråga om min order #${order.orderNumber}.`)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-bold transition-colors"
+        <ChatTrigger
+          context={{ topic: "Orderfråga", orderNumber: order.orderNumber }}
+          prefill={`Hej! Jag har en fråga om min order #${order.orderNumber}.`}
+          fallbackHref={`https://wa.me/4617121002?text=${encodeURIComponent(`Hej! Jag har en fråga om min order #${order.orderNumber}.`)}`}
+          ariaLabel="Öppna chatten med frågor om ordern"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] text-white text-sm font-bold transition-colors"
         >
-          Frågor? WhatsApp
-        </a>
+          💬 Frågor? Öppna chatten
+        </ChatTrigger>
       </div>
     </section>
   );

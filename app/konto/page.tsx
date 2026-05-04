@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { ChatTrigger } from "@/components/ChatTrigger";
 import { logoutAction } from "../logga-in/actions";
 
 export const metadata: Metadata = {
@@ -176,14 +177,21 @@ export default async function KontoPage() {
           cta="Skicka förfrågan"
           href="/eftersok"
         />
-        <PortalCard
-          icon="💬"
-          title="WhatsApp"
-          desc="Snabba frågor om en order eller del — chatta direkt med oss."
-          cta="Öppna WhatsApp"
-          href="https://wa.me/4617121002"
-          external
-        />
+        <ChatTrigger
+          context={{ topic: "Kundfråga (konto)" }}
+          fallbackHref="https://wa.me/4617121002"
+          ariaLabel="Öppna chatten"
+          className="card-hover p-6 rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] block hover:border-[var(--color-brand-orange)]/50 transition-all text-left w-full"
+        >
+          <div className="text-3xl mb-3">💬</div>
+          <h3 className="text-lg font-bold mb-2">Livechatt</h3>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-4">
+            Snabba frågor om en order eller del — chatta direkt med oss.
+          </p>
+          <span className="text-sm font-semibold text-[var(--color-brand-orange)]">
+            Öppna chatten →
+          </span>
+        </ChatTrigger>
         <PortalCard
           icon="📞"
           title="Ring oss"
