@@ -38,7 +38,7 @@ export function TrustStrip() {
               <img
                 src={item.src}
                 alt={item.label}
-                className="h-7 sm:h-8 max-w-[120px] object-contain opacity-70 hover:opacity-100 transition-opacity"
+                className="h-14 sm:h-16 max-w-[240px] object-contain opacity-70 hover:opacity-100 transition-opacity"
               />
             ) : (
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
