@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 import { HomeHero } from "@/components/HomeHero";
 import { TrustStrip } from "@/components/TrustStrip";
 import { FeaturedPartCard } from "@/components/FeaturedPartCard";
+import { TestimonialCarousel, type Testimonial } from "@/components/TestimonialCarousel";
+import { GUIDES } from "@/lib/guider";
 
 export const dynamic = "force-dynamic";
 
@@ -32,24 +34,46 @@ const MERCEDES_OE_CARDS = [
   { slug: "kaross-plat",        name: "Dörr",          image: "/images/mercedes-hero.jpeg" },
 ];
 
-const TESTIMONIALS = [
+const TESTIMONIALS: Testimonial[] = [
   {
-    author: "Lars E., Uppsala",
+    id: "t1",
+    author: "Lars E.",
+    location: "Uppsala",
     rating: 5,
     text: "Hittade en omöjlig Mercedes-del på 24 timmar. Adam ringde personligen och rapporterade. Toppservice.",
-    source: "Google Recensioner",
+    source: "Google",
   },
   {
-    author: "Anna K., Västerås",
+    id: "t2",
+    author: "Anna K.",
+    location: "Västerås",
     rating: 5,
     text: "Skrotade min gamla Volvo — gratis hämtning, fick betalt på Swish samma dag. Smidigare än jag trodde.",
     source: "Trustpilot",
   },
   {
-    author: "Bengts Bilservice, Enköping",
+    id: "t3",
+    author: "Bengts Bilservice",
+    location: "Enköping",
     rating: 5,
     text: "Vår fasta partner sedan 5 år. Snabba leveranser, faktura 30 dagar, alltid rätt del. Rekommenderas.",
     source: "B2B-kund",
+  },
+  {
+    id: "t4",
+    author: "Mikael S.",
+    location: "Stockholm",
+    rating: 5,
+    text: "Köpte luftfjäder till min E-klass. Halva priset mot ny — och med 6 månaders garanti.",
+    source: "Google",
+  },
+  {
+    id: "t5",
+    author: "Jenny H.",
+    location: "Eskilstuna",
+    rating: 5,
+    text: "Beställde söndag kväll. Levererad onsdag. Klarna-betalning gjorde det superenkelt.",
+    source: "Trustpilot",
   },
 ];
 
@@ -232,36 +256,7 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-200 shrink-0 flex items-center justify-center text-slate-500 font-bold">
-                    {TESTIMONIALS[0].author.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex gap-0.5 text-amber-400 text-sm mb-1">
-                      {Array.from({ length: TESTIMONIALS[0].rating }).map((_, k) => (
-                        <span key={k}>★</span>
-                      ))}
-                    </div>
-                    <p className="text-sm text-slate-700 leading-relaxed">
-                      &ldquo;{TESTIMONIALS[0].text}&rdquo;
-                    </p>
-                    <div className="text-xs text-slate-500 mt-2">
-                      <strong className="text-slate-700">{TESTIMONIALS[0].author}</strong>
-                      {" · "}
-                      {TESTIMONIALS[0].source}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-center gap-1.5 pt-2">
-                  {TESTIMONIALS.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`w-1.5 h-1.5 rounded-full ${i === 0 ? "bg-slate-900" : "bg-slate-300"}`}
-                    />
-                  ))}
-                </div>
-              </div>
+              <TestimonialCarousel testimonials={TESTIMONIALS} />
             </div>
 
             {/* RIGHT — B2B Portal */}
@@ -329,6 +324,123 @@ export default async function HomePage() {
               imageUrl={partImage(part.name, part.images[0]?.url)}
             />
           ))}
+        </div>
+      </section>
+
+      {/* ─── VERKSTAD — köp + montering på samma plats ─── */}
+      <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-[1.1fr,1fr] gap-8 items-center">
+            <div>
+              <span className="inline-block px-3 py-1 rounded-full bg-[var(--color-brand-orange)]/15 border border-[var(--color-brand-orange)]/30 text-[var(--color-brand-orange-light)] text-xs font-bold uppercase tracking-widest mb-4">
+                Köp + montering på samma plats
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight mb-4">
+                Vi är även en <span className="text-[var(--color-brand-orange)]">Mercedes-verkstad</span>
+              </h2>
+              <p className="text-base text-slate-300 mb-6 leading-relaxed">
+                Behöver du delen monterad? Vår verkstad i Enköping fixar det
+                samma dag — luftfjädring, AC, motor, växellåda och elektronik.
+                Originaldelar från eget lager till halva priset av nytt.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
+                {[
+                  "Luftfjädring (Airmatic)",
+                  "AC-service",
+                  "Motor & turbo",
+                  "Växellåda",
+                  "Diagnos & elektronik",
+                  "Hjul & balansering",
+                ].map((s) => (
+                  <div
+                    key={s}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700 text-xs text-slate-300"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-[var(--color-brand-orange)]" />
+                    <span>{s}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/verkstad"
+                  className="px-5 py-3 rounded-xl bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] text-white font-bold text-sm transition-colors uppercase tracking-wider"
+                >
+                  Boka verkstadstid →
+                </Link>
+                <a
+                  href="tel:017121002"
+                  className="px-5 py-3 rounded-xl border border-slate-600 hover:border-white text-slate-200 hover:text-white font-bold text-sm transition-colors"
+                >
+                  Ring 0171-210 02
+                </a>
+              </div>
+            </div>
+            <div className="relative rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-auto lg:h-[420px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/verkstad-hero.jpeg"
+                alt="Bilskrotscentralens verkstad i Enköping"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/70 via-transparent to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4">
+                  <div className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider mb-1">
+                    Mercedes-specialist sedan 1984
+                  </div>
+                  <div className="text-sm font-bold text-white">
+                    40 års erfarenhet — vi lagar det andra verkstäder skickar
+                    vidare.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── GUIDER — kunskapsbank för SEO ─── */}
+      <section className="bg-white py-16 border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-1">
+                Guider &amp; kunskapsbank
+              </h2>
+              <p className="text-sm text-slate-500">
+                40 års erfarenhet — gratis kunskap från våra Mercedes-specialister
+              </p>
+            </div>
+            <Link
+              href="/guider"
+              className="text-sm text-[var(--color-brand-orange)] font-medium hover:underline hidden sm:block"
+            >
+              Alla guider →
+            </Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {GUIDES.slice(0, 3).map((g) => (
+              <Link
+                key={g.slug}
+                href={`/guider/${g.slug}`}
+                className="group p-6 rounded-2xl bg-slate-50 hover:bg-white border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all flex flex-col"
+              >
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  {g.category} · {g.readTimeMin} min
+                </span>
+                <h3 className="font-bold text-slate-900 leading-tight mb-2 group-hover:text-[var(--color-brand-orange)] transition-colors">
+                  {g.title}
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed flex-1 mb-3">
+                  {g.excerpt}
+                </p>
+                <span className="text-sm font-semibold text-[var(--color-brand-orange)]">
+                  Läs guiden →
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

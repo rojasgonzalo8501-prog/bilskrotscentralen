@@ -4,6 +4,8 @@ import { getSession } from "@/lib/auth";
 import { CartProvider } from "@/components/CartContext";
 import Header from "@/components/Header";
 import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/JsonLd";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { Analytics } from "@/components/Analytics";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -97,10 +99,12 @@ export default async function RootLayout({
         <LocalBusinessJsonLd />
       </head>
       <body className="antialiased">
+        <Analytics />
         <CartProvider>
           <Header session={session} />
           <main>{children}</main>
           <Footer />
+          <WhatsAppButton />
         </CartProvider>
       </body>
     </html>
@@ -160,6 +164,8 @@ function Footer() {
               <FooterLink href="/om-oss" label="Om oss" />
               <FooterLink href="/kontakt" label="Kontakt" />
               <FooterLink href="/faq" label="Vanliga frågor" />
+              <FooterLink href="/guider" label="Guider & kunskapsbank" />
+              <FooterLink href="/omdomen" label="Kundomdömen" />
             </ul>
           </div>
 

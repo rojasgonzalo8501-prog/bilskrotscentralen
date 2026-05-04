@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { CATEGORIES } from "@/lib/categories";
 import { getBrands } from "@/lib/codelist";
+import { GUIDES } from "@/lib/guider";
 
 const BASE = "https://bilskrotscentralen.com";
 
@@ -24,9 +25,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/garanti`,                 priority: 0.5,  changeFrequency: "monthly" },
     { url: `${BASE}/faq`,                     priority: 0.5,  changeFrequency: "monthly" },
     { url: `${BASE}/omdomen`,                 priority: 0.6,  changeFrequency: "monthly" },
+    { url: `${BASE}/guider`,                  priority: 0.8,  changeFrequency: "weekly"  },
     { url: `${BASE}/kopvillkor`,              priority: 0.4,  changeFrequency: "yearly"  },
     { url: `${BASE}/integritetspolicy`,       priority: 0.4,  changeFrequency: "yearly"  },
   ];
+
+  const guideRoutes: MetadataRoute.Sitemap = GUIDES.map((g) => ({
+    url: `${BASE}/guider/${g.slug}`,
+    lastModified: g.updatedAt ? new Date(g.updatedAt) : new Date(g.publishedAt),
+    priority: 0.7,
+    changeFrequency: "monthly" as const,
+  }));
 
   const categoryRoutes: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
     url: `${BASE}/bildelar/kategorier/${c.slug}`,
@@ -57,5 +66,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB unavailable at build time — skip dynamic routes
   }
 
-  return [...staticRoutes, ...categoryRoutes, ...brandRoutes, ...partRoutes];
+  return [...staticRoutes, ...guideRoutes, ...categoryRoutes, ...brandRoutes, ...partRoutes];
 }

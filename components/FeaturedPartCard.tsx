@@ -41,6 +41,11 @@ export function FeaturedPartCard({ id, sku, name, priceSek, brandSlug, model, im
           alt={name}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
+        {/* Stock-urgency badge — every part is unique (1 of 1 from a dismantled vehicle) */}
+        <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-rose-500 text-white text-[10px] font-black uppercase tracking-wider shadow-md">
+          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+          Endast 1 kvar
+        </span>
       </div>
       <div className="p-4 flex flex-col flex-1">
         <div className="text-xs text-[var(--color-text-muted)] mb-1">
