@@ -117,6 +117,12 @@ export default async function EftersokAdminPage({
             Eftersökningar och pris-förfrågningar från kunder.
           </p>
         </div>
+        <a
+          href="/api/admin/export/eftersok"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] transition-colors"
+        >
+          ⬇ Exportera CSV
+        </a>
       </div>
 
       {/* Filter tabs */}

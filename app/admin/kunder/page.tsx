@@ -20,6 +20,12 @@ export default function KunderPage() {
             Kundregister och orderhistorik
           </p>
         </div>
+        <a
+          href="/api/admin/export/kunder"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] transition-colors"
+        >
+          ⬇ Exportera CSV
+        </a>
       </div>
 
       <div className="rounded-xl border border-dashed border-[var(--color-dark-500)] p-16 text-center max-w-lg mx-auto">

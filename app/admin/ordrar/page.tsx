@@ -55,6 +55,12 @@ export default async function OrdrarPage({
             {total} order{total !== 1 ? "ar" : ""} totalt
           </p>
         </div>
+        <a
+          href="/api/admin/export/ordrar"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] transition-colors"
+        >
+          ⬇ Exportera CSV
+        </a>
       </div>
 
       {/* Status filter tabs */}

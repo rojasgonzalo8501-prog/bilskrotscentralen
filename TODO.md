@@ -38,7 +38,11 @@ relevant section. PR description should reference the row(s) it closes.
 - [ ] **Bulk actions on `/admin/delar`**
       Select rows → bulk price update / bulk status change / bulk image
       upload. Adam stops clicking through 50 SKUs one by one.
-- [ ] **CSV export** on parts, orders, customers, invoices.
+- [x] **CSV export** on parts, orders, customers, invoices, leads.
+      `lib/csv.ts` builder with RFC 4180 escaping + UTF-8 BOM (Excel
+      opens åäö correctly). `/api/admin/export/<resource>` route
+      handler, admin/superadmin gated. Download buttons in each list
+      page header.
 - [ ] **Audit log model** + middleware that records every admin mutation
       with `userId`, `action`, `entityType`, `entityId`, `before`, `after`.
 - [ ] **2FA for admin users** (TOTP via `otplib`).
@@ -87,6 +91,9 @@ relevant section. PR description should reference the row(s) it closes.
 
 ## 📈 Sprint 7 — Marketing & B2B
 
+- [x] **Google Analytics 4** — measurement ID G-Y14NBBQ8NL hardcoded
+      as default in components/Analytics.tsx; overridable via
+      NEXT_PUBLIC_GA_ID. gtag.js loader is shared with Google Ads.
 - [ ] **Activate Meta Pixel + Google Ads tag**
       Already scaffolded in `components/Analytics.tsx` — needs IDs.
 - [ ] **Real Trustpilot integration**

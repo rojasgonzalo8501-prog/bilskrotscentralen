@@ -86,3 +86,63 @@ function parseCsvRows(text: string): string[][] {
   }
   return rows;
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+   CSV BUILDER — for admin exports.
+   RFC 4180 escaping + UTF-8 BOM so Excel opens åäö correctly.
+   ───────────────────────────────────────────────────────────────────── */
+
+type Primitive = string | number | boolean | bigint | null | undefined | Date;
+type Row = Record<string, Primitive>;
+
+const BOM = "﻿";
+
+function escapeCell(value: Primitive): string {
+  if (value == null) return "";
+  let s: string;
+  if (value instanceof Date) {
+    s = value.toISOString();
+  } else if (typeof value === "boolean") {
+    s = value ? "true" : "false";
+  } else {
+    s = String(value);
+  }
+  if (/[",\r\n]/.test(s)) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
+export function toCsv<T extends Row>(
+  rows: T[],
+  options?: {
+    columns?: { key: keyof T; label: string }[];
+    includeBOM?: boolean;
+  }
+): string {
+  const cols =
+    options?.columns ??
+    (rows[0]
+      ? Object.keys(rows[0]).map((k) => ({ key: k as keyof T, label: k }))
+      : []);
+
+  const header = cols.map((c) => escapeCell(c.label)).join(",");
+  const body = rows
+    .map((r) => cols.map((c) => escapeCell(r[c.key])).join(","))
+    .join("\r\n");
+
+  const csv = body ? `${header}\r\n${body}` : header;
+  return options?.includeBOM === false ? csv : BOM + csv;
+}
+
+export function csvResponseHeaders(filename: string): HeadersInit {
+  return {
+    "Content-Type": "text/csv; charset=utf-8",
+    "Content-Disposition": `attachment; filename="${filename}"`,
+    "Cache-Control": "no-store",
+  };
+}
+
+export function exportDatestamp(d: Date = new Date()): string {
+  return d.toISOString().slice(0, 10);
+}

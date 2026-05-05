@@ -96,6 +96,12 @@ export default async function DelarPage({
           >
             ⬆ Importera delar
           </Link>
+          <a
+            href="/api/admin/export/delar"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] transition-colors"
+          >
+            ⬇ Exportera CSV
+          </a>
         </div>
       </div>
 

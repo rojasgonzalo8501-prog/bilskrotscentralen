@@ -58,9 +58,17 @@ export default async function FakturorPage({
             {totalCount} faktura{totalCount !== 1 ? "r" : ""} totalt
           </p>
         </div>
-        <Link href="/admin/fakturor/ny" className="btn-primary px-5 py-2.5 text-sm">
-          + Ny faktura
-        </Link>
+        <div className="flex gap-2">
+          <a
+            href="/api/admin/export/fakturor"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] transition-colors"
+          >
+            ⬇ Exportera CSV
+          </a>
+          <Link href="/admin/fakturor/ny" className="btn-primary px-5 py-2.5 text-sm">
+            + Ny faktura
+          </Link>
+        </div>
       </div>
 
       {/* KPI cards */}
