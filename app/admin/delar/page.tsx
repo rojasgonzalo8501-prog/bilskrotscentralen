@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import type { PartStatus } from "@/lib/generated/prisma/enums";
+import { getBrand } from "@/lib/codelist";
 import { PartsBulkTable } from "./PartsBulkTable";
 
 export const metadata: Metadata = { title: "Delar — Admin" };
@@ -121,20 +122,25 @@ export default async function DelarPage({
       ) : (
         <>
           <PartsBulkTable
-            parts={parts.map((p) => ({
-              id: p.id,
-              sku: p.sku,
-              name: p.name,
-              oeNumber: p.oeNumber,
-              priceSek: p.priceSek,
-              status: p.status,
-              condition: p.condition,
-              vehicle: {
-                brandSlug: p.vehicle.brandSlug,
-                model: p.vehicle.model,
-                year: p.vehicle.year,
-              },
-            }))}
+            parts={parts.map((p) => {
+              const brand = getBrand(p.vehicle.brandSlug);
+              return {
+                id: p.id,
+                sku: p.sku,
+                name: p.name,
+                oeNumber: p.oeNumber,
+                priceSek: p.priceSek,
+                status: p.status,
+                condition: p.condition,
+                vehicle: {
+                  brandSlug: p.vehicle.brandSlug,
+                  brandName: brand?.name ?? "",
+                  brandLogo: brand?.logo ?? "",
+                  model: p.vehicle.model,
+                  year: p.vehicle.year,
+                },
+              };
+            })}
           />
 
           {/* Pagination */}

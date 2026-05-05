@@ -199,13 +199,13 @@ async function exportCustomers(date: string) {
 
 async function exportInvoices(date: string) {
   const invoices = await db.invoice.findMany({
-    orderBy: { issuedAt: "desc" },
+    orderBy: { invoiceDate: "desc" },
     include: { items: { select: { description: true, amountSek: true } } },
   });
   const rows = invoices.map((i) => ({
     fakturanr:    i.invoiceNumber,
-    utfardad:     i.issuedAt,
-    forfaller:    i.dueAt,
+    utfardad:     i.invoiceDate,
+    forfaller:    i.dueDate,
     kund:         i.customerName,
     epost:        i.customerEmail,
     status:       i.status,

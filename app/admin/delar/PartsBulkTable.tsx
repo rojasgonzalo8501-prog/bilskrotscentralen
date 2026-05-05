@@ -15,7 +15,6 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { bulkUpdateStatus, bulkUpdatePrice } from "./actions";
-import { getBrand } from "@/lib/codelist";
 
 type PartRow = {
   id: string;
@@ -25,7 +24,13 @@ type PartRow = {
   priceSek: number | null;
   status: string;
   condition: string;
-  vehicle: { brandSlug: string; model: string; year: number | null };
+  vehicle: {
+    brandSlug: string;
+    brandName: string;
+    brandLogo: string;
+    model: string;
+    year: number | null;
+  };
 };
 
 const CONDITION_LABELS: Record<string, string> = {
@@ -172,7 +177,6 @@ export function PartsBulkTable({ parts }: { parts: PartRow[] }) {
             </thead>
             <tbody>
               {parts.map((p) => {
-                const brand = getBrand(p.vehicle.brandSlug);
                 const isSelected = selected.has(p.id);
                 return (
                   <tr
@@ -205,9 +209,9 @@ export function PartsBulkTable({ parts }: { parts: PartRow[] }) {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-1.5">
-                        <span>{brand?.logo ?? "🚗"}</span>
+                        <span>{p.vehicle.brandLogo || "🚗"}</span>
                         <div className="text-xs">
-                          <div className="font-medium">{brand?.name ?? p.vehicle.brandSlug}</div>
+                          <div className="font-medium">{p.vehicle.brandName || p.vehicle.brandSlug}</div>
                           <div className="text-[var(--color-text-muted)]">
                             {p.vehicle.model} {p.vehicle.year ?? ""}
                           </div>
