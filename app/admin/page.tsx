@@ -9,6 +9,10 @@ import {
   Upload,
   Megaphone,
   Truck,
+  TrendingUp,
+  Wallet,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { db } from "@/lib/db";
 
@@ -16,39 +20,102 @@ export const metadata: Metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
 
 const STATUS_STYLES: Record<string, string> = {
-  PENDING:   "bg-[var(--color-warning)]/15 text-[var(--color-warning)]",
-  PAID:      "bg-blue-500/15 text-blue-300",
-  PACKED:    "bg-[var(--color-warning)]/15 text-[var(--color-warning)]",
-  SHIPPED:   "bg-[var(--color-success)]/15 text-[var(--color-success-bright)]",
-  DELIVERED: "bg-[var(--color-dark-500)] text-[var(--color-text-secondary)]",
+  PENDING:    "bg-[var(--color-warning)]/15 text-[var(--color-warning)]",
+  CONFIRMED:  "bg-blue-500/15 text-blue-300",
+  PROCESSING: "bg-amber-500/15 text-amber-300",
+  SHIPPED:    "bg-emerald-500/15 text-emerald-300",
+  DELIVERED:  "bg-[var(--color-dark-500)] text-[var(--color-text-secondary)]",
+  CANCELLED:  "bg-rose-500/15 text-rose-300",
+  REFUNDED:   "bg-sky-500/15 text-sky-300",
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  PENDING:   "Väntar",
-  PAID:      "Betald",
-  PACKED:    "Packad",
-  SHIPPED:   "Skickad",
-  DELIVERED: "Levererad",
+  PENDING:    "Väntar",
+  CONFIRMED:  "Bekräftad",
+  PROCESSING: "Packas",
+  SHIPPED:    "Skickad",
+  DELIVERED:  "Levererad",
+  CANCELLED:  "Avbruten",
+  REFUNDED:   "Återbetald",
 };
 
-export default async function AdminDashboardPage() {
-  const [partCount, availableCount, vehicleCount, dismantlingCount] =
-    await Promise.all([
-      db.part.count(),
-      db.part.count({ where: { status: "AVAILABLE" } }),
-      db.vehicle.count(),
-      db.vehicle.count({ where: { status: "DISMANTLING" } }),
-    ]);
+const fmtSek = (n: number) =>
+  `${n.toLocaleString("sv-SE")} kr`;
 
-  // Orders don't have a model yet — the dashboard shows an empty state that
-  // matches the rest of the app once Adam's data starts flowing in.
-  const recentOrders: {
-    id: string;
-    customer: string;
-    part: string;
-    total: string;
-    status: keyof typeof STATUS_LABELS;
-  }[] = [];
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString("sv-SE", { day: "numeric", month: "short" });
+
+export default async function AdminDashboardPage() {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const deadStockThreshold = new Date(Date.now() - 180 * 24 * 3600 * 1000);
+
+  const [
+    partCount,
+    availableCount,
+    vehicleCount,
+    dismantlingCount,
+    todayPaidOrders,
+    mtdPaidOrders,
+    ordersToPack,
+    pendingPayments,
+    deadStockCount,
+    stockValueAgg,
+    recentOrders,
+    eftersokInboxCount,
+  ] = await Promise.all([
+    db.part.count(),
+    db.part.count({ where: { status: "AVAILABLE" } }),
+    db.vehicle.count(),
+    db.vehicle.count({ where: { status: "DISMANTLING" } }),
+    db.order.findMany({
+      where: { paymentStatus: "PAID", createdAt: { gte: startOfToday } },
+      select: { totalSek: true },
+    }),
+    db.order.findMany({
+      where: { paymentStatus: "PAID", createdAt: { gte: startOfMonth } },
+      select: { totalSek: true },
+    }),
+    db.order.count({
+      where: {
+        paymentStatus: "PAID",
+        status: { in: ["CONFIRMED", "PROCESSING"] },
+      },
+    }),
+    db.order.count({ where: { paymentStatus: "PENDING" } }),
+    db.part.count({
+      where: {
+        status: "AVAILABLE",
+        createdAt: { lt: deadStockThreshold },
+      },
+    }),
+    db.part.aggregate({
+      where: { status: "AVAILABLE", priceSek: { not: null } },
+      _sum: { priceSek: true },
+    }),
+    db.order.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: {
+        id: true,
+        orderNumber: true,
+        firstName: true,
+        lastName: true,
+        totalSek: true,
+        status: true,
+        createdAt: true,
+        items: { select: { partName: true }, take: 1 },
+      },
+    }),
+    // Eftersok/Lead model doesn't exist yet — placeholder until Sprint 2 lands it.
+    Promise.resolve(0),
+  ]);
+
+  const todayRevenue = todayPaidOrders.reduce((s, o) => s + o.totalSek, 0);
+  const mtdRevenue   = mtdPaidOrders.reduce((s, o) => s + o.totalSek, 0);
+  const todayOrderCount = todayPaidOrders.length;
+  const stockValue   = stockValueAgg._sum.priceSek ?? 0;
 
   return (
     <div>
@@ -62,7 +129,7 @@ export default async function AdminDashboardPage() {
             Välkommen tillbaka <span className="gradient-text">Adam</span>
           </h1>
           <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            Översikt över lager, ordrar och förfrågningar.
+            Idag är det {now.toLocaleDateString("sv-SE", { weekday: "long", day: "numeric", month: "long" })}.
           </p>
         </div>
         <Link
@@ -73,32 +140,71 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      {/* Stats */}
+      {/* KPI row 1 — money */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <KpiCard
+          href="/admin/ordrar"
+          icon={<TrendingUp size={20} />}
+          label="Idag — försäljning"
+          value={fmtSek(todayRevenue)}
+          subtext={`${todayOrderCount} ${todayOrderCount === 1 ? "order" : "ordrar"}`}
+          accent="green"
+        />
+        <KpiCard
+          href="/admin/ordrar"
+          icon={<Wallet size={20} />}
+          label="Hittills i månaden"
+          value={fmtSek(mtdRevenue)}
+          subtext={`${mtdPaidOrders.length} betalda ordrar`}
+        />
+        <KpiCard
+          href="/admin/inventory"
+          icon={<Package size={20} />}
+          label="Lagervärde"
+          value={fmtSek(stockValue)}
+          subtext={`${availableCount.toLocaleString("sv-SE")} delar i lager`}
+        />
+        <KpiCard
+          href="/admin/ordrar"
+          icon={<ShoppingBag size={20} />}
+          label="Att packa"
+          value={ordersToPack}
+          subtext={ordersToPack > 0 ? "Kräver din uppmärksamhet" : "Inga väntande"}
+          accent={ordersToPack > 0 ? "orange" : undefined}
+        />
+      </div>
+
+      {/* KPI row 2 — operational */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          href="/admin/delar"
-          icon={<Package size={20} />}
-          label="Delar tillgängliga"
-          value={availableCount}
-          accent
+        <KpiCard
+          href="/admin/ordrar?paymentStatus=PENDING"
+          icon={<Clock size={20} />}
+          label="Väntar betalning"
+          value={pendingPayments}
+          subtext="Följ upp om mer än 24 h"
+          accent={pendingPayments > 0 ? "warning" : undefined}
         />
-        <StatCard
-          href="/admin/delar"
-          icon={<Package size={20} />}
-          label="Delar totalt"
-          value={partCount}
+        <KpiCard
+          href="/admin/eftersok"
+          icon={<Search size={20} />}
+          label="Förfrågningar i kö"
+          value={eftersokInboxCount}
+          subtext="Pris-förfrågningar att svara på"
         />
-        <StatCard
+        <KpiCard
+          href="/admin/delar"
+          icon={<AlertCircle size={20} />}
+          label="Dödbestånd > 180 dagar"
+          value={deadStockCount}
+          subtext={deadStockCount > 0 ? "Överväg rea / annons-boost" : "Allt är friskt"}
+          accent={deadStockCount > 20 ? "warning" : undefined}
+        />
+        <KpiCard
           href="/admin/bilar"
           icon={<Car size={20} />}
           label="Bilar under demontering"
           value={dismantlingCount}
-        />
-        <StatCard
-          href="/admin/bilar"
-          icon={<Car size={20} />}
-          label="Bilar totalt"
-          value={vehicleCount}
+          subtext={`${vehicleCount.toLocaleString("sv-SE")} bilar totalt`}
         />
       </div>
 
@@ -122,35 +228,38 @@ export default async function AdminDashboardPage() {
                 Inga ordrar ännu
               </div>
               <p className="text-xs text-[var(--color-text-muted)] max-w-sm mx-auto">
-                När Adam börjar ta emot beställningar dyker de upp här.
-                Kassaflödet går igång så snart lagerexporten är importerad.
+                När kassan börjar rulla dyker ordrarna upp här i realtid.
               </p>
             </div>
           ) : (
             <div className="divide-y divide-[var(--color-dark-500)]">
               {recentOrders.map((order) => (
-                <div
+                <Link
                   key={order.id}
+                  href={`/admin/ordrar?q=${order.orderNumber}`}
                   className="px-5 py-4 flex items-center gap-4 hover:bg-[var(--color-dark-600)] transition-colors"
                 >
-                  <div className="text-xs font-mono text-[var(--color-text-muted)] min-w-[56px]">
-                    {order.id}
+                  <div className="text-xs font-mono text-[var(--color-text-muted)] min-w-[88px]">
+                    {order.orderNumber}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold truncate">
-                      {order.customer}
+                      {order.firstName} {order.lastName}
                     </div>
                     <div className="text-xs text-[var(--color-text-muted)] truncate">
-                      {order.part}
+                      {order.items[0]?.partName ?? "—"}
                     </div>
                   </div>
-                  <div className="text-sm font-bold shrink-0">{order.total}</div>
+                  <div className="text-xs text-[var(--color-text-muted)] hidden sm:block shrink-0">
+                    {fmtDate(order.createdAt)}
+                  </div>
+                  <div className="text-sm font-bold shrink-0">{fmtSek(order.totalSek)}</div>
                   <span
-                    className={`text-[10px] uppercase tracking-wider px-2 py-1 rounded-full font-semibold shrink-0 ${STATUS_STYLES[order.status]}`}
+                    className={`text-[10px] uppercase tracking-wider px-2 py-1 rounded-full font-semibold shrink-0 ${STATUS_STYLES[order.status] ?? ""}`}
                   >
-                    {STATUS_LABELS[order.status]}
+                    {STATUS_LABELS[order.status] ?? order.status}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           )}
@@ -203,43 +312,48 @@ export default async function AdminDashboardPage() {
   );
 }
 
-function StatCard({
+const ACCENT_STYLES: Record<string, { value: string; bar: string; icon: string }> = {
+  green:   { value: "text-emerald-400",                 bar: "bg-emerald-500",                       icon: "text-emerald-400" },
+  orange:  { value: "text-[var(--color-brand-orange)]", bar: "bg-[var(--color-brand-orange)]",       icon: "text-[var(--color-brand-orange)]" },
+  warning: { value: "text-amber-400",                   bar: "bg-amber-500",                         icon: "text-amber-400" },
+};
+
+function KpiCard({
   href,
   icon,
   label,
   value,
+  subtext,
   accent,
 }: {
   href: string;
   icon: React.ReactNode;
   label: string;
-  value: number;
-  accent?: boolean;
+  value: string | number;
+  subtext?: string;
+  accent?: keyof typeof ACCENT_STYLES;
 }) {
+  const a = accent ? ACCENT_STYLES[accent] : null;
   return (
     <Link
       href={href}
-      className="card-hover block rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] p-5 hover:border-[var(--color-brand-orange)]/40 transition-colors"
+      className="card-hover relative block rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] p-5 hover:border-[var(--color-brand-orange)]/40 transition-colors overflow-hidden"
     >
-      <div
-        className={`mb-3 ${
-          accent
-            ? "text-[var(--color-brand-orange)]"
-            : "text-[var(--color-text-secondary)]"
-        }`}
-      >
+      {a && <div className={`absolute top-0 left-0 w-1 h-full ${a.bar}`} />}
+      <div className={`mb-3 ${a ? a.icon : "text-[var(--color-text-secondary)]"}`}>
         {icon}
       </div>
-      <div
-        className={`text-3xl font-black ${
-          accent ? "text-[var(--color-brand-orange)]" : ""
-        }`}
-      >
-        {value.toLocaleString("sv-SE")}
+      <div className={`text-2xl lg:text-3xl font-black leading-none ${a ? a.value : ""}`}>
+        {typeof value === "number" ? value.toLocaleString("sv-SE") : value}
       </div>
-      <div className="text-xs text-[var(--color-text-muted)] mt-1 uppercase tracking-wider">
+      <div className="text-[10px] text-[var(--color-text-muted)] mt-2 uppercase tracking-wider font-bold">
         {label}
       </div>
+      {subtext && (
+        <div className="text-xs text-[var(--color-text-secondary)] mt-1.5">
+          {subtext}
+        </div>
+      )}
     </Link>
   );
 }

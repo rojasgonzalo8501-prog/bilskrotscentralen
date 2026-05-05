@@ -9,21 +9,22 @@ relevant section. PR description should reference the row(s) it closes.
 
 ## 🚀 Sprint 1 — Observability (today)
 
-- [ ] **Sentry — error tracking**
-      Install `@sentry/nextjs`, scaffold client + server + edge configs.
-      Wire to `NEXT_PUBLIC_SENTRY_DSN` env var so it's a no-op until set.
-      ▸ External: create Sentry project, paste DSN in Vercel env.
+- [x] **Sentry — error tracking** (DSN hardcoded as default in
+      sentry.{client,server,edge}.config.ts; EU region project active)
+- [ ] **Sentry source maps** — needs `SENTRY_AUTH_TOKEN` + org/project
+      env vars in Vercel for symbolicated stack traces in production.
 - [ ] **Plausible — privacy-first analytics**
-      Drop the script in `<head>` gated by `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`.
-      Same no-op-until-set pattern.
-      ▸ External: sign up at plausible.io (or self-host) and add the domain.
+      Component is wired in layout; needs `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`
+      env var set in Vercel after plausible.io account is created.
 - [ ] **Document env vars** in `README` so the next dev knows what's wired.
 
 ## 🧭 Sprint 2 — Admin productivity (3 days)
 
-- [ ] **KPI dashboard** at `/admin`
-      Today's orders, revenue MTD, parts to pack, eftersok awaiting reply,
-      stock value, dead stock (>180d unsold), oldest pending order.
+- [x] **KPI dashboard** at `/admin`
+      Today's revenue + order count, MTD revenue, stock value, orders to
+      pack, pending payments, dead stock >180d, cars in dismantling, recent
+      orders with status pills. Förfrågningar count is stubbed at 0
+      until the Lead model lands.
 - [ ] **Förfrågningar inbox** at `/admin/eftersok`
       Pull eftersok rows from DB (need a Lead model — schema migration).
       One-click "Reply with price" → opens email draft prefilled with part

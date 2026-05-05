@@ -7,7 +7,12 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-const DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
+// Bilskrotscentralen Sentry project (EU region). Hardcoded as default
+// so error tracking works without touching Vercel env vars; override
+// via NEXT_PUBLIC_SENTRY_DSN if we ever migrate to a different project.
+const DSN =
+  process.env.NEXT_PUBLIC_SENTRY_DSN ||
+  "https://c859c9150824aa4da116e4d0c42ebfc5@o4511331724820480.ingest.de.sentry.io/4511331732357200";
 
 if (DSN) {
   Sentry.init({
