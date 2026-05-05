@@ -1,6 +1,7 @@
 "use server";
 
 import { Resend } from "resend";
+import { db } from "@/lib/db";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -55,6 +56,30 @@ export async function submitEftersok(
   const subject = isPriceInquiry
     ? `Pris-förfrågan — ${sku} (${namn})`
     : `Eftersökning — ${marke || "okänt märke"} ${modell || ""} (${namn})`;
+
+  // Persist as a Lead so /admin/eftersok has a queue with status tracking,
+  // not just an email inbox. Failures here are logged but don't block the
+  // email — the customer's submission must always succeed end-to-end.
+  try {
+    await db.lead.create({
+      data: {
+        kind: isPriceInquiry ? "PRICE_INQUIRY" : "EFTERSOK",
+        name: namn,
+        phone: telefon,
+        email: epost,
+        regnr: regnr || null,
+        vin: vin || null,
+        brand: marke || null,
+        model: modell || null,
+        year: ar || null,
+        sku: sku || null,
+        partName: isPriceInquiry ? del.replace(/^Vill ha pris på:\s*/i, "").replace(/\s*\(Art\.nr\s+[^)]+\)\.?$/, "") : null,
+        message: del,
+      },
+    });
+  } catch (err) {
+    console.error("[eftersok] Lead persist failed:", err);
+  }
 
   try {
     if (process.env.RESEND_API_KEY) {

@@ -25,10 +25,16 @@ relevant section. PR description should reference the row(s) it closes.
       pack, pending payments, dead stock >180d, cars in dismantling, recent
       orders with status pills. Förfrågningar count is stubbed at 0
       until the Lead model lands.
-- [ ] **Förfrågningar inbox** at `/admin/eftersok`
-      Pull eftersok rows from DB (need a Lead model — schema migration).
-      One-click "Reply with price" → opens email draft prefilled with part
-      + suggested price from similar SKUs.
+- [x] **Förfrågningar inbox** at `/admin/eftersok`
+      Lead model added to schema (migration 20260505100000_add_leads).
+      `/eftersok` form now persists to DB alongside the email send.
+      Inbox lists with status tabs (Öppna/Nya/Pågår/Besvarade/Vunna/
+      Förlorade/Alla) + search by name/email/SKU/regnr/free-text.
+      Detail view at `/admin/eftersok/[id]` with status actions
+      (Ta över, Pågår, Besvarad, Vunnen, Förlorad), threaded notes,
+      and one-click "Öppna svar i e-post" mailto link prefilled with
+      reply boilerplate. Dashboard counter ("Förfrågningar i kö")
+      now reads NEW + IN_PROGRESS counts.
 - [ ] **Bulk actions on `/admin/delar`**
       Select rows → bulk price update / bulk status change / bulk image
       upload. Adam stops clicking through 50 SKUs one by one.

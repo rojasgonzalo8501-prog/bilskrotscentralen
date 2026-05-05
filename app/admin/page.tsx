@@ -108,8 +108,7 @@ export default async function AdminDashboardPage() {
         items: { select: { partName: true }, take: 1 },
       },
     }),
-    // Eftersok/Lead model doesn't exist yet — placeholder until Sprint 2 lands it.
-    Promise.resolve(0),
+    db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
   ]);
 
   const todayRevenue = todayPaidOrders.reduce((s, o) => s + o.totalSek, 0);
