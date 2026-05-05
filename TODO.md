@@ -35,9 +35,13 @@ relevant section. PR description should reference the row(s) it closes.
       and one-click "Öppna svar i e-post" mailto link prefilled with
       reply boilerplate. Dashboard counter ("Förfrågningar i kö")
       now reads NEW + IN_PROGRESS counts.
-- [ ] **Bulk actions on `/admin/delar`**
-      Select rows → bulk price update / bulk status change / bulk image
-      upload. Adam stops clicking through 50 SKUs one by one.
+- [x] **Bulk actions on `/admin/delar`** — checkboxes per row + select-
+      all on page; floating action bar with bulk status change
+      (Tillgänglig/Reserverad/Såld/Dragen) and bulk price set (single
+      shared price or "pris på förfrågan" by leaving the input empty).
+      `bulkUpdateStatus` + `bulkUpdatePrice` server actions, admin-gated,
+      cap of 500 rows per call. Bulk image upload deferred to a future
+      pass — needs a media-upload pipeline first.
 - [x] **CSV export** on parts, orders, customers, invoices, leads.
       `lib/csv.ts` builder with RFC 4180 escaping + UTF-8 BOM (Excel
       opens åäö correctly). `/api/admin/export/<resource>` route

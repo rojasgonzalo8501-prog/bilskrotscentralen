@@ -1,33 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
-import { getBrand } from "@/lib/codelist";
 import type { PartStatus } from "@/lib/generated/prisma/enums";
+import { PartsBulkTable } from "./PartsBulkTable";
 
 export const metadata: Metadata = { title: "Delar — Admin" };
 export const dynamic = "force-dynamic";
-
-const CONDITION_LABELS: Record<string, string> = {
-  NEW:           "Ny",
-  USED_LIKE_NEW: "Begagnad (som ny)",
-  USED_GOOD:     "Begagnad (bra)",
-  USED_OK:       "Begagnad (ok)",
-  USED_POOR:     "Begagnad (sliten)",
-};
-
-const STATUS_STYLES: Record<string, string> = {
-  AVAILABLE:  "bg-[var(--color-success)]/10 text-[var(--color-success-bright)]",
-  RESERVED:   "bg-blue-500/10 text-blue-300",
-  SOLD:       "bg-[var(--color-dark-500)] text-[var(--color-text-muted)]",
-  WITHDRAWN:  "bg-[var(--color-error)]/10 text-[var(--color-error)]",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  AVAILABLE:  "Tillgänglig",
-  RESERVED:   "Reserverad",
-  SOLD:       "Såld",
-  WITHDRAWN:  "Dragen",
-};
 
 export default async function DelarPage({
   searchParams,
@@ -142,64 +120,22 @@ export default async function DelarPage({
         </div>
       ) : (
         <>
-          <div className="glass rounded-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider">
-                  <tr className="border-b border-[var(--color-dark-500)]">
-                    <th className="text-left px-5 py-3 font-semibold">SKU</th>
-                    <th className="text-left px-5 py-3 font-semibold">Namn</th>
-                    <th className="text-left px-5 py-3 font-semibold">Bil</th>
-                    <th className="text-left px-5 py-3 font-semibold">Skick</th>
-                    <th className="text-right px-5 py-3 font-semibold">Pris</th>
-                    <th className="text-left px-5 py-3 font-semibold">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {parts.map((p) => {
-                    const brand = getBrand(p.vehicle.brandSlug);
-                    return (
-                      <tr key={p.id} className="border-b border-[var(--color-dark-500)]/50 hover:bg-white/[0.02]">
-                        <td className="px-5 py-3 font-mono text-xs">
-                          <Link href={`/admin/delar/${p.id}`} className="text-[var(--color-text-muted)] hover:text-[var(--color-brand-orange)]">
-                            {p.sku}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-3">
-                          <Link href={`/admin/delar/${p.id}`} className="block hover:text-[var(--color-brand-orange)]">
-                            <div className="font-semibold">{p.name}</div>
-                            {p.oeNumber && (
-                              <div className="text-xs text-[var(--color-text-muted)]">OE: {p.oeNumber}</div>
-                            )}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="flex items-center gap-1.5">
-                            <span>{brand?.logo ?? "🚗"}</span>
-                            <div className="text-xs">
-                              <div className="font-medium">{brand?.name ?? p.vehicle.brandSlug}</div>
-                              <div className="text-[var(--color-text-muted)]">{p.vehicle.model} {p.vehicle.year}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-5 py-3 text-xs text-[var(--color-text-secondary)]">
-                          {CONDITION_LABELS[p.condition] ?? p.condition}
-                        </td>
-                        <td className="px-5 py-3 text-right font-semibold">
-                          {p.priceSek != null ? `${p.priceSek.toLocaleString("sv-SE")} kr` : "—"}
-                        </td>
-                        <td className="px-5 py-3">
-                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[p.status] ?? ""}`}>
-                            {STATUS_LABELS[p.status] ?? p.status}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <PartsBulkTable
+            parts={parts.map((p) => ({
+              id: p.id,
+              sku: p.sku,
+              name: p.name,
+              oeNumber: p.oeNumber,
+              priceSek: p.priceSek,
+              status: p.status,
+              condition: p.condition,
+              vehicle: {
+                brandSlug: p.vehicle.brandSlug,
+                model: p.vehicle.model,
+                year: p.vehicle.year,
+              },
+            }))}
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (
