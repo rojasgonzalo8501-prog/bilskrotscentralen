@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { verifyOrderToken } from "@/lib/order-token";
 import { ChatTrigger } from "@/components/ChatTrigger";
 import { OrderStatusTimeline } from "@/components/OrderStatusTimeline";
+import { PrintButton } from "@/components/PrintButton";
 
 export const metadata: Metadata = {
   title: "Min order — Bilskrotscentralen",
@@ -168,6 +169,7 @@ export default async function MinOrderPage({
             >
               💬 Öppna chatten
             </ChatTrigger>
+            <PrintButton title={`Order ${order.orderNumber} — Bilskrotscentralen`} />
           </div>
         </div>
 
