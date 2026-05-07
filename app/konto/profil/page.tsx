@@ -177,6 +177,31 @@ export default async function ProfilPage() {
           </ul>
         )}
       </div>
+
+      {/* ─── GDPR — exportera mina uppgifter ─── */}
+      <div className="glass rounded-xl p-6 mt-6">
+        <h2 className="font-bold text-sm uppercase tracking-wider text-[var(--color-text-muted)] mb-3">
+          Mina uppgifter (GDPR)
+        </h2>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-4 leading-relaxed">
+          Du har rätt att få ut all information vi har om dig — kontodata,
+          ordrar, förfrågningar — i ett maskinläsbart format (JSON).
+        </p>
+        <a
+          href="/api/konto/export"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] text-sm font-bold transition-colors"
+        >
+          ⬇ Ladda ner mina uppgifter
+        </a>
+        <p className="text-xs text-[var(--color-text-muted)] mt-3">
+          Vill du att vi raderar ditt konto? Mejla{" "}
+          <a href="mailto:info@bilskrotscentralen.com" className="text-[var(--color-brand-orange)] hover:underline">
+            info@bilskrotscentralen.com
+          </a>
+          {" "}— observera att orderhistorik bevaras enligt Bokföringslagen
+          (7 år) men kan anonymiseras på begäran.
+        </p>
+      </div>
     </section>
   );
 }

@@ -126,7 +126,12 @@ relevant section. PR description should reference the row(s) it closes.
       users; 2FA users get sent back to login with a "✓ Lösenordet
       uppdaterat" banner. Honeypot on the request form.
 - [ ] **Email verification on signup** — separate task.
-- [ ] **GDPR self-service** — export my data + delete my account.
+- [x] **GDPR data export** — `/api/konto/export` returns the user's
+      complete record (User row + linked orders with line items + leads
+      matched on email) as a JSON download with proper Content-Disposition.
+      Session-gated, never lets one user pull another user's data.
+      Linked from `/konto/profil`. Account-deletion still by email
+      (Bokföringslagen forces 7y order retention anyway).
 - [ ] **Save fitment** — "min bil = W212 2014" filters parts automatically.
 - [ ] **Garanti / claim form** with photo upload.
 
