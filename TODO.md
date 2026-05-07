@@ -59,14 +59,20 @@ relevant section. PR description should reference the row(s) it closes.
 
 ## 🖼 Sprint 3 — Performance & mobile (1.5 days)
 
-- [ ] **Migrate `<img>` → `<Image>`** across the codebase
-      (~23 lint warnings to clear; biggest LCP wins on hero, category cards,
-      part galleries).
-- [ ] **ISR for part pages and category pages**
-      Drop `force-dynamic` where it's not necessary — 60-second revalidate
-      gives near-static performance with no stale risk.
-- [ ] **Sticky "Lägg i varukorg" bar on mobile** on `/bildelar/[slug]`
-      so the CTA never scrolls out of view.
+- [x] **Migrate `<img>` → `<Image>`** on the high-impact paths:
+      HomeHero photo background (priority + sizes=100vw),
+      FeaturedPartCard, homepage Mercedes-grid + category cards +
+      brand grid + verkstad highlight image. Smaller decorative
+      `<img>`s in admin / less-trafficked routes left for a follow-up.
+- [x] **ISR on homepage and /mercedes** — `revalidate = 60` instead
+      of `force-dynamic`. Gives near-static TTFB with at-most-60s
+      staleness on featured parts. Category/brand listings kept
+      dynamic since they take filter searchParams.
+- [x] **Sticky "Lägg i varukorg" bar on mobile** on `/bildelar/[slug]`
+      via new `StickyAddToCart` component. IntersectionObserver tied
+      to a sentinel near the desktop CTA reveals the bar only after
+      the user scrolls past it; hidden on sm+. Handles all three
+      states (available, in cart, price-on-request).
 - [ ] **Lazy-load below-the-fold sections** on the homepage.
 
 ## 🌐 Sprint 4 — Public-site UX & conversion

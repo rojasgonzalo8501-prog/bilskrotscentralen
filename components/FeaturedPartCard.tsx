@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useCart } from "./CartContext";
 
@@ -35,11 +36,12 @@ export function FeaturedPartCard({ id, sku, name, priceSek, brandSlug, model, im
       className="card-hover rounded-xl bg-[var(--color-dark-700)] border border-[var(--color-dark-500)] overflow-hidden group flex flex-col"
     >
       <div className="h-44 overflow-hidden relative shrink-0 bg-[var(--color-dark-600)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={imageUrl ?? "/images/motor.jpeg"}
           alt={name}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {/* Stock-urgency badge — every part is unique (1 of 1 from a dismantled vehicle) */}
         <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-rose-500 text-white text-[10px] font-black uppercase tracking-wider shadow-md">

@@ -1,5 +1,6 @@
 /* ─── Homepage — Bilskrotscentralen ─── */
 
+import Image from "next/image";
 import Link from "next/link";
 import { getBrands } from "@/lib/codelist";
 import { db } from "@/lib/db";
@@ -9,7 +10,10 @@ import { FeaturedPartCard } from "@/components/FeaturedPartCard";
 import { TestimonialCarousel, type Testimonial } from "@/components/TestimonialCarousel";
 import { GUIDES } from "@/lib/guider";
 
-export const dynamic = "force-dynamic";
+// ISR: regenerate the homepage every 60s instead of fetching live on
+// every request — featured parts and category counts don't need to be
+// up-to-the-second, and this gives near-static performance.
+export const revalidate = 60;
 
 const BRANDS = getBrands();
 const TOP_BRANDS = BRANDS.slice(0, 8);
@@ -129,11 +133,12 @@ export default async function HomePage() {
           <div className="grid lg:grid-cols-[1fr,3fr] gap-6 items-stretch">
             {/* Big Mercedes engine illustration */}
             <div className="relative rounded-2xl overflow-hidden bg-slate-100 min-h-[260px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/images/motor.jpeg"
                 alt="Mercedes motor"
-                className="absolute inset-0 w-full h-full object-cover"
+                fill
+                sizes="(max-width: 1024px) 100vw, 25vw"
+                className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/30 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 text-white">
@@ -154,11 +159,12 @@ export default async function HomePage() {
                   <input type="hidden" name="marke" value="mercedes-benz" />
                   <input type="hidden" name="kategori" value={card.slug} />
                   <div className="aspect-square bg-slate-50 relative">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={card.image}
                       alt={card.name}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 15vw"
+                      className="object-cover"
                     />
                   </div>
                   <div className="p-2 border-t border-slate-100 flex flex-col gap-1.5 bg-white">
@@ -208,11 +214,12 @@ export default async function HomePage() {
               href={`/bildelar/kategorier/${cat.slug}`}
               className="group relative rounded-xl overflow-hidden border border-slate-200 aspect-[4/3] hover:shadow-lg transition-shadow"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={cat.image}
                 alt={cat.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/30 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
@@ -377,11 +384,12 @@ export default async function HomePage() {
               </div>
             </div>
             <div className="relative rounded-2xl overflow-hidden aspect-[4/3] lg:aspect-auto lg:h-[420px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/images/verkstad-hero.jpeg"
                 alt="Bilskrotscentralens verkstad i Enköping"
-                className="absolute inset-0 w-full h-full object-cover"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/70 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -497,8 +505,13 @@ export default async function HomePage() {
                 className="flex flex-col items-center gap-2 p-4 rounded-xl bg-white border border-slate-200 text-center group hover:border-slate-300 hover:shadow-md transition-all"
               >
                 <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center p-1.5 group-hover:scale-110 transition-transform">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain" />
+                  <Image
+                    src={brand.logoUrl}
+                    alt={brand.name}
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <span className="font-semibold text-xs leading-tight text-slate-700">{brand.name}</span>
               </Link>

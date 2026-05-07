@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { getBrand } from "@/lib/codelist";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { ChatTrigger } from "@/components/ChatTrigger";
+import { StickyAddToCart } from "@/components/StickyAddToCart";
 import { BreadcrumbJsonLd, ProductJsonLd } from "@/components/JsonLd";
 
 const SITE_URL = "https://bilskrotscentralen.com";
@@ -230,6 +231,14 @@ export default async function PartPage({
           </div>
         </div>
       </div>
+
+      <StickyAddToCart
+        partId={part.id}
+        sku={part.sku}
+        name={part.name}
+        priceSek={part.priceSek}
+        available={part.status === "AVAILABLE"}
+      />
     </section>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -128,11 +129,13 @@ export function HomeHero({ brands }: Props) {
     <section className="relative overflow-hidden bg-slate-900">
       {/* Hero photo background — Mercedes engine bay */}
       <div className="absolute inset-0" aria-hidden>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src="/images/mercedes-hero.jpeg"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
         />
       </div>
       {/* Soft frosted overlay so the cards stay readable on top */}

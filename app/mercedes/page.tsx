@@ -36,7 +36,9 @@ const MERCEDES_PARTS = [
   { name: "Instrumentkluster", priceFrom: 1900, oem: "VDO" },
 ];
 
-export const dynamic = "force-dynamic";
+// ISR: cache the Mercedes overview for 60 s. Inventory rolls slowly
+// here and a slightly-stale count is a fair trade for fast TTFB.
+export const revalidate = 60;
 
 export default async function MercedesPage() {
   const models = getModelsForBrand("mercedes-benz");
