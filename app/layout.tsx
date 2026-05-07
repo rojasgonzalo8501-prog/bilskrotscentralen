@@ -171,6 +171,8 @@ function Footer() {
               <FooterLink href="/faq" label="Vanliga frågor" />
               <FooterLink href="/guider" label="Guider & kunskapsbank" />
               <FooterLink href="/omdomen" label="Kundomdömen" />
+              <FooterLink href="/min-order" label="Hitta min order" />
+              <FooterLink href="/sparda" label="Sparda delar" />
             </ul>
           </div>
 
