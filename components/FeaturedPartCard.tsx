@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useCart } from "./CartContext";
+import { WishlistButton } from "./WishlistButton";
 
 interface Props {
   id: string;
@@ -48,6 +49,10 @@ export function FeaturedPartCard({ id, sku, name, priceSek, brandSlug, model, im
           <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
           Endast 1 kvar
         </span>
+        {/* Wishlist heart */}
+        <div className="absolute top-2 right-2">
+          <WishlistButton sku={sku} variant="card" />
+        </div>
       </div>
       <div className="p-4 flex flex-col flex-1">
         <div className="text-xs text-[var(--color-text-muted)] mb-1">

@@ -7,6 +7,7 @@ import { getBrand } from "@/lib/codelist";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { ChatTrigger } from "@/components/ChatTrigger";
 import { StickyAddToCart } from "@/components/StickyAddToCart";
+import { WishlistButton } from "@/components/WishlistButton";
 import { BreadcrumbJsonLd, ProductJsonLd } from "@/components/JsonLd";
 
 const SITE_URL = "https://bilskrotscentralen.com";
@@ -159,13 +160,16 @@ export default async function PartPage({
               <div className="text-xs text-[var(--color-text-muted)] mb-8">
                 inkl. moms · Fri frakt över 500 kr
               </div>
-              <AddToCartButton
-                partId={part.id}
-                sku={part.sku}
-                name={part.name}
-                priceSek={part.priceSek}
-                available={part.status === "AVAILABLE"}
-              />
+              <div className="flex flex-wrap gap-2 items-center">
+                <AddToCartButton
+                  partId={part.id}
+                  sku={part.sku}
+                  name={part.name}
+                  priceSek={part.priceSek}
+                  available={part.status === "AVAILABLE"}
+                />
+                <WishlistButton sku={part.sku} variant="inline" />
+              </div>
             </>
           ) : (
             <>

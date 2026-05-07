@@ -92,7 +92,15 @@ relevant section. PR description should reference the row(s) it closes.
       (Beställd → Betald → Packas → Skickad → Levererad), order items,
       delivery address, and a chat/phone CTA. Without a valid token
       the route 404s so the order number alone leaks nothing.
-- [ ] **Wishlist / "Spara delar"** for logged-in users + email reminders.
+- [x] **Wishlist / "Sparda delar"** — pure localStorage so it works for
+      guests and signed-in users alike, no schema involved. Heart-toggle
+      on FeaturedPartCard + part-detail page (inline pill variant).
+      `/sparda` page lists everything saved with a stale-removal
+      panel for SKUs that have been sold/withdrawn since they were
+      saved. Sync via custom event for same-tab plus the standard
+      `storage` event for cross-tab. Header gets a heart icon to
+      reach /sparda quickly. Email reminders deferred — can re-add
+      once we have a User-linked persistent list.
 - [ ] **Customer reviews per part** — email 14d after DELIVERED.
 - [x] **Honeypot on /eftersok** — hidden field `company_url` that real
       users can't see (tabIndex=-1, off-screen, aria-hidden). Server
