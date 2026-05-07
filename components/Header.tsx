@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Session } from "@/lib/auth";
 import { useCart } from "@/components/CartContext";
 import ThemeToggle from "@/components/ThemeToggle";
+import { getWishlist, subscribeWishlist } from "@/lib/wishlist-storage";
 
 const NAV = [
   { href: "/bildelar",     label: "Bildelar",     dropdown: true },
@@ -136,15 +137,7 @@ export default function Header({ session }: { session: Session | null }) {
           </form>
 
           {/* Wishlist */}
-          <Link
-            href="/sparda"
-            aria-label="Sparda delar"
-            className="hidden sm:flex items-center justify-center w-9 h-9 rounded-lg text-[var(--color-text-secondary)] hover:text-rose-400 hover:bg-[var(--color-dark-700)] transition-colors"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
-            </svg>
-          </Link>
+          <WishlistHeaderLink />
 
           {/* Theme toggle */}
           <ThemeToggle />
@@ -225,6 +218,16 @@ export default function Header({ session }: { session: Session | null }) {
                 {label}
               </a>
             ))}
+            <Link
+              href="/sparda"
+              onClick={() => setMobileOpen(false)}
+              className="px-3 py-2.5 rounded-md text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] hover:text-rose-400 inline-flex items-center gap-2"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
+              </svg>
+              Sparda delar
+            </Link>
             {session?.role === "admin" && (
               <a href="/admin" onClick={() => setMobileOpen(false)} className="px-3 py-2.5 rounded-md text-sm font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] hover:text-[var(--color-text-primary)]">Admin</a>
             )}
@@ -255,6 +258,30 @@ export default function Header({ session }: { session: Session | null }) {
         </div>
       )}
     </header>
+  );
+}
+
+function WishlistHeaderLink() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    setCount(getWishlist().length);
+    return subscribeWishlist((list) => setCount(list.length));
+  }, []);
+  return (
+    <Link
+      href="/sparda"
+      aria-label={count > 0 ? `Sparda delar (${count})` : "Sparda delar"}
+      className="hidden sm:flex relative items-center justify-center w-9 h-9 rounded-lg text-[var(--color-text-secondary)] hover:text-rose-400 hover:bg-[var(--color-dark-700)] transition-colors"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill={count > 0 ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
+      </svg>
+      {count > 0 && (
+        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
+          {count > 9 ? "9+" : count}
+        </span>
+      )}
+    </Link>
   );
 }
 
