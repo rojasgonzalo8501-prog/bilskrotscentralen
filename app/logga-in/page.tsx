@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Logga in på Bilskrotscentralen.",
 };
 
-type SearchParams = Promise<{ fel?: string }>;
+type SearchParams = Promise<{ fel?: string; reset?: string }>;
 
 export default async function LoginPage({
   searchParams,
@@ -23,8 +23,9 @@ export default async function LoginPage({
     );
   }
 
-  const { fel } = await searchParams;
+  const { fel, reset } = await searchParams;
   const hasError = fel === "1";
+  const justReset = reset === "1";
 
   return (
     <section className="relative min-h-[calc(100vh-4rem)] overflow-hidden pt-10 pb-20 flex items-center">
@@ -55,6 +56,11 @@ export default async function LoginPage({
               Fel användarnamn eller lösenord. Försök igen.
             </div>
           )}
+          {justReset && (
+            <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+              ✓ Lösenordet är uppdaterat. Logga in med det nya lösenordet.
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">
@@ -70,9 +76,17 @@ export default async function LoginPage({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">
-              Lösenord
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wider">
+                Lösenord
+              </label>
+              <Link
+                href="/glomt-losenord"
+                className="text-xs text-[var(--color-brand-orange)] hover:underline"
+              >
+                Glömt lösenordet?
+              </Link>
+            </div>
             <input
               type="password"
               name="password"

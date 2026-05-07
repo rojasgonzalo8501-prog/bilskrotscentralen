@@ -107,7 +107,16 @@ relevant section. PR description should reference the row(s) it closes.
 - [ ] **"Köp igen"** button on past orders.
 - [ ] **Invoice / receipt PDF download** in order detail.
 - [ ] **Order status timeline** (Beställd → Betald → Packad → Skickad → Levererad).
-- [ ] **Email verification on signup** + **password reset flow**.
+- [x] **Password reset flow** — /glomt-losenord asks for an email and
+      always responds "if it exists, a link is on its way" (no user
+      enumeration). Reset link is HMAC-signed in lib/password-reset-
+      token.ts using the user's CURRENT passwordHash as part of the
+      payload, so each link self-invalidates the moment the password
+      is changed (single-use without DB storage). 60-min TTL. New
+      password must be ≥8 chars and confirmed. Auto-logs in non-2FA
+      users; 2FA users get sent back to login with a "✓ Lösenordet
+      uppdaterat" banner. Honeypot on the request form.
+- [ ] **Email verification on signup** — separate task.
 - [ ] **GDPR self-service** — export my data + delete my account.
 - [ ] **Save fitment** — "min bil = W212 2014" filters parts automatically.
 - [ ] **Garanti / claim form** with photo upload.
