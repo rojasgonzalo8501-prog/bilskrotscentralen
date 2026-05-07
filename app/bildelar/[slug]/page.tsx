@@ -8,6 +8,7 @@ import { AddToCartButton } from "@/components/AddToCartButton";
 import { ChatTrigger } from "@/components/ChatTrigger";
 import { StickyAddToCart } from "@/components/StickyAddToCart";
 import { WishlistButton } from "@/components/WishlistButton";
+import { RecentlyViewed } from "@/components/RecentlyViewed";
 import { BreadcrumbJsonLd, ProductJsonLd } from "@/components/JsonLd";
 
 const SITE_URL = "https://bilskrotscentralen.com";
@@ -235,6 +236,8 @@ export default async function PartPage({
           </div>
         </div>
       </div>
+
+      <RecentlyViewed currentSku={part.sku} />
 
       <StickyAddToCart
         partId={part.id}
