@@ -25,6 +25,15 @@ export async function submitEftersok(
   const ar      = (formData.get("ar")      as string | null)?.trim() ?? "";
   const sku     = (formData.get("sku")     as string | null)?.trim() ?? "";
 
+  // Honeypot: bots fill every field. Real users never touch this one
+  // (it's hidden off-screen with tabIndex=-1). Silently pretend success
+  // so the bot moves on without retrying.
+  const honeypot = (formData.get("company_url") as string | null)?.trim() ?? "";
+  if (honeypot) {
+    console.log("[eftersok] honeypot tripped, dropping submission");
+    return { status: "success" };
+  }
+
   if (!namn || !telefon || !epost || !del) {
     return { status: "error", message: "Fyll i namn, telefon, e-post och vad du letar efter." };
   }

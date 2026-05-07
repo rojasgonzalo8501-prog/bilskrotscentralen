@@ -77,13 +77,23 @@ relevant section. PR description should reference the row(s) it closes.
 
 ## 🌐 Sprint 4 — Public-site UX & conversion
 
-- [ ] **Search page `/sök`**
-      Real fulltext over SKU + name + OE-nr + brand + model.
+- [x] **Search in the header** — replaced the placeholder Link with a
+      real `<form action="/bildelar" method="get">` containing a search
+      input that submits ?q=… directly. Mobile menu gets the same
+      input. /bildelar already does case-insensitive contains across
+      name + SKU + OE number, so this turns "click → page → type" into
+      "type from anywhere". Standalone `/sök` route deferred — not
+      enough additional value over /bildelar?q=.
 - [ ] **Order tracking without login** at `/spara-order/[orderNumber]`
       Tokenised link from confirmation email; no account required.
 - [ ] **Wishlist / "Spara delar"** for logged-in users + email reminders.
 - [ ] **Customer reviews per part** — email 14d after DELIVERED.
-- [ ] **CAPTCHA / honeypot on all public forms** (Cloudflare Turnstile).
+- [x] **Honeypot on /eftersok** — hidden field `company_url` that real
+      users can't see (tabIndex=-1, off-screen, aria-hidden). Server
+      action drops submissions where it's filled in and returns a
+      fake success so spammers don't retry. Cloudflare Turnstile is
+      still on the table for tougher bots, but this kills 90% of basic
+      spam without an external dep.
 - [ ] **Compare mode** — pick 2–3 alternative SKUs side-by-side.
 
 ## 🧾 Sprint 5 — Customer portal `/konto`

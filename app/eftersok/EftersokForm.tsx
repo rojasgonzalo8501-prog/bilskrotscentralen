@@ -91,6 +91,24 @@ function EftersokFormInner() {
       {/* Hidden SKU so the email/lead can be linked back to the part */}
       {prefillSku && <input type="hidden" name="sku" value={prefillSku} />}
 
+      {/* Honeypot — bots fill in any field they can find. Real users
+          never see this because tabIndex=-1 and aria-hidden + offscreen.
+          The server-side action discards the submission if it's set. */}
+      <div
+        aria-hidden
+        className="absolute left-[-9999px] top-0 w-1 h-1 overflow-hidden opacity-0 pointer-events-none"
+      >
+        <label>
+          Lämna detta fält tomt
+          <input
+            type="text"
+            name="company_url"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </label>
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-5">
         <Field label="Ditt namn" name="namn" required />
         <Field label="Telefon" name="telefon" type="tel" required />
