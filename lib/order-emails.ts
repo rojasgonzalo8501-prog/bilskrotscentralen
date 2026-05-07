@@ -8,6 +8,10 @@
  */
 
 import { Resend } from "resend";
+import { orderTrackingUrl } from "@/lib/order-token";
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://bilskrotscentralen.com";
 
 type OrderForEmail = {
   orderNumber: string;
@@ -47,6 +51,7 @@ function escape(s: string) {
 }
 
 function buildHtml(order: OrderForEmail) {
+  const trackUrl = orderTrackingUrl(SITE_URL, order.orderNumber);
   const lines = order.items
     .map((it) => {
       const lineTotal = it.priceSek * it.quantity;
@@ -75,7 +80,8 @@ function buildHtml(order: OrderForEmail) {
     <div style="text-align:center;margin-bottom:24px">
       <div style="font-size:13px;letter-spacing:1px;color:#888;text-transform:uppercase">Bilskrotscentralen</div>
       <h1 style="margin:8px 0 4px;font-size:22px">Tack för din beställning!</h1>
-      <p style="margin:0;color:#555;font-size:14px">Vi har tagit emot din betalning. Order packas inom 1–3 arbetsdagar.</p>
+      <p style="margin:0 0 16px;color:#555;font-size:14px">Vi har tagit emot din betalning. Order packas inom 1–3 arbetsdagar.</p>
+      <a href="${trackUrl}" style="display:inline-block;padding:10px 20px;border-radius:8px;background:#ea580c;color:#fff;font-weight:700;font-size:14px;text-decoration:none">Spåra din order →</a>
     </div>
 
     <div style="background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px">
@@ -113,12 +119,15 @@ function buildHtml(order: OrderForEmail) {
 }
 
 function buildText(order: OrderForEmail) {
+  const trackUrl = orderTrackingUrl(SITE_URL, order.orderNumber);
   const lines = order.items
     .map((it) => `  ${it.partName} × ${it.quantity}  —  ${fmt(it.priceSek * it.quantity)} kr`)
     .join("\n");
   return `Tack för din beställning!
 
 Order #${order.orderNumber} — Betald ✓
+
+Spåra din order: ${trackUrl}
 
 ${lines}
 

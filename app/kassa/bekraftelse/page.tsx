@@ -5,6 +5,7 @@ import { getPayment, isPaymentSuccessful } from "@/lib/nets";
 import { createInvoiceFromOrder } from "@/lib/invoice-utils";
 import { sendOrderConfirmationEmail } from "@/lib/order-emails";
 import { ChatTrigger } from "@/components/ChatTrigger";
+import { signOrderToken } from "@/lib/order-token";
 
 export const metadata: Metadata = {
   title: "Orderbekräftelse — Bilskrotscentralen",
@@ -181,6 +182,12 @@ export default async function BekraftelsePage({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Link
+          href={`/min-order/${order.orderNumber}?t=${signOrderToken(order.orderNumber)}`}
+          className="btn-primary text-center"
+        >
+          📦 Spåra min order
+        </Link>
         <Link href="/bildelar" className="btn-secondary text-center">Fortsätt handla</Link>
         <ChatTrigger
           context={{ topic: "Orderfråga (bekräftelse)", orderNumber: order.orderNumber }}

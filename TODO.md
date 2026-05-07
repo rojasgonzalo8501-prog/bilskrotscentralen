@@ -84,8 +84,14 @@ relevant section. PR description should reference the row(s) it closes.
       name + SKU + OE number, so this turns "click → page → type" into
       "type from anywhere". Standalone `/sök` route deferred — not
       enough additional value over /bildelar?q=.
-- [ ] **Order tracking without login** at `/spara-order/[orderNumber]`
-      Tokenised link from confirmation email; no account required.
+- [x] **Order tracking without login** at `/min-order/[orderNumber]`
+      HMAC-signed token (lib/order-token.ts) — short, URL-safe, no DB
+      write needed. Tracking link gets dropped into the order
+      confirmation email (HTML + plain-text) and the post-checkout
+      bekräftelse page. Page renders a 5-step status timeline
+      (Beställd → Betald → Packas → Skickad → Levererad), order items,
+      delivery address, and a chat/phone CTA. Without a valid token
+      the route 404s so the order number alone leaks nothing.
 - [ ] **Wishlist / "Spara delar"** for logged-in users + email reminders.
 - [ ] **Customer reviews per part** — email 14d after DELIVERED.
 - [x] **Honeypot on /eftersok** — hidden field `company_url` that real
