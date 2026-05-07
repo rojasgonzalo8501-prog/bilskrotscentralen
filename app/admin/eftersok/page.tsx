@@ -46,28 +46,31 @@ export default async function EftersokAdminPage({
 }) {
   const { status: statusFilter = "open", q = "" } = await searchParams;
 
-  const statusWhere = (() => {
+  type LeadStatusLiteral = "NEW" | "IN_PROGRESS" | "ANSWERED" | "WON" | "LOST";
+  const openStatuses: LeadStatusLiteral[] = ["NEW", "IN_PROGRESS"];
+  const statusWhere: { status?: LeadStatusLiteral | { in: LeadStatusLiteral[] } } = (() => {
     switch (statusFilter) {
       case "all":         return {};
-      case "open":        return { status: { in: ["NEW", "IN_PROGRESS"] as const } };
-      case "new":         return { status: "NEW" as const };
-      case "in_progress": return { status: "IN_PROGRESS" as const };
-      case "answered":    return { status: "ANSWERED" as const };
-      case "won":         return { status: "WON" as const };
-      case "lost":        return { status: "LOST" as const };
+      case "open":        return { status: { in: openStatuses } };
+      case "new":         return { status: "NEW" };
+      case "in_progress": return { status: "IN_PROGRESS" };
+      case "answered":    return { status: "ANSWERED" };
+      case "won":         return { status: "WON" };
+      case "lost":        return { status: "LOST" };
     }
   })();
 
-  const searchWhere = q.trim()
+  const term = q.trim();
+  const searchWhere = term
     ? {
         OR: [
-          { name:     { contains: q.trim(), mode: "insensitive" as const } },
-          { email:    { contains: q.trim(), mode: "insensitive" as const } },
-          { phone:    { contains: q.trim() } },
-          { sku:      { contains: q.trim(), mode: "insensitive" as const } },
-          { regnr:    { contains: q.trim(), mode: "insensitive" as const } },
-          { partName: { contains: q.trim(), mode: "insensitive" as const } },
-          { message:  { contains: q.trim(), mode: "insensitive" as const } },
+          { name:     { contains: term, mode: "insensitive" } },
+          { email:    { contains: term, mode: "insensitive" } },
+          { phone:    { contains: term } },
+          { sku:      { contains: term, mode: "insensitive" } },
+          { regnr:    { contains: term, mode: "insensitive" } },
+          { partName: { contains: term, mode: "insensitive" } },
+          { message:  { contains: term, mode: "insensitive" } },
         ],
       }
     : {};
@@ -80,7 +83,7 @@ export default async function EftersokAdminPage({
       include: { assignedTo: { select: { name: true, username: true } } },
     }),
     Promise.all([
-      db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
+      db.lead.count({ where: { status: { in: openStatuses } } }),
       db.lead.count({ where: { status: "NEW" } }),
       db.lead.count({ where: { status: "IN_PROGRESS" } }),
       db.lead.count({ where: { status: "ANSWERED" } }),
