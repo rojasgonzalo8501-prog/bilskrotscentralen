@@ -27,6 +27,11 @@ const KIND_PILL: Record<string, { label: string; cls: string; icon: React.ReactN
     cls: "bg-blue-500/15 text-blue-300",
     icon: <Search size={11} />,
   },
+  WORKSHOP_APPLICATION: {
+    label: "Verkstadsansökan",
+    cls: "bg-emerald-500/15 text-emerald-300",
+    icon: <Car size={11} />,
+  },
 };
 
 function formatDate(d: Date) {

@@ -385,6 +385,9 @@ enum LeadKind {
   EFTERSOK
   /// /bildelar/[sku] price-on-request → /eftersok?sku=… — needs price reply.
   PRICE_INQUIRY
+  /// /b2b/anslut — workshop wants to sign up for B2B portal. Admin
+  /// approves manually before granting WORKSHOP role.
+  WORKSHOP_APPLICATION
 }
 
 enum LeadStatus {

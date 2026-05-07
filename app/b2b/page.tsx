@@ -83,11 +83,11 @@ export default function B2BPage() {
         <div className="max-w-2xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Bli B2B-kund</h2>
           <p className="text-[var(--color-text-secondary)] mb-8">
-            Skicka ett mejl med organisationsnummer och kort beskrivning av verksamheten —
-            vi öppnar ett konto inom 24 h.
+            Fyll i ansökningsformuläret så ringer vi upp inom 1–3 arbetsdagar
+            och öppnar kontot. Inga avgifter, inget bindande.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="mailto:b2b@bilskrotscentralen.com" className="btn-primary">✉️ b2b@bilskrotscentralen.com</a>
+            <Link href="/b2b/anslut" className="btn-primary">→ Anslut din verkstad</Link>
             <a href="tel:017121002" className="btn-secondary">📞 0171-210 02</a>
           </div>
         </div>
