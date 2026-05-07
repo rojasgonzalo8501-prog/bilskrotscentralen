@@ -4,6 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ChatTrigger } from "@/components/ChatTrigger";
+import { OrderStatusTimeline } from "@/components/OrderStatusTimeline";
+import { BuyAgainButton } from "@/components/BuyAgainButton";
 
 export const metadata: Metadata = { title: "Order — Mitt konto" };
 export const dynamic = "force-dynamic";
@@ -51,7 +53,15 @@ export default async function OrderDetailPage({
 
   const order = await db.order.findFirst({
     where: { orderNumber },
-    include: { items: true, invoices: true },
+    include: {
+      items: {
+        // Pull the live part record so we can tell which lines are still
+        // in stock (for "Köp igen"). Salvage parts are unique — sold or
+        // withdrawn means it's gone.
+        include: { part: { select: { id: true, sku: true, name: true, status: true, priceSek: true } } },
+      },
+      invoices: true,
+    },
   });
 
   // Authorization: customer can only see their own orders (matched by email).
@@ -90,20 +100,8 @@ export default async function OrderDetailPage({
       </div>
 
       {/* Status / progress */}
-      <div className="glass rounded-xl p-6 mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-bold text-sm uppercase tracking-wider text-[var(--color-text-muted)]">Status</h2>
-          <span className="text-sm font-semibold">{ORDER_STATUS_LABELS[order.status] ?? order.status}</span>
-        </div>
-        <div className="text-sm text-[var(--color-text-secondary)]">
-          {order.status === "CONFIRMED" && "Vi packar din order och meddelar dig när den skickas."}
-          {order.status === "PROCESSING" && "Din order packas just nu."}
-          {order.status === "SHIPPED" && "Din order är skickad och bör vara framme inom 1–3 arbetsdagar."}
-          {order.status === "DELIVERED" && "Din order är levererad. Tack för köpet!"}
-          {order.status === "PENDING" && "Vi har tagit emot din order och väntar på betalningsbekräftelse."}
-          {order.status === "CANCELLED" && "Den här ordern är avbruten."}
-          {order.status === "REFUNDED" && "Den här ordern har återbetalats."}
-        </div>
+      <div className="mb-6">
+        <OrderStatusTimeline status={order.status} theme="dark" />
       </div>
 
       {/* Items */}
@@ -190,14 +188,25 @@ export default async function OrderDetailPage({
       )}
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
         <Link href="/konto/ordrar" className="btn-secondary text-center">← Tillbaka</Link>
+        <BuyAgainButton
+          items={order.items
+            .filter((it) => it.part?.status === "AVAILABLE" && it.part?.priceSek != null)
+            .map((it) => ({
+              partId: it.part!.id,
+              sku: it.part!.sku,
+              name: it.part!.name,
+              priceSek: it.part!.priceSek!,
+            }))}
+          originalCount={order.items.length}
+        />
         <ChatTrigger
           context={{ topic: "Orderfråga", orderNumber: order.orderNumber }}
           prefill={`Hej! Jag har en fråga om min order #${order.orderNumber}.`}
           fallbackHref={`https://wa.me/4617121002?text=${encodeURIComponent(`Hej! Jag har en fråga om min order #${order.orderNumber}.`)}`}
           ariaLabel="Öppna chatten med frågor om ordern"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] text-white text-sm font-bold transition-colors"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] text-[var(--color-text-primary)] text-sm font-bold transition-colors"
         >
           💬 Frågor? Öppna chatten
         </ChatTrigger>

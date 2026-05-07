@@ -104,9 +104,18 @@ relevant section. PR description should reference the row(s) it closes.
 
 ## 🧾 Sprint 5 — Customer portal `/konto`
 
-- [ ] **"Köp igen"** button on past orders.
+- [x] **"Köp igen"** button on past orders. New `BuyAgainButton`
+      client component pulls live `Part.status` server-side and only
+      lets you re-add lines that are still AVAILABLE; if some are
+      gone the button shows "X av Y" and a yellow message. All-gone
+      → button is disabled with "Slut i lager". Routes straight to
+      /kassa after add.
 - [ ] **Invoice / receipt PDF download** in order detail.
-- [ ] **Order status timeline** (Beställd → Betald → Packad → Skickad → Levererad).
+- [x] **Order status timeline** — extracted to `OrderStatusTimeline`
+      component (light + dark themes), used both on the guest
+      tracking page (/min-order) and the customer portal
+      (/konto/ordrar/[orderNumber]). Cancelled / refunded states
+      render a separate panel.
 - [x] **Password reset flow** — /glomt-losenord asks for an email and
       always responds "if it exists, a link is on its way" (no user
       enumeration). Reset link is HMAC-signed in lib/password-reset-

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { verifyOrderToken } from "@/lib/order-token";
 import { ChatTrigger } from "@/components/ChatTrigger";
+import { OrderStatusTimeline } from "@/components/OrderStatusTimeline";
 
 export const metadata: Metadata = {
   title: "Min order — Bilskrotscentralen",
@@ -11,22 +12,6 @@ export const metadata: Metadata = {
 };
 
 export const dynamic = "force-dynamic";
-
-const ORDER_TIMELINE = [
-  { key: "PENDING",    label: "Beställd",   icon: "📝" },
-  { key: "CONFIRMED",  label: "Betald",     icon: "💳" },
-  { key: "PROCESSING", label: "Packas",     icon: "📦" },
-  { key: "SHIPPED",    label: "Skickad",    icon: "🚚" },
-  { key: "DELIVERED",  label: "Levererad",  icon: "✅" },
-] as const;
-
-const STATUS_INDEX: Record<string, number> = {
-  PENDING:    0,
-  CONFIRMED:  1,
-  PROCESSING: 2,
-  SHIPPED:    3,
-  DELIVERED:  4,
-};
 
 const PAYMENT_LABEL: Record<string, { label: string; cls: string }> = {
   PENDING:  { label: "⏳ Väntar betalning", cls: "bg-amber-50 text-amber-700 border-amber-200" },
@@ -73,8 +58,6 @@ export default async function MinOrderPage({
   });
   if (!order) notFound();
 
-  const statusIdx = STATUS_INDEX[order.status] ?? 0;
-  const isCancelled = order.status === "CANCELLED" || order.status === "REFUNDED";
   const payment = PAYMENT_LABEL[order.paymentStatus];
 
   return (
@@ -101,68 +84,9 @@ export default async function MinOrderPage({
         </div>
 
         {/* Status timeline */}
-        {!isCancelled && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-6 shadow-sm">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-6">
-              Status
-            </h2>
-            <ol className="grid grid-cols-5 gap-2 sm:gap-4">
-              {ORDER_TIMELINE.map((step, i) => {
-                const reached = i <= statusIdx;
-                const current = i === statusIdx;
-                return (
-                  <li key={step.key} className="flex flex-col items-center text-center relative">
-                    {/* Connector line */}
-                    {i > 0 && (
-                      <span
-                        className={`absolute top-5 right-1/2 w-full h-0.5 -z-0 ${
-                          i <= statusIdx ? "bg-emerald-500" : "bg-slate-200"
-                        }`}
-                        aria-hidden
-                      />
-                    )}
-                    <span
-                      className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center text-base mb-2 ${
-                        current
-                          ? "bg-emerald-500 text-white ring-4 ring-emerald-200"
-                          : reached
-                          ? "bg-emerald-500 text-white"
-                          : "bg-slate-100 text-slate-400 border border-slate-200"
-                      }`}
-                    >
-                      {step.icon}
-                    </span>
-                    <span
-                      className={`text-[11px] font-bold uppercase tracking-wider leading-tight ${
-                        reached ? "text-slate-900" : "text-slate-400"
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-            <p className="text-sm text-slate-600 leading-relaxed mt-6 text-center">
-              {order.status === "PENDING" && "Vi väntar på att din betalning ska bekräftas."}
-              {order.status === "CONFIRMED" && "Tack! Vi börjar plocka din order inom 1–2 arbetsdagar."}
-              {order.status === "PROCESSING" && "Din order packas just nu."}
-              {order.status === "SHIPPED" && "Din order är skickad. Spårningsnummer skickas via mejl när vi har det."}
-              {order.status === "DELIVERED" && "Din order är levererad. Vi hoppas att du är nöjd!"}
-            </p>
-          </div>
-        )}
-
-        {isCancelled && (
-          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 mb-6">
-            <h2 className="font-bold text-rose-700 mb-1">
-              {order.status === "CANCELLED" ? "Avbruten" : "Återbetald"}
-            </h2>
-            <p className="text-sm text-rose-700">
-              Den här ordern är inte längre aktiv. Frågor? Ring oss på 0171-210 02.
-            </p>
-          </div>
-        )}
+        <div className="mb-6">
+          <OrderStatusTimeline status={order.status} theme="light" />
+        </div>
 
         {/* Items */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 mb-6 shadow-sm">
