@@ -8,6 +8,7 @@ import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 import { Plausible } from "@/components/Plausible";
 import { CookieConsent } from "@/components/CookieConsent";
+import { CookieSettingsLink } from "@/components/CookieSettingsLink";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -207,6 +208,7 @@ function Footer() {
             <a href="/integritetspolicy" className="hover:text-[var(--color-text-primary)] transition-colors">Integritetspolicy</a>
             <a href="/kopvillkor" className="hover:text-[var(--color-text-primary)] transition-colors">Köpvillkor</a>
             <a href="/garanti" className="hover:text-[var(--color-text-primary)] transition-colors">Garanti</a>
+            <CookieSettingsLink />
           </div>
         </div>
       </div>

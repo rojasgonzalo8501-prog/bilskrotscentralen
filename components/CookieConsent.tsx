@@ -24,6 +24,19 @@ import { useEffect, useState } from "react";
 
 const KEY = "merca:consent";
 export const CONSENT_EVENT = "merca:consent-changed";
+const REOPEN_EVENT = "merca:consent-reopen";
+
+/**
+ * Re-open the cookie banner (used by the "Cookie-inställningar"
+ * link in the footer). Wipes the stored choice so analytics is
+ * paused until the user picks again.
+ */
+export function openCookieSettings() {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(KEY);
+  window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: null }));
+  window.dispatchEvent(new CustomEvent(REOPEN_EVENT));
+}
 
 export type ConsentValue = "all" | "necessary";
 
@@ -46,6 +59,9 @@ export function CookieConsent() {
 
   useEffect(() => {
     if (readConsent() == null) setShow(true);
+    const onReopen = () => setShow(true);
+    window.addEventListener(REOPEN_EVENT, onReopen);
+    return () => window.removeEventListener(REOPEN_EVENT, onReopen);
   }, []);
 
   if (!show) return null;
