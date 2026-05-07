@@ -28,6 +28,13 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  /// TOTP (Google Authenticator-style 2FA). totpSecret is the raw
+  /// base32 shared secret; only set when the user has scanned the QR.
+  /// totpEnabled flips to true after they verify the first code.
+  totpSecret      String?
+  totpEnabled     Boolean   @default(false)
+  totpVerifiedAt  DateTime?
+
   /// Leads assigned to this user (eftersökningar / pris-förfrågningar)
   leads        Lead[]
 }

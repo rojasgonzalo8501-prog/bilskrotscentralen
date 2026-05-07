@@ -36,6 +36,7 @@ const NAV: NavItem[] = [
   { href: "/admin/eftersok",  icon: <Search size={18} />,          label: "Förfrågningar"   },
   { href: "/admin/annonser",  icon: <Megaphone size={18} />,       label: "Annonser"        },
   { href: "/admin/import",    icon: <Upload size={18} />,          label: "Importera"       },
+  { href: "/admin/sakerhet",  icon: <ShieldCheck size={18} />,     label: "Säkerhet (2FA)"  },
 ];
 
 const SUPERADMIN_NAV: NavItem[] = [

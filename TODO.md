@@ -49,7 +49,13 @@ relevant section. PR description should reference the row(s) it closes.
       page header.
 - [ ] **Audit log model** + middleware that records every admin mutation
       with `userId`, `action`, `entityType`, `entityId`, `before`, `after`.
-- [ ] **2FA for admin users** (TOTP via `otplib`).
+- [x] **2FA for admin users** (TOTP via in-house RFC 6238 implementation
+      in `lib/totp.ts` — uses Node's `crypto`, no npm dependency).
+      Schema: User gets totpSecret, totpEnabled, totpVerifiedAt
+      (migration 20260507100000_add_totp). Login flow: when password is
+      OK and totpEnabled, set short-lived `merca_pending_2fa` cookie
+      and redirect to `/logga-in/2fa` for the 6-digit challenge.
+      Self-enrollment + disable at `/admin/sakerhet` with QR code.
 
 ## 🖼 Sprint 3 — Performance & mobile (1.5 days)
 

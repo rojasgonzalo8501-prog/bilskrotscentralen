@@ -15,6 +15,10 @@ export type Session = {
 const COOKIE_NAME = "merca_session";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
+/** Short-lived cookie set after password OK but before 2FA verification. */
+const PENDING_2FA_COOKIE = "merca_pending_2fa";
+const PENDING_2FA_MAX_AGE = 60 * 5; // 5 minutes
+
 function getSecret(): string {
   const s = process.env.SESSION_SECRET;
   if (!s) throw new Error("SESSION_SECRET env var is not set");
@@ -25,28 +29,58 @@ function signPayload(payload: string): string {
   return createHmac("sha256", getSecret()).update(payload).digest("hex");
 }
 
-/** Validate credentials against the User table. */
+const ROLE_MAP: Record<string, Role> = {
+  SUPERADMIN: "superadmin",
+  ADMIN: "admin",
+  CUSTOMER: "customer",
+};
+
+export type CredentialResult =
+  | { kind: "ok"; session: Session }
+  | { kind: "needs-2fa"; userId: string }
+  | { kind: "fail" };
+
+/**
+ * Validate username + password.
+ *
+ * If the user has 2FA enabled we return `{ kind: "needs-2fa", userId }`
+ * — the caller is expected to set the pending-2FA cookie and route
+ * the user to the TOTP challenge page.
+ */
 export async function verifyCredentials(
   username: string,
   password: string
-): Promise<Session | null> {
+): Promise<CredentialResult> {
   const u = username.trim().toLowerCase();
   const user = await db.user.findUnique({ where: { username: u } });
-  if (!user || !user.active) return null;
+  if (!user || !user.active) return { kind: "fail" };
 
   const ok = await verifyPassword(password, user.passwordHash);
-  if (!ok) return null;
+  if (!ok) return { kind: "fail" };
 
-  const roleMap: Record<string, Role> = {
-    SUPERADMIN: "superadmin",
-    ADMIN: "admin",
-    CUSTOMER: "customer",
+  if (user.totpEnabled && user.totpSecret) {
+    return { kind: "needs-2fa", userId: user.id };
+  }
+
+  return {
+    kind: "ok",
+    session: {
+      userId: user.id,
+      username: user.username,
+      role: ROLE_MAP[user.role] ?? "customer",
+      name: user.name,
+    },
   };
+}
 
+/** Build a Session from a User row that already passed authentication. */
+export async function sessionForUser(userId: string): Promise<Session | null> {
+  const user = await db.user.findUnique({ where: { id: userId } });
+  if (!user || !user.active) return null;
   return {
     userId: user.id,
     username: user.username,
-    role: roleMap[user.role] ?? "customer",
+    role: ROLE_MAP[user.role] ?? "customer",
     name: user.name,
   };
 }
@@ -103,4 +137,55 @@ export async function getSession(): Promise<Session | null> {
 export async function clearSession(): Promise<void> {
   const store = await cookies();
   store.delete(COOKIE_NAME);
+}
+
+/* ───────── Pending-2FA cookie helpers ───────── */
+
+type PendingPayload = { userId: string; expires: number };
+
+/** Set a short-lived pending-2FA cookie after password OK. */
+export async function setPending2FA(userId: string): Promise<void> {
+  const expires = Date.now() + PENDING_2FA_MAX_AGE * 1000;
+  const payload = Buffer.from(JSON.stringify({ userId, expires }), "utf-8").toString("base64");
+  const sig = signPayload(payload);
+  const value = `${payload}.${sig}`;
+
+  const store = await cookies();
+  store.set(PENDING_2FA_COOKIE, value, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: PENDING_2FA_MAX_AGE,
+  });
+}
+
+/** Read + validate the pending-2FA cookie. Returns the userId, or null. */
+export async function getPending2FA(): Promise<string | null> {
+  const store = await cookies();
+  const raw = store.get(PENDING_2FA_COOKIE)?.value;
+  if (!raw) return null;
+  try {
+    const dot = raw.lastIndexOf(".");
+    if (dot === -1) return null;
+    const payload = raw.slice(0, dot);
+    const sig = raw.slice(dot + 1);
+    const expected = signPayload(payload);
+    const sigBuf = Buffer.from(sig, "hex");
+    const expBuf = Buffer.from(expected, "hex");
+    if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) return null;
+    const { userId, expires } = JSON.parse(
+      Buffer.from(payload, "base64").toString("utf-8")
+    ) as PendingPayload;
+    if (!userId || typeof expires !== "number" || Date.now() > expires) return null;
+    return userId;
+  } catch {
+    return null;
+  }
+}
+
+/** Clear the pending-2FA cookie. Call after successful TOTP verify or cancel. */
+export async function clearPending2FA(): Promise<void> {
+  const store = await cookies();
+  store.delete(PENDING_2FA_COOKIE);
 }
