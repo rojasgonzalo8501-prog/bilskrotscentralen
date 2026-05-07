@@ -46,52 +46,55 @@ export default async function EftersokAdminPage({
 }) {
   const { status: statusFilter = "open", q = "" } = await searchParams;
 
-  type LeadStatusLiteral = "NEW" | "IN_PROGRESS" | "ANSWERED" | "WON" | "LOST";
-  const openStatuses: LeadStatusLiteral[] = ["NEW", "IN_PROGRESS"];
-  const statusWhere: { status?: LeadStatusLiteral | { in: LeadStatusLiteral[] } } = (() => {
-    switch (statusFilter) {
-      case "all":         return {};
-      case "open":        return { status: { in: openStatuses } };
-      case "new":         return { status: "NEW" };
-      case "in_progress": return { status: "IN_PROGRESS" };
-      case "answered":    return { status: "ANSWERED" };
-      case "won":         return { status: "WON" };
-      case "lost":        return { status: "LOST" };
-    }
-  })();
-
   const term = q.trim();
-  const searchWhere = term
-    ? {
-        OR: [
-          { name:     { contains: term, mode: "insensitive" } },
-          { email:    { contains: term, mode: "insensitive" } },
-          { phone:    { contains: term } },
-          { sku:      { contains: term, mode: "insensitive" } },
-          { regnr:    { contains: term, mode: "insensitive" } },
-          { partName: { contains: term, mode: "insensitive" } },
-          { message:  { contains: term, mode: "insensitive" } },
-        ],
-      }
-    : {};
 
-  const [leads, counts] = await Promise.all([
-    db.lead.findMany({
-      where: { ...statusWhere, ...searchWhere },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-      include: { assignedTo: { select: { name: true, username: true } } },
-    }),
-    Promise.all([
-      db.lead.count({ where: { status: { in: openStatuses } } }),
+  // Build the OR clause as a function of `term` so contextual typing
+  // from the inline findMany call infers Prisma's QueryMode correctly.
+  const buildSearch = (t: string) => [
+    { name:     { contains: t, mode: "insensitive" as const } },
+    { email:    { contains: t, mode: "insensitive" as const } },
+    { phone:    { contains: t } },
+    { sku:      { contains: t, mode: "insensitive" as const } },
+    { regnr:    { contains: t, mode: "insensitive" as const } },
+    { partName: { contains: t, mode: "insensitive" as const } },
+    { message:  { contains: t, mode: "insensitive" as const } },
+  ];
+
+  // Fan out the seven count queries first; main listing follows.
+  const [leads, openCount, newCount, inProgCount, answeredCount, wonCount, lostCount, allCount] =
+    await Promise.all([
+      db.lead.findMany({
+        where: {
+          ...(statusFilter === "open" && { status: { in: ["NEW", "IN_PROGRESS"] } }),
+          ...(statusFilter === "new"         && { status: "NEW" }),
+          ...(statusFilter === "in_progress" && { status: "IN_PROGRESS" }),
+          ...(statusFilter === "answered"    && { status: "ANSWERED" }),
+          ...(statusFilter === "won"         && { status: "WON" }),
+          ...(statusFilter === "lost"        && { status: "LOST" }),
+          ...(term && { OR: buildSearch(term) }),
+        },
+        orderBy: { createdAt: "desc" },
+        take: 100,
+        include: { assignedTo: { select: { name: true, username: true } } },
+      }),
+      db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
       db.lead.count({ where: { status: "NEW" } }),
       db.lead.count({ where: { status: "IN_PROGRESS" } }),
       db.lead.count({ where: { status: "ANSWERED" } }),
       db.lead.count({ where: { status: "WON" } }),
       db.lead.count({ where: { status: "LOST" } }),
       db.lead.count(),
-    ]).then(([open, newC, inProg, answered, won, lost, all]) => ({ open, newC, inProg, answered, won, lost, all })),
-  ]);
+    ]);
+
+  const counts = {
+    open:     openCount,
+    newC:     newCount,
+    inProg:   inProgCount,
+    answered: answeredCount,
+    won:      wonCount,
+    lost:     lostCount,
+    all:      allCount,
+  };
 
   const tabs: { key: StatusFilter; label: string; count: number }[] = [
     { key: "open",        label: "Öppna",     count: counts.open },

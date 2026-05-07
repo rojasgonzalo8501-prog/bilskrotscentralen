@@ -108,7 +108,7 @@ export default async function AdminDashboardPage() {
         items: { select: { partName: true }, take: 1 },
       },
     }),
-    db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] as ("NEW" | "IN_PROGRESS")[] } } }),
+    db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
   ]);
 
   const todayRevenue = todayPaidOrders.reduce((s, o) => s + o.totalSek, 0);
