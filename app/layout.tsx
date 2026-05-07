@@ -7,6 +7,7 @@ import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/compon
 import { ChatWidget } from "@/components/ChatWidget";
 import { Analytics } from "@/components/Analytics";
 import { Plausible } from "@/components/Plausible";
+import { CookieConsent } from "@/components/CookieConsent";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -107,6 +108,7 @@ export default async function RootLayout({
           <main>{children}</main>
           <Footer />
           <ChatWidget />
+          <CookieConsent />
         </CartProvider>
       </body>
     </html>

@@ -1,44 +1,54 @@
+"use client";
+
 /**
- * Marketing analytics scaffolding.
+ * Marketing analytics gated behind cookie consent.
  *
- * - Google Analytics 4 (GA4) — measurement ID hardcoded as default so
- *   pageviews start flowing without touching Vercel env vars. Override
- *   via NEXT_PUBLIC_GA_ID if we ever migrate properties.
- * - Meta Pixel — enabled by NEXT_PUBLIC_META_PIXEL_ID.
- * - Google Ads tag — enabled by NEXT_PUBLIC_GOOGLE_ADS_ID.
+ * GA4 (Google Analytics 4) and the Meta + Google Ads tags only load
+ * after the user clicks "Acceptera alla" in the CookieConsent banner.
+ * If they pick "Bara nödvändiga" — or if the banner hasn't been
+ * answered yet — these scripts stay off the page entirely.
  *
- * gtag.js is loaded once and shared between GA4 and Google Ads, so
- * we don't double-load the same library when both IDs are present.
+ * Plausible (privacy-first, no cookies) is loaded unconditionally
+ * from its own component since it doesn't legally require consent.
  *
- * Plausible (privacy-first traffic analytics) lives in its own
- * Plausible.tsx component — these two stack rather than replace each
- * other: Plausible gives clean truth-of-traffic, GA4 + the pixels
- * power retargeting.
+ * NOTE: We hardcode the GA4 measurement ID as a default so the site
+ * works without env-var setup. NEXT_PUBLIC_GA_ID overrides.
  */
 
 import Script from "next/script";
+import { useEffect, useState } from "react";
+import { CONSENT_EVENT, readConsent } from "./CookieConsent";
 
-// Bilskrotscentralen GA4 measurement ID. Hardcoded so analytics
-// activate immediately on next deploy.
-const GA_ID =
-  process.env.NEXT_PUBLIC_GA_ID || "G-Y14NBBQ8NL";
-
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID || "G-Y14NBBQ8NL";
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
-const needsGtag = Boolean(GA_ID || GOOGLE_ADS_ID);
-// Single loader script — gtag.js can configure multiple targets.
-const gtagSrc = `https://www.googletagmanager.com/gtag/js?id=${GA_ID || GOOGLE_ADS_ID}`;
-
-const gtagInit = `
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  ${GA_ID ? `gtag('config', '${GA_ID}');` : ""}
-  ${GOOGLE_ADS_ID ? `gtag('config', '${GOOGLE_ADS_ID}');` : ""}
-`.trim();
-
 export function Analytics() {
+  const [consented, setConsented] = useState(false);
+
+  useEffect(() => {
+    setConsented(readConsent() === "all");
+    const onChange = () => setConsented(readConsent() === "all");
+    window.addEventListener(CONSENT_EVENT, onChange);
+    window.addEventListener("storage", onChange); // other tabs
+    return () => {
+      window.removeEventListener(CONSENT_EVENT, onChange);
+      window.removeEventListener("storage", onChange);
+    };
+  }, []);
+
+  if (!consented) return null;
+
+  const needsGtag = Boolean(GA_ID || GOOGLE_ADS_ID);
+  const gtagSrc = `https://www.googletagmanager.com/gtag/js?id=${GA_ID || GOOGLE_ADS_ID}`;
+  const gtagInit = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    ${GA_ID ? `gtag('config', '${GA_ID}');` : ""}
+    ${GOOGLE_ADS_ID ? `gtag('config', '${GOOGLE_ADS_ID}');` : ""}
+  `.trim();
+
   return (
     <>
       {needsGtag && (
