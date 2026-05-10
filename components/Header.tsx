@@ -50,9 +50,9 @@ export default function Header({ session }: { session: Session | null }) {
         <Link href="/" className="flex items-center gap-3 shrink-0 min-w-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="Bilskrotscentralen" className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 object-contain shrink-0" />
-          <div className="leading-tight min-w-0">
-            <div className="font-black text-[var(--color-text-primary)] text-sm sm:text-base lg:text-lg tracking-tight truncate">BILSKROTSCENTRALEN</div>
-            <div className="text-xs sm:text-sm text-[var(--color-text-muted)] truncate hidden sm:block">Bildemontering &amp; Reservdelar</div>
+          <div className="leading-tight min-w-0 hidden md:block">
+            <div className="font-black text-[var(--color-text-primary)] text-sm md:text-base lg:text-lg tracking-tight truncate">BILSKROTSCENTRALEN</div>
+            <div className="text-xs md:text-sm text-[var(--color-text-muted)] truncate hidden lg:block">Bildemontering &amp; Reservdelar</div>
           </div>
         </Link>
 
@@ -145,11 +145,11 @@ export default function Header({ session }: { session: Session | null }) {
           {/* Cart with badge */}
           <CartButton />
 
-          {/* Account */}
+          {/* Account — full pills only at lg+; the user/login icon handles smaller screens */}
           {session ? (
             <a
               href={session.role === "admin" ? "/admin" : "/konto"}
-              className="hidden sm:flex p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] transition-colors"
+              className="flex p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] transition-colors"
               aria-label="Mitt konto"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -157,24 +157,37 @@ export default function Header({ session }: { session: Session | null }) {
               </svg>
             </a>
           ) : (
-            <div className="hidden sm:flex items-center gap-1">
+            <>
+              {/* Compact login icon for sm/md so the header still fits */}
               <a
                 href="/logga-in"
-                className="px-3 py-2 rounded-lg text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-700)] transition-colors"
+                aria-label="Logga in"
+                className="lg:hidden flex p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-dark-700)] transition-colors"
               >
-                Logga in
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                </svg>
               </a>
-              <a
-                href="/skapa-konto"
-                className="px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10 transition-colors"
-              >
-                Skapa konto
-              </a>
-            </div>
+              {/* Full pills only on lg+ where there's room */}
+              <div className="hidden lg:flex items-center gap-1">
+                <a
+                  href="/logga-in"
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-700)] transition-colors"
+                >
+                  Logga in
+                </a>
+                <a
+                  href="/skapa-konto"
+                  className="px-3 py-2 rounded-lg text-sm font-semibold text-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange)]/10 transition-colors"
+                >
+                  Skapa konto
+                </a>
+              </div>
+            </>
           )}
 
-          {/* CTA */}
-          <Link href="/skrota-bilen" className="hidden sm:block px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] transition-colors whitespace-nowrap">
+          {/* CTA — only at lg+; in burger on smaller screens */}
+          <Link href="/skrota-bilen" className="hidden lg:block px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] transition-colors whitespace-nowrap">
             Skrota bilen
           </Link>
 
