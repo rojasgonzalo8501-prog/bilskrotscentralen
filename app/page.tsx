@@ -289,10 +289,16 @@ export default async function HomePage() {
                 </h3>
 
                 <Link
-                  href="/b2b"
+                  href="/b2b/anslut"
                   className="block text-center px-5 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm uppercase tracking-wider transition-colors"
                 >
                   Anslut Din Verkstad
+                </Link>
+                <Link
+                  href="/b2b"
+                  className="block text-center mt-2 text-xs text-slate-500 hover:text-slate-900 transition-colors"
+                >
+                  Läs mer om B2B-portalen →
                 </Link>
 
                 <Link
