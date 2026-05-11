@@ -8,6 +8,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { GoogleReviewCTA } from "@/components/GoogleReviewCTA";
 
 export const metadata: Metadata = {
   title: "Omdömen — vad våra kunder säger",
@@ -201,29 +202,21 @@ export default function OmdomenPage() {
         </p>
       </section>
 
-      {/* ─── CTA ─── */}
-      <section className="bg-white border-t border-slate-200">
+      {/* ─── Google Review CTA — primary flywheel for local SEO ─── */}
+      <GoogleReviewCTA />
+
+      {/* ─── Browse CTA ─── */}
+      <section className="bg-slate-50 border-t border-slate-200">
         <div className="max-w-3xl mx-auto px-4 py-12 text-center">
-          <h2 className="text-2xl font-black text-slate-900 mb-2">
-            Köpt av oss tidigare?
-          </h2>
           <p className="text-sm text-slate-600 mb-5">
-            Lämna gärna ett omdöme — det hjälper andra att hitta rätt.
+            Letar du efter en specifik del?
           </p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link
-              href="/bildelar"
-              className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition-colors"
-            >
-              Bläddra bildelar
-            </Link>
-            <a
-              href="tel:017121002"
-              className="px-5 py-3 rounded-xl border border-slate-300 hover:border-slate-900 text-slate-900 font-bold text-sm transition-colors"
-            >
-              Ring 0171-210 02
-            </a>
-          </div>
+          <Link
+            href="/bildelar"
+            className="inline-block px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm transition-colors"
+          >
+            Bläddra bildelar →
+          </Link>
         </div>
       </section>
     </main>

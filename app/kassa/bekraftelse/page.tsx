@@ -6,6 +6,7 @@ import { createInvoiceFromOrder } from "@/lib/invoice-utils";
 import { sendOrderConfirmationEmail } from "@/lib/order-emails";
 import { ChatTrigger } from "@/components/ChatTrigger";
 import { signOrderToken } from "@/lib/order-token";
+import { GoogleReviewCTA } from "@/components/GoogleReviewCTA";
 
 export const metadata: Metadata = {
   title: "Orderbekräftelse — Bilskrotscentralen",
@@ -198,6 +199,11 @@ export default async function BekraftelsePage({
         >
           💬 Frågor? Öppna chatten
         </ChatTrigger>
+      </div>
+
+      {/* Post-purchase review nudge — kunden är som mest nöjd just nu. */}
+      <div className="mt-12">
+        <GoogleReviewCTA />
       </div>
     </section>
   );
