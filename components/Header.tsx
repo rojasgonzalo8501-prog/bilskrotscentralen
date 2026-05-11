@@ -10,7 +10,6 @@ const NAV = [
   { href: "/bildelar",     label: "Bildelar",     dropdown: true },
   { href: "/mercedes",     label: "Mercedes",     highlight: true },
   { href: "/bilrutor",     label: "Bilrutor",     highlight: false },
-  { href: "/skrota-bilen", label: "Skrota bilen" },
   { href: "/verkstad",     label: "Verkstad" },
   { href: "/guider",       label: "Guider" },
   { href: "/om-oss",       label: "Om oss" },
