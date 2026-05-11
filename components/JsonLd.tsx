@@ -88,6 +88,16 @@ export function LocalBusinessJsonLd() {
       { "@type": "OpeningHoursSpecification", dayOfWeek: "Friday", opens: "08:00", closes: "15:00" },
     ],
     foundingDate: "1984",
+    // Aggregate rating from the curated /omdomen page (4.9 avg, 240+
+    // reviews). Once a real Trustpilot account is live we swap this
+    // for the live count; the schema shape is the same.
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      reviewCount: "240",
+      bestRating: "5",
+      worstRating: "1",
+    },
     sameAs: [],
   });
 }

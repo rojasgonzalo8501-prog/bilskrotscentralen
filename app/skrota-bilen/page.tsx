@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { CITIES } from "@/lib/cities";
 import { SkrotaForm } from "./SkrotaForm";
+import { FaqJsonLd } from "@/components/JsonLd";
 
 export const metadata: Metadata = {
-  title: "Skrota bilen gratis — vi hämtar i hela Mälardalen",
+  // Front-loaded with the primary location keyword + free + auktoriserad
+  // — the three triggers that move ranking on "skrot enköping" /
+  // "bilskrot mälardalen" / "skrota bilen [stad]" queries.
+  title: "Bilskrot Enköping — skrota bilen gratis i hela Mälardalen | Auktoriserad sedan 1984",
   description:
-    "Skrota din bil kostnadsfritt. Vi hämtar gratis i Enköping, Uppsala, Västerås, Stockholm och Eskilstuna. Auktoriserad bilskrot sedan 1984. Ring oss idag.",
+    "Auktoriserad bilskrot i Enköping. Skrota din bil kostnadsfritt — vi hämtar gratis i Enköping, Uppsala, Västerås, Stockholm och Eskilstuna. Marknadens bästa skrotpremie. Ring 0171-210 02.",
   keywords: [
     "skrota bilen",
     "skrota bilen gratis",
@@ -195,6 +199,9 @@ export default function SkrotaBilenPage() {
       </section>
 
       {/* ─── FAQ ─── */}
+      {/* FAQ JSON-LD lets Google render these as expandable rich snippets
+          on the SERP — proven to lift CTR on transactional queries. */}
+      <FaqJsonLd items={FAQ.map((f) => ({ question: f.q, answer: f.a }))} />
       <section className="max-w-3xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-black mb-8 text-center">Vanliga frågor</h2>
         <div className="space-y-4">

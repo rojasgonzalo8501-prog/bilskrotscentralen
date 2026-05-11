@@ -63,6 +63,55 @@ export const CITIES: City[] = [
     blurb:
       "Hela Mälardalen — Enköping, Västerås, Uppsala, Stockholm, Eskilstuna. Gratis hämtning vart du än bor.",
   },
+  // Smaller surrounding towns — low Google competition, easy organic wins.
+  {
+    slug: "balsta",
+    name: "Bålsta",
+    distanceKm: 25,
+    population: 17000,
+    blurb:
+      "Bara 20 minuter från oss. Vi hämtar bilen i hela Bålsta och Håbo kommun — ofta samma dag som du ringer.",
+  },
+  {
+    slug: "sala",
+    name: "Sala",
+    distanceKm: 50,
+    population: 12000,
+    blurb:
+      "Gratis bilhämtning i Sala och kringliggande Salbohed, Ransta och Möklinta. Boka via formulär eller telefon.",
+  },
+  {
+    slug: "knivsta",
+    name: "Knivsta",
+    distanceKm: 40,
+    population: 19000,
+    blurb:
+      "Skrota bilen i Knivsta — vi kommer med bärgare, hanterar avregistreringen och betalar dig samma dag.",
+  },
+  {
+    slug: "heby",
+    name: "Heby",
+    distanceKm: 45,
+    population: 14000,
+    blurb:
+      "Gratis hämtning av skrotbil i Heby kommun — Tärnsjö, Östervåla, Morgongåva. Boka direkt online.",
+  },
+  {
+    slug: "tierp",
+    name: "Tierp",
+    distanceKm: 80,
+    population: 21000,
+    blurb:
+      "Vi hämtar gratis i hela Tierps kommun. Ring eller boka online, vi sköter resten.",
+  },
+  {
+    slug: "sigtuna",
+    name: "Sigtuna",
+    distanceKm: 35,
+    population: 50000,
+    blurb:
+      "Skrota bilen i Sigtuna kommun — Märsta, Rosersberg, Sigtuna stad. Gratis hämtning inom Mälardalen.",
+  },
 ];
 
 export function getCity(slug: string): City | undefined {
