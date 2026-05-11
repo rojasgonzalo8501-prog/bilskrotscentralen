@@ -577,6 +577,25 @@ export default async function HomePage() {
               </a>
             </div>
           </div>
+
+          {/* Google Maps embed — single iframe is plenty for one location */}
+          <div className="mt-10">
+            <div className="rounded-2xl overflow-hidden border border-slate-200 aspect-[16/9] sm:aspect-[21/9] shadow-sm">
+              <iframe
+                src="https://www.google.com/maps?q=Magasingatan+2,+749+35+Enk%C3%B6ping&output=embed"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                title="Bilskrotscentralen — Magasingatan 2, Enköping"
+              />
+            </div>
+            <p className="text-xs text-slate-500 text-center mt-3">
+              Gratis besöksparkering · 5 min från E18 · enklast med bil
+            </p>
+          </div>
         </div>
       </section>
 

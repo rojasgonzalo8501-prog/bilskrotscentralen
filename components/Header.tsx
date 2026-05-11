@@ -111,31 +111,6 @@ export default function Header({ session }: { session: Session | null }) {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
-          {/* Search — real form input that submits to /bildelar?q=… */}
-          <form
-            action="/bildelar"
-            method="get"
-            role="search"
-            className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--color-dark-700)] hover:bg-[var(--color-dark-600)] focus-within:bg-[var(--color-dark-600)] focus-within:ring-1 focus-within:ring-[var(--color-brand-orange)]/40 transition-colors"
-          >
-            <button
-              type="submit"
-              aria-label="Sök"
-              className="text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-              </svg>
-            </button>
-            <input
-              type="search"
-              name="q"
-              placeholder="Sök SKU, OE-nr, del…"
-              aria-label="Sök bildelar"
-              className="hidden md:block bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none w-44 lg:w-56"
-            />
-          </form>
-
           {/* Wishlist */}
           <WishlistHeaderLink />
 
