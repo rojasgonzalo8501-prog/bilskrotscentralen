@@ -51,6 +51,18 @@ export default async function AdminDashboardPage() {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const deadStockThreshold = new Date(Date.now() - 180 * 24 * 3600 * 1000);
 
+  // Each query is wrapped so a single missing column or table never
+  // tears down the whole dashboard. Anything that fails just shows 0
+  // and logs to Vercel for debugging.
+  async function safe<T>(fn: () => Promise<T>, fallback: T, label: string): Promise<T> {
+    try {
+      return await fn();
+    } catch (err) {
+      console.error(`[admin-dashboard] ${label} failed:`, err);
+      return fallback;
+    }
+  }
+
   const [
     partCount,
     availableCount,
@@ -65,60 +77,84 @@ export default async function AdminDashboardPage() {
     recentOrders,
     eftersokInboxCount,
   ] = await Promise.all([
-    db.part.count(),
-    db.part.count({ where: { status: "AVAILABLE" } }),
-    db.vehicle.count(),
-    db.vehicle.count({ where: { status: "DISMANTLING" } }),
-    db.order.findMany({
-      where: { paymentStatus: "PAID", createdAt: { gte: startOfToday } },
-      select: { totalSek: true },
-    }),
-    db.order.findMany({
-      where: { paymentStatus: "PAID", createdAt: { gte: startOfMonth } },
-      select: { totalSek: true },
-    }),
-    db.order.count({
-      where: {
-        paymentStatus: "PAID",
-        status: { in: ["CONFIRMED", "PROCESSING"] },
-      },
-    }),
-    db.order.count({ where: { paymentStatus: "PENDING" } }),
-    db.part.count({
-      where: {
-        status: "AVAILABLE",
-        createdAt: { lt: deadStockThreshold },
-      },
-    }),
-    db.part.aggregate({
-      where: { status: "AVAILABLE", priceSek: { not: null } },
-      _sum: { priceSek: true },
-    }),
-    db.order.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 8,
-      select: {
-        id: true,
-        orderNumber: true,
-        firstName: true,
-        lastName: true,
-        totalSek: true,
-        status: true,
-        createdAt: true,
-        items: { select: { partName: true }, take: 1 },
-      },
-    }),
-    // Lead table may be missing from prod DBs that haven't run the
-    // 20260505_add_leads migration yet. Fall back to 0 so the whole
-    // dashboard doesn't 500 — the inbox link still works once the
-    // migration runs and the count starts populating.
-    (async () => {
-      try {
-        return await db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } });
-      } catch {
-        return 0;
-      }
-    })(),
+    safe(() => db.part.count(), 0, "partCount"),
+    safe(() => db.part.count({ where: { status: "AVAILABLE" } }), 0, "availableCount"),
+    safe(() => db.vehicle.count(), 0, "vehicleCount"),
+    safe(() => db.vehicle.count({ where: { status: "DISMANTLING" } }), 0, "dismantlingCount"),
+    safe(
+      () => db.order.findMany({
+        where: { paymentStatus: "PAID", createdAt: { gte: startOfToday } },
+        select: { totalSek: true },
+      }),
+      [] as { totalSek: number }[],
+      "todayPaidOrders",
+    ),
+    safe(
+      () => db.order.findMany({
+        where: { paymentStatus: "PAID", createdAt: { gte: startOfMonth } },
+        select: { totalSek: true },
+      }),
+      [] as { totalSek: number }[],
+      "mtdPaidOrders",
+    ),
+    safe(
+      () => db.order.count({
+        where: {
+          paymentStatus: "PAID",
+          status: { in: ["CONFIRMED", "PROCESSING"] },
+        },
+      }),
+      0,
+      "ordersToPack",
+    ),
+    safe(() => db.order.count({ where: { paymentStatus: "PENDING" } }), 0, "pendingPayments"),
+    safe(
+      () => db.part.count({
+        where: { status: "AVAILABLE", createdAt: { lt: deadStockThreshold } },
+      }),
+      0,
+      "deadStockCount",
+    ),
+    safe(
+      () => db.part.aggregate({
+        where: { status: "AVAILABLE", priceSek: { not: null } },
+        _sum: { priceSek: true },
+      }),
+      { _sum: { priceSek: 0 as number | null } },
+      "stockValueAgg",
+    ),
+    safe(
+      () => db.order.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 8,
+        select: {
+          id: true,
+          orderNumber: true,
+          firstName: true,
+          lastName: true,
+          totalSek: true,
+          status: true,
+          createdAt: true,
+          items: { select: { partName: true }, take: 1 },
+        },
+      }),
+      [] as Array<{
+        id: string;
+        orderNumber: string;
+        firstName: string;
+        lastName: string;
+        totalSek: number;
+        status: string;
+        createdAt: Date;
+        items: { partName: string }[];
+      }>,
+      "recentOrders",
+    ),
+    safe(
+      () => db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
+      0,
+      "eftersokInboxCount",
+    ),
   ]);
 
   const todayRevenue = todayPaidOrders.reduce((s, o) => s + o.totalSek, 0);
