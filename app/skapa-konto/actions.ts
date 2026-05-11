@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { setSession } from "@/lib/auth";
+import { sendWelcomeEmail } from "@/lib/welcome-email";
 
 export type SignupResult = {
   ok: boolean;
@@ -77,6 +78,14 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
     username: user.username,
     role: "customer",
     name: user.name,
+  });
+
+  // Best-effort welcome mail — don't block the signup flow if Resend
+  // is unavailable or the domain isn't verified yet.
+  void sendWelcomeEmail({
+    email: user.email!,
+    name: user.name,
+    username: user.username,
   });
 
   redirect("/konto");
