@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldCheck, Shield, User, PauseCircle, PlayCircle, Trash2, Plus } from "lucide-react";
+import { ShieldCheck, Shield, User, PauseCircle, PlayCircle, Trash2, Plus, KeyRound, Check, X } from "lucide-react";
 
 type UserRow = {
   id: string;
@@ -36,6 +36,10 @@ export default function UsersClient({
   const [showAdd, setShowAdd] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
+  // Per-row "reset password" state — only one row open at a time.
+  const [resetFor, setResetFor] = useState<string | null>(null);
+  const [resetPw, setResetPw] = useState("");
+  const [resetOk, setResetOk] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     username: "", password: "", name: "", email: "",
@@ -67,6 +71,41 @@ export default function UsersClient({
       setError(data.error ?? "Något gick fel");
     }
     setLoading(null);
+  }
+
+  async function resetPassword(user: UserRow) {
+    if (resetPw.length < 8) {
+      setError("Lösenordet måste vara minst 8 tecken.");
+      return;
+    }
+    setLoading(user.id);
+    setError("");
+    const res = await fetch(`/api/admin/users/${user.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: resetPw }),
+    });
+    if (res.ok) {
+      setResetOk(`${user.name}: lösenord uppdaterat → ${resetPw}`);
+      setResetPw("");
+      setResetFor(null);
+      // Auto-hide success after 8s
+      setTimeout(() => setResetOk(null), 8000);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Kunde inte uppdatera lösenord.");
+    }
+    setLoading(null);
+  }
+
+  function genPassword() {
+    // 12-char alphanumeric, no ambiguous chars (0/O/1/l)
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+    let out = "";
+    const rnd = new Uint8Array(12);
+    crypto.getRandomValues(rnd);
+    for (let i = 0; i < rnd.length; i++) out += alphabet[rnd[i] % alphabet.length];
+    setResetPw(out);
   }
 
   async function addUser(e: React.FormEvent) {
@@ -143,6 +182,18 @@ export default function UsersClient({
                 </td>
                 <td className="px-5 py-3.5 text-right">
                   <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => {
+                        setResetFor(resetFor === user.id ? null : user.id);
+                        setResetPw("");
+                        setError("");
+                      }}
+                      disabled={loading === user.id}
+                      title="Återställ lösenord"
+                      className="p-1.5 rounded-lg hover:bg-[var(--color-brand-orange)]/10 text-[var(--color-text-muted)] hover:text-[var(--color-brand-orange)] transition-colors disabled:opacity-40"
+                    >
+                      <KeyRound size={16} />
+                    </button>
                     {user.id !== currentUserId && (
                       <>
                         <button
@@ -170,6 +221,56 @@ export default function UsersClient({
                 </td>
               </tr>
             ))}
+            {/* Reset-password inline form spans the table when a row is selected */}
+            {resetFor && (() => {
+              const target = users.find((u) => u.id === resetFor);
+              if (!target) return null;
+              return (
+                <tr className="bg-[var(--color-brand-orange)]/5 border-b border-[var(--color-brand-orange)]/20">
+                  <td colSpan={6} className="px-5 py-4">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <KeyRound size={16} className="text-[var(--color-brand-orange)]" />
+                      <span className="text-sm font-bold">
+                        Återställ lösenord för <span className="text-[var(--color-brand-orange)]">{target.name}</span> ({target.username})
+                      </span>
+                      <input
+                        type="text"
+                        value={resetPw}
+                        onChange={(e) => setResetPw(e.target.value)}
+                        placeholder="Nytt lösenord (min 8 tecken)"
+                        autoFocus
+                        className="flex-1 min-w-[200px] px-3 py-2 rounded-lg bg-[var(--color-dark-800)] border border-[var(--color-dark-500)] text-sm font-mono text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-brand-orange)]"
+                      />
+                      <button
+                        type="button"
+                        onClick={genPassword}
+                        className="px-3 py-2 rounded-lg border border-[var(--color-dark-500)] hover:border-[var(--color-brand-orange)] text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+                        title="Generera slumpmässigt lösenord"
+                      >
+                        🎲 Generera
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => resetPassword(target)}
+                        disabled={loading === target.id || resetPw.length < 8}
+                        className="px-3 py-2 rounded-lg bg-[var(--color-brand-orange)] hover:bg-[var(--color-brand-orange-dark)] text-white text-xs font-bold disabled:opacity-50 inline-flex items-center gap-1"
+                      >
+                        <Check size={14} />
+                        {loading === target.id ? "Sparar…" : "Spara"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setResetFor(null); setResetPw(""); setError(""); }}
+                        className="p-2 rounded-lg hover:bg-[var(--color-dark-600)] text-[var(--color-text-muted)]"
+                        title="Avbryt"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })()}
           </tbody>
         </table>
       </div>
@@ -177,6 +278,15 @@ export default function UsersClient({
       {error && (
         <div className="rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3">
           {error}
+        </div>
+      )}
+      {resetOk && (
+        <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm px-4 py-3 font-mono">
+          ✓ {resetOk}
+          <div className="text-xs text-emerald-400/80 mt-1 font-sans">
+            Kopiera och skicka till användaren via säker kanal — meddelandet
+            försvinner från skärmen om 8 sekunder.
+          </div>
         </div>
       )}
 
