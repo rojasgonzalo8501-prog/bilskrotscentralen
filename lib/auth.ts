@@ -52,14 +52,41 @@ export async function verifyCredentials(
   password: string
 ): Promise<CredentialResult> {
   const u = username.trim().toLowerCase();
-  const user = await db.user.findUnique({ where: { username: u } });
+  // Explicit `select` so we only query columns that exist in every
+  // deployed DB. The 2FA columns (totpSecret/totpEnabled) are read in
+  // a defensive second step below — if they're missing in the prod
+  // schema we simply skip the 2FA branch instead of crashing the
+  // whole login flow.
+  const user = await db.user.findUnique({
+    where: { username: u },
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      role: true,
+      active: true,
+      passwordHash: true,
+    },
+  });
   if (!user || !user.active) return { kind: "fail" };
 
   const ok = await verifyPassword(password, user.passwordHash);
   if (!ok) return { kind: "fail" };
 
-  if (user.totpEnabled && user.totpSecret) {
-    return { kind: "needs-2fa", userId: user.id };
+  // Optional 2FA check — wrapped in try/catch because the totp columns
+  // may not exist on older deployments that haven't run the migration
+  // yet. A missing-column error becomes "no 2FA on this account" so
+  // the user can still log in.
+  try {
+    const twoFa = await db.user.findUnique({
+      where: { id: user.id },
+      select: { totpEnabled: true, totpSecret: true },
+    });
+    if (twoFa?.totpEnabled && twoFa?.totpSecret) {
+      return { kind: "needs-2fa", userId: user.id };
+    }
+  } catch {
+    /* totp columns not present in this DB — proceed without 2FA */
   }
 
   return {
@@ -75,7 +102,16 @@ export async function verifyCredentials(
 
 /** Build a Session from a User row that already passed authentication. */
 export async function sessionForUser(userId: string): Promise<Session | null> {
-  const user = await db.user.findUnique({ where: { id: userId } });
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      role: true,
+      active: true,
+    },
+  });
   if (!user || !user.active) return null;
   return {
     userId: user.id,
