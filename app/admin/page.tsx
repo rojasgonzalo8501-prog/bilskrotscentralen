@@ -108,7 +108,17 @@ export default async function AdminDashboardPage() {
         items: { select: { partName: true }, take: 1 },
       },
     }),
-    db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
+    // Lead table may be missing from prod DBs that haven't run the
+    // 20260505_add_leads migration yet. Fall back to 0 so the whole
+    // dashboard doesn't 500 — the inbox link still works once the
+    // migration runs and the count starts populating.
+    (async () => {
+      try {
+        return await db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } });
+      } catch {
+        return 0;
+      }
+    })(),
   ]);
 
   const todayRevenue = todayPaidOrders.reduce((s, o) => s + o.totalSek, 0);

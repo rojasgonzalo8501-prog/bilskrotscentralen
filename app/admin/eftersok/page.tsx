@@ -65,31 +65,43 @@ export default async function EftersokAdminPage({
     { message:  { contains: t, mode: "insensitive" as const } },
   ];
 
-  // Fan out the seven count queries first; main listing follows.
-  const [leads, openCount, newCount, inProgCount, answeredCount, wonCount, lostCount, allCount] =
-    await Promise.all([
-      db.lead.findMany({
-        where: {
-          ...(statusFilter === "open" && { status: { in: ["NEW", "IN_PROGRESS"] } }),
-          ...(statusFilter === "new"         && { status: "NEW" }),
-          ...(statusFilter === "in_progress" && { status: "IN_PROGRESS" }),
-          ...(statusFilter === "answered"    && { status: "ANSWERED" }),
-          ...(statusFilter === "won"         && { status: "WON" }),
-          ...(statusFilter === "lost"        && { status: "LOST" }),
-          ...(term && { OR: buildSearch(term) }),
-        },
-        orderBy: { createdAt: "desc" },
-        take: 100,
-        include: { assignedTo: { select: { name: true, username: true } } },
-      }),
-      db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
-      db.lead.count({ where: { status: "NEW" } }),
-      db.lead.count({ where: { status: "IN_PROGRESS" } }),
-      db.lead.count({ where: { status: "ANSWERED" } }),
-      db.lead.count({ where: { status: "WON" } }),
-      db.lead.count({ where: { status: "LOST" } }),
-      db.lead.count(),
-    ]);
+  // Defensive: if the Lead table hasn't been migrated to prod yet
+  // every query throws and the inbox 500s. Fall back to empty data
+  // so the page still renders with the right copy.
+  type LeadWithAssignee = Awaited<ReturnType<typeof db.lead.findMany>>[number] & {
+    assignedTo?: { name: string; username: string } | null;
+  };
+  let leads: LeadWithAssignee[] = [];
+  let openCount = 0, newCount = 0, inProgCount = 0;
+  let answeredCount = 0, wonCount = 0, lostCount = 0, allCount = 0;
+  try {
+    [leads, openCount, newCount, inProgCount, answeredCount, wonCount, lostCount, allCount] =
+      await Promise.all([
+        db.lead.findMany({
+          where: {
+            ...(statusFilter === "open" && { status: { in: ["NEW", "IN_PROGRESS"] } }),
+            ...(statusFilter === "new"         && { status: "NEW" }),
+            ...(statusFilter === "in_progress" && { status: "IN_PROGRESS" }),
+            ...(statusFilter === "answered"    && { status: "ANSWERED" }),
+            ...(statusFilter === "won"         && { status: "WON" }),
+            ...(statusFilter === "lost"        && { status: "LOST" }),
+            ...(term && { OR: buildSearch(term) }),
+          },
+          orderBy: { createdAt: "desc" },
+          take: 100,
+          include: { assignedTo: { select: { name: true, username: true } } },
+        }),
+        db.lead.count({ where: { status: { in: ["NEW", "IN_PROGRESS"] } } }),
+        db.lead.count({ where: { status: "NEW" } }),
+        db.lead.count({ where: { status: "IN_PROGRESS" } }),
+        db.lead.count({ where: { status: "ANSWERED" } }),
+        db.lead.count({ where: { status: "WON" } }),
+        db.lead.count({ where: { status: "LOST" } }),
+        db.lead.count(),
+      ]);
+  } catch (err) {
+    console.error("[admin/eftersok] Lead table query failed — probably missing migration:", err);
+  }
 
   const counts = {
     open:     openCount,
