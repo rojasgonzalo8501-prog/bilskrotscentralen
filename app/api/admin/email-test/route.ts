@@ -1,25 +1,33 @@
 /**
- * GET /api/admin/email-test?to=<email>
+ * GET /api/admin/email-test?to=<email>&type=<all|test|welcome|order|reset>
  *
- * Admin-only diagnostic that fires a test email via Resend and reports
- * the response back as JSON. Use this to verify:
- *  - RESEND_API_KEY is set
- *  - The from-domain is verified at Resend
- *  - DNS (SPF/DKIM/DMARC) lets the mail through to the inbox
+ * Admin diagnostic that fires sample copies of every customer-facing
+ * mail through the same code paths production uses. Admin-only.
  *
- * Returns { ok: true, id } on success or { ok: false, reason, error }
- * so problems are obvious without sifting through Vercel logs.
+ * Types:
+ *  - test     (default) — minimal Resend ping, verifies API key + domain
+ *  - welcome  — sendWelcomeEmail with a fake account name
+ *  - order    — sendOrderConfirmationEmail with one demo line item
+ *  - reset    — sendPasswordResetEmail with a real signed token
+ *  - all      — runs welcome → order → reset → test in sequence and
+ *               reports per-mail status
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSession } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { sendWelcomeEmail } from "@/lib/welcome-email";
+import { sendOrderConfirmationEmail } from "@/lib/order-emails";
+import { sendPasswordResetEmail } from "@/lib/password-reset-email";
 
 export const dynamic = "force-dynamic";
 
 const FROM =
   process.env.RESEND_FROM_EMAIL ??
   "Bilskrotscentralen <noreply@bilskrotscentralen.com>";
+
+type Result = { ok: boolean; note?: string; error?: string };
 
 export async function GET(req: NextRequest) {
   const session = await getSession();
@@ -28,37 +36,135 @@ export async function GET(req: NextRequest) {
   }
 
   const to = req.nextUrl.searchParams.get("to")?.trim();
+  const type = (req.nextUrl.searchParams.get("type") ?? "test").toLowerCase();
+
   if (!to || !to.includes("@")) {
     return NextResponse.json(
-      { ok: false, reason: "missing-to", hint: "Anropa med ?to=din@email.se" },
+      { ok: false, reason: "missing-to", hint: "Anropa med ?to=din@email.se&type=all" },
       { status: 400 }
     );
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  if (!process.env.RESEND_API_KEY) {
     return NextResponse.json(
-      { ok: false, reason: "missing-api-key", hint: "Lägg till RESEND_API_KEY i Vercel → Settings → Environment Variables." },
+      {
+        ok: false,
+        reason: "missing-api-key",
+        hint: "Lägg till RESEND_API_KEY i Vercel → Settings → Environment Variables.",
+      },
       { status: 500 }
     );
   }
 
-  const resend = new Resend(apiKey);
-  const { data, error } = await resend.emails.send({
+  const results: Record<string, Result> = {};
+
+  async function runTest(): Promise<Result> {
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const { data, error } = await resend.emails.send({
+        from: FROM,
+        to,
+        subject: "Test från Bilskrotscentralen",
+        html: `<p>Test-ping ${new Date().toLocaleString("sv-SE")}. Om du läser detta funkar Resend, API-nyckeln och domän-verifieringen.</p>`,
+        text: "Test-ping.",
+      });
+      if (error) return { ok: false, error: JSON.stringify(error) };
+      return { ok: true, note: `Resend id ${data?.id}` };
+    } catch (err) {
+      return { ok: false, error: String(err) };
+    }
+  }
+
+  async function runWelcome(): Promise<Result> {
+    try {
+      await sendWelcomeEmail({
+        email: to,
+        name: "Testkund Testsson",
+        username: "test-konto",
+      });
+      return { ok: true, note: "sendWelcomeEmail körd" };
+    } catch (err) {
+      return { ok: false, error: String(err) };
+    }
+  }
+
+  async function runOrder(): Promise<Result> {
+    try {
+      await sendOrderConfirmationEmail({
+        orderNumber: "MS-TEST-0001",
+        email: to,
+        firstName: "Test",
+        lastName: "Testsson",
+        address: "Testgatan 1",
+        postalCode: "123 45",
+        city: "Enköping",
+        subtotalSek: 2000,
+        shippingSek: 0,
+        vatSek: 500,
+        totalSek: 2500,
+        items: [
+          { partName: "TEST: Strålkastare vänster", priceSek: 2000, quantity: 1 },
+        ],
+      });
+      return { ok: true, note: "sendOrderConfirmationEmail körd" };
+    } catch (err) {
+      return { ok: false, error: String(err) };
+    }
+  }
+
+  async function runReset(): Promise<Result> {
+    try {
+      const user =
+        (await db.user.findFirst({
+          where: { email: to.toLowerCase(), active: true },
+          select: { id: true, name: true, passwordHash: true },
+        })) ??
+        ({
+          id: "fake-id-for-testing",
+          name: "Testkund",
+          passwordHash: "fake-hash-for-testing",
+        });
+      await sendPasswordResetEmail({
+        email: to,
+        name: user.name,
+        userId: user.id,
+        passwordHash: user.passwordHash,
+      });
+      return {
+        ok: true,
+        note:
+          user.id === "fake-id-for-testing"
+            ? "skickat MEN länken är ogiltig (ingen riktig user matchar e-posten)"
+            : "skickat med giltig reset-länk",
+      };
+    } catch (err) {
+      return { ok: false, error: String(err) };
+    }
+  }
+
+  if (type === "test") results.test = await runTest();
+  else if (type === "welcome") results.welcome = await runWelcome();
+  else if (type === "order") results.order = await runOrder();
+  else if (type === "reset") results.reset = await runReset();
+  else if (type === "all") {
+    results.welcome = await runWelcome();
+    results.order = await runOrder();
+    results.reset = await runReset();
+    results.test = await runTest();
+  } else {
+    return NextResponse.json(
+      { ok: false, reason: "unknown-type", validTypes: ["test", "welcome", "order", "reset", "all"] },
+      { status: 400 }
+    );
+  }
+
+  const allOk = Object.values(results).every((r) => r.ok);
+  return NextResponse.json({
+    ok: allOk,
     from: FROM,
     to,
-    subject: "Test från Bilskrotscentralen",
-    html: `<p>Det här är ett testmejl skickat från <strong>${FROM}</strong> via Resend kl ${new Date().toLocaleString("sv-SE")}.</p>
-           <p>Om du läser det här fungerar Resend, API-nyckeln, och domän-verifieringen.</p>`,
-    text: `Test från Bilskrotscentralen — om du läser detta fungerar Resend.`,
+    type,
+    results,
+    note: "Kolla inkorg + skräpposten. Vid fel — se 'error'-fältet och Vercel runtime logs.",
   });
-
-  if (error) {
-    return NextResponse.json(
-      { ok: false, reason: "resend-error", error, from: FROM },
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json({ ok: true, id: data?.id, from: FROM, to });
 }
