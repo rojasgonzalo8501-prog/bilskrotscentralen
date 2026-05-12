@@ -35,15 +35,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: "forbidden" }, { status: 403 });
   }
 
-  const to = req.nextUrl.searchParams.get("to")?.trim();
+  const rawTo = req.nextUrl.searchParams.get("to")?.trim();
   const type = (req.nextUrl.searchParams.get("type") ?? "test").toLowerCase();
 
-  if (!to || !to.includes("@")) {
+  if (!rawTo || !rawTo.includes("@")) {
     return NextResponse.json(
       { ok: false, reason: "missing-to", hint: "Anropa med ?to=din@email.se&type=all" },
       { status: 400 }
     );
   }
+  // Locked to a definite string so closures below don't carry the
+  // string | undefined union through capture.
+  const to: string = rawTo;
 
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json(
