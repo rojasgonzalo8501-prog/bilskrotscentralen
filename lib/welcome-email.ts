@@ -6,7 +6,7 @@
  * missed welcome mail is a soft loss — they can always reach support.
  */
 
-import { Resend } from "resend";
+import { sendEmail } from "@/lib/email-send";
 
 const FROM =
   process.env.RESEND_FROM_EMAIL ??
@@ -30,11 +30,6 @@ export async function sendWelcomeEmail(opts: {
   name: string;
   username: string;
 }): Promise<EmailSendResult> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn("[welcome-email] RESEND_API_KEY missing — skipping");
-    return { ok: false, error: "RESEND_API_KEY not set" };
-  }
 
   const html = `<!doctype html>
 <html lang="sv"><head><meta charset="utf-8"></head>
@@ -95,22 +90,13 @@ Frågor? Ring 0171-210 02 eller info@bilskrotscentralen.com.
 Bilskrotscentralen · Magasingatan 2, Enköping
 `;
 
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from: FROM,
-      to: opts.email,
-      subject: `Välkommen till Bilskrotscentralen, ${opts.name.split(" ")[0]}!`,
-      html,
-      text,
-    });
-    if (error) {
-      console.error("[welcome-email] Resend error:", error);
-      return { ok: false, error: JSON.stringify(error) };
-    }
-    return { ok: true };
-  } catch (err) {
-    console.error("[welcome-email] send threw:", err);
-    return { ok: false, error: String(err) };
-  }
+  const r = await sendEmail({
+    from: FROM,
+    to: opts.email,
+    subject: `Välkommen till Bilskrotscentralen, ${opts.name.split(" ")[0]}!`,
+    html,
+    text,
+  });
+  if (!r.ok) console.error("[welcome-email] failed:", r.error);
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
 }

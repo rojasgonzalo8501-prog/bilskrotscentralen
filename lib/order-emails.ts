@@ -7,7 +7,7 @@
  * fail; the order is already PAID by the time we get here.
  */
 
-import { Resend } from "resend";
+import { sendEmail } from "@/lib/email-send";
 import { orderTrackingUrl } from "@/lib/order-token";
 
 const SITE_URL =
@@ -152,28 +152,14 @@ export type EmailSendResult = { ok: true } | { ok: false; error: string };
 export async function sendOrderConfirmationEmail(
   order: OrderForEmail
 ): Promise<EmailSendResult> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn("[order-email] RESEND_API_KEY not set — skipping confirmation");
-    return { ok: false, error: "RESEND_API_KEY not set" };
-  }
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from: FROM,
-      to: order.email,
-      bcc: [ADMIN_BCC],
-      subject: `Orderbekräftelse #${order.orderNumber} — Bilskrotscentralen`,
-      html: buildHtml(order),
-      text: buildText(order),
-    });
-    if (error) {
-      console.error("[order-email] Resend error:", error);
-      return { ok: false, error: JSON.stringify(error) };
-    }
-    return { ok: true };
-  } catch (err) {
-    console.error("[order-email] send threw:", err);
-    return { ok: false, error: String(err) };
-  }
+  const r = await sendEmail({
+    from: FROM,
+    to: order.email,
+    bcc: [ADMIN_BCC],
+    subject: `Orderbekräftelse #${order.orderNumber} — Bilskrotscentralen`,
+    html: buildHtml(order),
+    text: buildText(order),
+  });
+  if (!r.ok) console.error("[order-email] failed:", r.error);
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
 }

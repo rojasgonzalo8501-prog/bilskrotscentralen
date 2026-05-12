@@ -14,9 +14,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { sendEmail } from "@/lib/email-send";
 import { sendWelcomeEmail } from "@/lib/welcome-email";
 import { sendOrderConfirmationEmail } from "@/lib/order-emails";
 import { sendPasswordResetEmail } from "@/lib/password-reset-email";
@@ -62,20 +62,20 @@ export async function GET(req: NextRequest) {
   const results: Record<string, Result> = {};
 
   async function runTest(): Promise<Result> {
-    try {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const { data, error } = await resend.emails.send({
-        from: FROM,
-        to,
-        subject: "Test från Bilskrotscentralen",
-        html: `<p>Test-ping ${new Date().toLocaleString("sv-SE")}. Om du läser detta funkar Resend, API-nyckeln och domän-verifieringen.</p>`,
-        text: "Test-ping.",
-      });
-      if (error) return { ok: false, error: JSON.stringify(error) };
-      return { ok: true, note: `Resend id ${data?.id}` };
-    } catch (err) {
-      return { ok: false, error: String(err) };
-    }
+    const r = await sendEmail({
+      from: FROM,
+      to,
+      subject: "Test från Bilskrotscentralen",
+      html: `<p>Test-ping ${new Date().toLocaleString("sv-SE")}. Om du läser detta funkar Resend, API-nyckeln och domän-verifieringen.</p>`,
+      text: "Test-ping.",
+    });
+    if (!r.ok) return { ok: false, error: r.error };
+    return {
+      ok: true,
+      note: r.usedFallback
+        ? `Levererat via onboarding@resend.dev (fallback — din domän är inte fullt verifierad än)`
+        : `Levererat via Resend id ${r.id}`,
+    };
   }
 
   async function runWelcome(): Promise<Result> {

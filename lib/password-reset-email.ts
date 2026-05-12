@@ -8,7 +8,7 @@
  * are registered.
  */
 
-import { Resend } from "resend";
+import { sendEmail } from "@/lib/email-send";
 import { buildResetToken } from "@/lib/password-reset-token";
 
 const FROM =
@@ -34,11 +34,6 @@ export async function sendPasswordResetEmail(opts: {
   userId: string;
   passwordHash: string;
 }): Promise<EmailSendResult> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn("[password-reset] RESEND_API_KEY missing — skipping email");
-    return { ok: false, error: "RESEND_API_KEY not set" };
-  }
 
   const token = buildResetToken({
     userId: opts.userId,
@@ -96,22 +91,13 @@ nuvarande lösenord fortsätter att fungera.
 Bilskrotscentralen · 0171-210 02
 `;
 
-  try {
-    const resend = new Resend(apiKey);
-    const { error } = await resend.emails.send({
-      from: FROM,
-      to: opts.email,
-      subject: "Återställ ditt lösenord — Bilskrotscentralen",
-      html,
-      text,
-    });
-    if (error) {
-      console.error("[password-reset] Resend error:", error);
-      return { ok: false, error: JSON.stringify(error) };
-    }
-    return { ok: true };
-  } catch (err) {
-    console.error("[password-reset] send threw:", err);
-    return { ok: false, error: String(err) };
-  }
+  const r = await sendEmail({
+    from: FROM,
+    to: opts.email,
+    subject: "Återställ ditt lösenord — Bilskrotscentralen",
+    html,
+    text,
+  });
+  if (!r.ok) console.error("[password-reset] failed:", r.error);
+  return r.ok ? { ok: true } : { ok: false, error: r.error };
 }
