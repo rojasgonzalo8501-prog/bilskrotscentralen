@@ -23,15 +23,17 @@ function escape(s: string) {
     .replace(/"/g, "&quot;");
 }
 
+export type EmailSendResult = { ok: true } | { ok: false; error: string };
+
 export async function sendWelcomeEmail(opts: {
   email: string;
   name: string;
   username: string;
-}): Promise<void> {
+}): Promise<EmailSendResult> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn("[welcome-email] RESEND_API_KEY missing — skipping");
-    return;
+    return { ok: false, error: "RESEND_API_KEY not set" };
   }
 
   const html = `<!doctype html>
@@ -102,8 +104,13 @@ Bilskrotscentralen · Magasingatan 2, Enköping
       html,
       text,
     });
-    if (error) console.error("[welcome-email] Resend error:", error);
+    if (error) {
+      console.error("[welcome-email] Resend error:", error);
+      return { ok: false, error: JSON.stringify(error) };
+    }
+    return { ok: true };
   } catch (err) {
     console.error("[welcome-email] send threw:", err);
+    return { ok: false, error: String(err) };
   }
 }

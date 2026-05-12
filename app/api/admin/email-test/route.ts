@@ -80,12 +80,13 @@ export async function GET(req: NextRequest) {
 
   async function runWelcome(): Promise<Result> {
     try {
-      await sendWelcomeEmail({
+      const r = await sendWelcomeEmail({
         email: to,
         name: "Testkund Testsson",
         username: "test-konto",
       });
-      return { ok: true, note: "sendWelcomeEmail körd" };
+      if (!r.ok) return { ok: false, error: r.error };
+      return { ok: true, note: "sendWelcomeEmail levererad" };
     } catch (err) {
       return { ok: false, error: String(err) };
     }
@@ -93,7 +94,7 @@ export async function GET(req: NextRequest) {
 
   async function runOrder(): Promise<Result> {
     try {
-      await sendOrderConfirmationEmail({
+      const r = await sendOrderConfirmationEmail({
         orderNumber: "MS-TEST-0001",
         email: to,
         firstName: "Test",
@@ -109,7 +110,8 @@ export async function GET(req: NextRequest) {
           { partName: "TEST: Strålkastare vänster", priceSek: 2000, quantity: 1 },
         ],
       });
-      return { ok: true, note: "sendOrderConfirmationEmail körd" };
+      if (!r.ok) return { ok: false, error: r.error };
+      return { ok: true, note: "sendOrderConfirmationEmail levererad" };
     } catch (err) {
       return { ok: false, error: String(err) };
     }
@@ -127,17 +129,18 @@ export async function GET(req: NextRequest) {
           name: "Testkund",
           passwordHash: "fake-hash-for-testing",
         });
-      await sendPasswordResetEmail({
+      const r = await sendPasswordResetEmail({
         email: to,
         name: user.name,
         userId: user.id,
         passwordHash: user.passwordHash,
       });
+      if (!r.ok) return { ok: false, error: r.error };
       return {
         ok: true,
         note:
           user.id === "fake-id-for-testing"
-            ? "skickat MEN länken är ogiltig (ingen riktig user matchar e-posten)"
+            ? "levererad MEN länken är ogiltig (ingen riktig user matchar e-posten)"
             : "skickat med giltig reset-länk",
       };
     } catch (err) {
