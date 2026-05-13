@@ -44,6 +44,13 @@ function withFallbackFrom(from: string): string {
 function isDomainNotVerified(err: unknown): boolean {
   if (!err) return false;
   const blob = typeof err === "string" ? err : JSON.stringify(err);
+  // Don't retry on:
+  //   - testing-mode restrictions (account hasn't verified any domain yet
+  //     — retrying with resend.dev still fails because the recipient
+  //     isn't the account owner). Wastes rate-limit budget.
+  //   - rate limit (obviously)
+  if (/you can only send testing emails/i.test(blob)) return false;
+  if (/rate_limit_exceeded/i.test(blob)) return false;
   return /domain is not verified|not verified|validation_error/i.test(blob);
 }
 
