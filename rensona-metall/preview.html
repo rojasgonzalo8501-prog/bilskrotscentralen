@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Rensona Metall — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@1&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cu:#c87941;--cu-b:#e8964a;--cu-dim:#7a4420;--cu-bg:rgba(200,121,65,.09);
+  --bg:#f2ede6;--bg2:#ece6dd;--panel:#e6dfd5;
+  --dark:#0f0a06;--dark2:#1a1008;
+  --border:rgba(60,30,10,.10);--border2:rgba(60,30,10,.18);
+  --txt:#1c1208;--txt2:#6b5c4e;--white:#faf7f3;
+  --fd:'Bebas Neue',sans-serif;
+  --fs:'Instrument Serif',serif;
+  --fb:'DM Sans',sans-serif;
+  --fm:'Space Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);-webkit-font-smoothing:antialiased}
+
+/* ── Nav ── */
+nav{position:fixed;top:0;inset-inline:0;z-index:50;transition:background .3s,backdrop-filter .3s}
+nav.scrolled{background:rgba(15,10,6,.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
+.nav-inner{max-width:1152px;margin:0 auto;padding:0 2.5rem;height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-rensona{font-family:var(--fd);font-size:1.5rem;letter-spacing:.04em;color:var(--cu)}
+.logo-metall{font-family:var(--fd);font-size:1.5rem;letter-spacing:.04em;color:rgba(250,247,243,.9)}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{font-family:var(--fm);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--cu-b)}
+.nav-phone{font-family:var(--fm);font-size:.72rem;color:rgba(255,255,255,.65);text-decoration:none}
+.btn-cu{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.6rem 1.25rem;background:var(--cu);color:var(--white);font-family:var(--fm);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;text-decoration:none;transition:background .2s}
+.btn-cu:hover{background:var(--cu-dim)}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;padding:.75rem 1.75rem;background:transparent;color:var(--white);font-family:var(--fm);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;border:1px solid rgba(255,255,255,.3);cursor:pointer;text-decoration:none;transition:border-color .2s,background .2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,.7);background:rgba(255,255,255,.05)}
+@media(max-width:768px){.nav-links,.nav-phone{display:none}}
+
+/* ── Hero ── */
+#hero{height:240vh;position:relative}
+.hero-sticky{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--dark)}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(15,10,6,.55) 0%,rgba(15,10,6,.22) 45%,rgba(15,10,6,.72) 100%);pointer-events:none}
+.hero-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1.5rem}
+.hero-rensona{font-family:var(--fd);font-size:clamp(4rem,14vw,12rem);line-height:.9;letter-spacing:.04em;color:transparent;-webkit-text-stroke:2px var(--cu)}
+.hero-metall{font-family:var(--fd);font-size:clamp(4rem,14vw,12rem);line-height:.9;letter-spacing:.04em;color:var(--white)}
+.hero-sub{font-family:var(--fs);font-style:italic;font-size:clamp(1.3rem,3vw,2.2rem);color:var(--cu);margin:1.25rem 0 2.5rem}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+.hero-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none;transition:opacity .4s}
+.hero-scroll span{font-family:var(--fm);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(250,247,243,.35)}
+.hero-scroll-line{width:1px;height:2.5rem;background:linear-gradient(to bottom,rgba(200,121,65,.6),transparent)}
+
+/* ── Ticker ── */
+.ticker{background:var(--dark);border-top:1px solid rgba(200,121,65,.2);border-bottom:1px solid rgba(200,121,65,.2);overflow:hidden;padding:.85rem 0}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-track{display:flex;width:max-content;animation:ticker 28s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-track span{font-family:var(--fm);font-size:.72rem;letter-spacing:.12em;color:var(--white);white-space:nowrap;padding-right:4rem}
+
+/* ── Shared section layout ── */
+.section{padding:5rem 0}
+.container{max-width:1152px;margin:0 auto;padding:0 2.5rem}
+.section-label{font-family:var(--fm);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--cu);margin-bottom:.75rem}
+.section-heading{font-family:var(--fd);font-size:clamp(2.8rem,6vw,4.5rem);line-height:1;letter-spacing:.03em;color:var(--txt);margin-bottom:3rem}
+.section-heading.white{color:var(--white)}
+
+/* ── Trust bar ── */
+#trust{background:var(--bg);border-bottom:1px solid var(--border)}
+.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+.trust-item{text-align:center}
+.trust-number{font-family:var(--fd);font-size:clamp(2.5rem,5vw,4rem);color:var(--cu);line-height:1}
+.trust-label{font-family:var(--fm);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--txt2);margin-top:.5rem}
+@media(max-width:640px){.trust-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── How ── */
+#how{background:var(--bg);border-top:1px solid var(--border)}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:2rem}
+.card-num{font-family:var(--fd);font-size:3.5rem;color:var(--cu);line-height:1;margin-bottom:1rem}
+.card-title{font-family:var(--fb);font-weight:700;font-size:1.1rem;color:var(--txt);margin-bottom:.5rem}
+.card-desc{font-family:var(--fb);color:var(--txt2);font-size:.95rem;line-height:1.65}
+@media(max-width:768px){.how-grid{grid-template-columns:1fr}}
+
+/* ── Process timeline ── */
+#process{background:var(--bg2);border-top:1px solid var(--border)}
+.timeline{list-style:none}
+.timeline-item{display:flex;gap:2rem}
+.timeline-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:2.5rem}
+.timeline-circle{width:2.5rem;height:2.5rem;border-radius:50%;background:var(--cu);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.timeline-circle span{font-family:var(--fd);color:var(--white);font-size:1rem;line-height:1}
+.timeline-line{width:2px;flex:1;min-height:4rem;background:rgba(200,121,65,.3);margin:.25rem 0}
+.timeline-content{padding-bottom:2rem}
+.timeline-content:last-child{padding-bottom:0}
+.timeline-title{font-family:var(--fb);font-weight:700;font-size:1.1rem;color:var(--txt);margin:.4rem 0;line-height:2.5rem}
+.timeline-desc{font-family:var(--fb);color:var(--txt2);font-size:.95rem;line-height:1.65}
+
+/* ── Features ── */
+#features{background:var(--bg);border-top:1px solid var(--border)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.feature-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:2rem}
+.feature-icon{font-size:2rem;margin-bottom:1rem}
+.feature-title{font-family:var(--fb);font-weight:700;font-size:1rem;color:var(--txt);margin-bottom:.5rem}
+.feature-desc{font-family:var(--fb);color:var(--txt2);font-size:.9rem;line-height:1.6}
+@media(max-width:768px){.features-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.features-grid{grid-template-columns:1fr}}
+
+/* ── Pricing ── */
+#pris{background:var(--bg2);border-top:1px solid var(--border)}
+.pris-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.pris-card{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:2rem}
+.pris-range{font-family:var(--fd);font-size:3rem;color:var(--cu);letter-spacing:.02em;margin:1rem 0 .5rem}
+.pris-note{font-family:var(--fm);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--txt2);margin-bottom:1.5rem}
+.pris-rows{margin-bottom:2rem}
+.pris-row{display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--border);font-size:.9rem;color:var(--txt2);font-family:var(--fb)}
+.pris-row:last-child{border-bottom:none}
+.pris-row span:last-child{color:var(--cu);font-weight:600}
+@media(max-width:768px){.pris-grid{grid-template-columns:1fr;gap:2rem}}
+
+/* ── Environment ── */
+#miljo{background:var(--dark);border-top:1px solid rgba(200,121,65,.15)}
+#miljo .section-heading{color:var(--white)}
+#miljo .section-label{color:rgba(200,121,65,.7)}
+.miljo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:4rem}
+.miljo-stat{text-align:center;padding:2rem 1rem;border:1px solid rgba(200,121,65,.2);border-radius:12px}
+.miljo-number{font-family:var(--fd);font-size:clamp(2.5rem,5vw,3.8rem);color:var(--cu);line-height:1}
+.miljo-label{font-family:var(--fm);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,247,243,.45);margin-top:.5rem}
+@media(max-width:640px){.miljo-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Certs ── */
+#cert{background:var(--bg);border-top:1px solid var(--border)}
+.cert-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.cert-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.75rem}
+.cert-check{width:2.2rem;height:2.2rem;border-radius:50%;background:rgba(200,121,65,.12);border:1.5px solid rgba(200,121,65,.35);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;color:var(--cu);font-size:1rem}
+.cert-title{font-family:var(--fb);font-weight:700;font-size:.95rem;color:var(--txt);margin-bottom:.25rem}
+.cert-sub{font-family:var(--fm);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--cu);margin-bottom:.6rem}
+.cert-desc{font-family:var(--fb);font-size:.85rem;color:var(--txt2);line-height:1.55}
+@media(max-width:768px){.cert-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── Testimonials ── */
+#testi{background:var(--bg2);border-top:1px solid var(--border)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.testi-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:2rem;display:flex;flex-direction:column}
+.stars{color:var(--cu);font-size:1rem;margin-bottom:1rem;letter-spacing:2px}
+blockquote{font-family:var(--fb);font-size:1rem;color:var(--txt);line-height:1.7;font-style:italic;flex:1;margin:0 0 1.5rem}
+.testi-author{display:flex;align-items:center;gap:.75rem}
+.testi-avatar{width:2.2rem;height:2.2rem;border-radius:50%;background:rgba(200,121,65,.15);border:1.5px solid rgba(200,121,65,.3);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:.9rem;color:var(--cu)}
+.testi-name{font-family:var(--fb);font-weight:600;font-size:.9rem;color:var(--txt)}
+.testi-city{font-family:var(--fm);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--txt2)}
+@media(max-width:768px){.testi-grid{grid-template-columns:1fr}}
+
+/* ── CTA ── */
+#kontakt{background:var(--dark);border-top:1px solid rgba(200,121,65,.15);text-align:center;padding:6rem 0}
+.cta-heading{font-family:var(--fd);font-size:clamp(3rem,8vw,7rem);line-height:1;letter-spacing:.03em;color:var(--white);margin-bottom:1rem}
+.cta-sub{font-family:var(--fs);font-style:italic;font-size:clamp(1.2rem,2.5vw,1.8rem);color:var(--cu-b);margin-bottom:2rem}
+.cta-phone{font-family:var(--fd);font-size:clamp(2rem,5vw,3.5rem);letter-spacing:.05em;color:var(--white);text-decoration:none;display:block;margin-bottom:2.5rem;transition:color .2s}
+.cta-phone:hover{color:var(--cu-b)}
+.cta-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center}
+
+/* ── Footer ── */
+footer{background:var(--dark2);border-top:1px solid rgba(60,30,10,.25)}
+.footer-inner{max-width:1152px;margin:0 auto;padding:4rem 2.5rem}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1.5fr 1.5fr;gap:3rem;margin-bottom:3rem}
+.footer-logo{font-family:var(--fd);font-size:1.4rem;letter-spacing:.04em;color:var(--white);margin-bottom:.75rem}
+.footer-logo span{color:var(--cu)}
+.footer-tagline{font-family:var(--fb);font-size:.9rem;color:rgba(250,247,243,.45);line-height:1.65;margin-bottom:1rem}
+.footer-org{font-family:var(--fm);font-size:.62rem;letter-spacing:.08em;color:rgba(250,247,243,.25)}
+.footer-col h4{font-family:var(--fm);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,247,243,.35);margin-bottom:1.2rem}
+.footer-col ul{list-style:none}
+.footer-col ul li{margin-bottom:.6rem}
+.footer-col ul li a{font-family:var(--fb);font-size:.9rem;color:rgba(250,247,243,.55);text-decoration:none;transition:color .2s}
+.footer-col ul li a:hover{color:var(--cu-b)}
+.footer-contact-item{display:flex;gap:.6rem;align-items:flex-start;margin-bottom:.75rem;font-family:var(--fb);font-size:.9rem;color:rgba(250,247,243,.55)}
+.footer-contact-item a{color:rgba(250,247,243,.55);text-decoration:none;transition:color .2s}
+.footer-contact-item a:hover{color:var(--cu-b)}
+.footer-cert-badge{font-family:var(--fm);font-size:.62rem;letter-spacing:.06em;color:rgba(250,247,243,.35);padding:.3rem .6rem;border:1px solid rgba(200,121,65,.18);border-radius:4px;display:inline-block;margin:.25rem .25rem .25rem 0}
+.footer-bottom{padding-top:2rem;border-top:1px solid rgba(60,30,10,.3);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-copy{font-family:var(--fm);font-size:.65rem;letter-spacing:.06em;color:rgba(250,247,243,.25)}
+.footer-links{display:flex;gap:1.5rem}
+.footer-links a{font-family:var(--fm);font-size:.65rem;letter-spacing:.06em;color:rgba(250,247,243,.25);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--cu-b)}
+@media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr;gap:2rem}}
+@media(max-width:540px){.footer-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <span class="logo-rensona">RENSONA</span>
+      <span class="logo-metall">METALL</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how">Hur det funkar</a>
+      <a href="#pris">Pris</a>
+      <a href="#miljo">Miljö</a>
+      <a href="#kontakt">Kontakt</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <a href="tel:017121002" class="nav-phone">0171-210 02</a>
+      <a href="#kontakt" class="btn-cu">Boka hämtning</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-sticky">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-rensona">RENSONA</div>
+      <div class="hero-metall">METALL.</div>
+      <p class="hero-sub">Vi skrotar smart.</p>
+      <div class="hero-btns">
+        <a href="#kontakt" class="btn-cu" style="padding:.85rem 2rem;font-size:.85rem">Boka hämtning</a>
+        <a href="#how" class="btn-ghost" style="padding:.85rem 2rem;font-size:.85rem">Se hur det funkar</a>
+      </div>
+    </div>
+    <div class="hero-scroll" id="hero-scroll">
+      <span>Scrolla</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TICKER ── -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span>AUKTORISERAD BILDEMONTERING &nbsp;·&nbsp; KOSTNADSFRI HÄMTNING &nbsp;·&nbsp; LME-PRISSÄTTNING &nbsp;·&nbsp; SKROTNINGSINTYG &nbsp;·&nbsp; EU ELV-DIREKTIV &nbsp;·&nbsp; AUKTORISERAD SEDAN 1984 &nbsp;·&nbsp; </span>
+    <span>AUKTORISERAD BILDEMONTERING &nbsp;·&nbsp; KOSTNADSFRI HÄMTNING &nbsp;·&nbsp; LME-PRISSÄTTNING &nbsp;·&nbsp; SKROTNINGSINTYG &nbsp;·&nbsp; EU ELV-DIREKTIV &nbsp;·&nbsp; AUKTORISERAD SEDAN 1984 &nbsp;·&nbsp; </span>
+    <span>AUKTORISERAD BILDEMONTERING &nbsp;·&nbsp; KOSTNADSFRI HÄMTNING &nbsp;·&nbsp; LME-PRISSÄTTNING &nbsp;·&nbsp; SKROTNINGSINTYG &nbsp;·&nbsp; EU ELV-DIREKTIV &nbsp;·&nbsp; AUKTORISERAD SEDAN 1984 &nbsp;·&nbsp; </span>
+    <span>AUKTORISERAD BILDEMONTERING &nbsp;·&nbsp; KOSTNADSFRI HÄMTNING &nbsp;·&nbsp; LME-PRISSÄTTNING &nbsp;·&nbsp; SKROTNINGSINTYG &nbsp;·&nbsp; EU ELV-DIREKTIV &nbsp;·&nbsp; AUKTORISERAD SEDAN 1984 &nbsp;·&nbsp; </span>
+  </div>
+</div>
+
+<!-- ── TRUST BAR ── -->
+<section id="trust" class="section">
+  <div class="container">
+    <div class="trust-grid">
+      <div class="trust-item"><div class="trust-number">12 400+</div><div class="trust-label">Skrotade bilar</div></div>
+      <div class="trust-item"><div class="trust-number">98%</div><div class="trust-label">Återvinningsgrad</div></div>
+      <div class="trust-item"><div class="trust-number">3 850 kr</div><div class="trust-label">Genomsnittlig skrotpremie</div></div>
+      <div class="trust-item"><div class="trust-number">24h</div><div class="trust-label">Svarstid</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section id="how" class="section" style="background:var(--bg);border-top:1px solid var(--border)">
+  <div class="container">
+    <p class="section-label">Processen</p>
+    <h2 class="section-heading">SÅ FUNGERAR DET</h2>
+    <div class="how-grid">
+      <div class="card">
+        <div class="card-num">01</div>
+        <h3 class="card-title">Ange regnumret</h3>
+        <p class="card-desc">Autofyll via Transportstyrelsen — fordonets uppgifter hämtas direkt utan manuell inmatning.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">02</div>
+        <h3 class="card-title">Få ditt pris</h3>
+        <p class="card-desc">Realtids LME-prissättning ger dig alltid ett rättvist och transparent erbjudande utan dolda avdrag.</p>
+      </div>
+      <div class="card">
+        <div class="card-num">03</div>
+        <h3 class="card-title">Boka hämtning</h3>
+        <p class="card-desc">Swish · Bankgiro · Kontant. Vi kör till dig i hela Mälardalen — körbar eller ej.</p>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <a href="#kontakt" class="btn-cu" style="padding:.85rem 2rem;font-size:.85rem">Starta din skrotning</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS TIMELINE ── -->
+<section id="process" class="section" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="container">
+    <p class="section-label">Steg för steg</p>
+    <h2 class="section-heading">FRÅN BILNYCKEL TILL INTYG</h2>
+    <ol class="timeline">
+      <li class="timeline-item">
+        <div class="timeline-left"><div class="timeline-circle"><span>1</span></div><div class="timeline-line"></div></div>
+        <div class="timeline-content"><div class="timeline-title">Ange regnummer</div><p class="timeline-desc">Fyll i ditt registreringsnummer på vår webbplats eller ring oss. Vi söker upp bilens uppgifter hos Transportstyrelsen automatiskt.</p></div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-left"><div class="timeline-circle"><span>2</span></div><div class="timeline-line"></div></div>
+        <div class="timeline-content"><div class="timeline-title">Få erbjudande</div><p class="timeline-desc">Baserat på bilens vikt, skick och aktuellt LME-metallpris beräknas din skrotpremie. Priset presenteras direkt — inga dolda avdrag.</p></div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-left"><div class="timeline-circle"><span>3</span></div><div class="timeline-line"></div></div>
+        <div class="timeline-content"><div class="timeline-title">Boka upphämtning</div><p class="timeline-desc">Välj datum och tid som passar dig. Vi hämtar i hela Mälardalen utan kostnad, oavsett om bilen är körbar eller ej.</p></div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-left"><div class="timeline-circle"><span>4</span></div><div class="timeline-line"></div></div>
+        <div class="timeline-content"><div class="timeline-title">Vi hämtar bilen</div><p class="timeline-desc">Vår chaufför anländer med bärgningsbil i tid. Du behöver bara lämna nycklarna — vi tar hand om resten.</p></div>
+      </li>
+      <li class="timeline-item">
+        <div class="timeline-left"><div class="timeline-circle"><span>5</span></div></div>
+        <div class="timeline-content" style="padding-bottom:0"><div class="timeline-title">Du får betalt &amp; intyg</div><p class="timeline-desc">Betalning sker direkt via Swish, Bankgiro eller kontant. Skrotningsintyg och avregistrering hos Transportstyrelsen skickas digitalt.</p></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section id="features" class="section" style="border-top:1px solid var(--border)">
+  <div class="container">
+    <p class="section-label">Fördelar</p>
+    <h2 class="section-heading">VARFÖR RENSONA?</h2>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon">🚛</div><div class="feature-title">Gratis hämtning</div><p class="feature-desc">Vi kör till dig i hela Mälardalen, oavsett om bilen är körbar.</p></div>
+      <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-title">Marknadens bästa pris</div><p class="feature-desc">LME-kopplad prissättning uppdaterad dagligen — inga schabloner.</p></div>
+      <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">Svar inom 24h</div><p class="feature-desc">Ring eller boka online, vi återkommer alltid snabbt.</p></div>
+      <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Vi sköter pappren</div><p class="feature-desc">Avregistrering hos Transportstyrelsen och skrotningsintyg ingår alltid.</p></div>
+      <div class="feature-card"><div class="feature-icon">♻️</div><div class="feature-title">98% återvinning</div><p class="feature-desc">EU ELV-certifierat. Inget av bilen hamnar på soptipp.</p></div>
+      <div class="feature-card"><div class="feature-icon">🔒</div><div class="feature-title">Auktoriserad sedan 1984</div><p class="feature-desc">Länsstyrelsen, Naturvårdsverket och Transportstyrelsen godkända.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ── -->
+<section id="pris" class="section" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="pris-grid">
+      <div>
+        <p class="section-label">Prissättning</p>
+        <h2 class="section-heading" style="margin-bottom:1.5rem">RÄTTVIST PRIS, ALLTID</h2>
+        <p style="font-family:var(--fb);color:var(--txt2);line-height:1.75;font-size:1rem;max-width:480px">
+          Vi prissätter baserat på London Metal Exchange (LME) dagspris för stål, aluminium och koppar — inte ett fast schablonvärde. Det betyder att du alltid får marknadens rättmätiga värde för din bil.
+        </p>
+        <p style="font-family:var(--fb);color:var(--txt2);line-height:1.75;font-size:1rem;max-width:480px;margin-top:1rem">
+          Mercedes och Volvo betingar ofta högre priser hos oss eftersom vi säljer reservdelar vidare — du tjänar på vår specialisering.
+        </p>
+      </div>
+      <div class="pris-card">
+        <p style="font-family:var(--fm);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--txt2)">Estimerat erbjudande</p>
+        <div class="pris-range">2 000 – 6 000 kr</div>
+        <p class="pris-note">Slutpris bekräftas vid hämtning</p>
+        <div class="pris-rows">
+          <div class="pris-row"><span>Järn &amp; stål (ca 65%)</span><span>2,5 kr/kg</span></div>
+          <div class="pris-row"><span>Aluminium (ca 8%)</span><span>18 kr/kg</span></div>
+          <div class="pris-row"><span>Koppar (ca 2%)</span><span>75 kr/kg</span></div>
+          <div class="pris-row"><span>Mercedes-premie</span><span>+1 500 kr</span></div>
+        </div>
+        <a href="#kontakt" class="btn-cu" style="width:100%;justify-content:center;padding:.85rem">Få ditt pris</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ENVIRONMENT ── -->
+<section id="miljo" class="section" style="background:var(--dark);border-top:1px solid rgba(200,121,65,.15)">
+  <div class="container">
+    <p class="section-label" style="color:rgba(200,121,65,.7)">Hållbarhet</p>
+    <h2 class="section-heading white">MILJÖANSVAR ÄR KÄRNAN</h2>
+    <p style="font-family:var(--fb);font-size:1.05rem;line-height:1.75;color:rgba(250,247,243,.5);max-width:600px;margin-top:-1.5rem;margin-bottom:1rem">
+      Varje skrotad bil är en insats för klimatet. Återvunnet stål kräver 75% mindre energi än nyproduktion. Vi säkerställer att inget hamnar på deponi.
+    </p>
+    <div class="miljo-grid">
+      <div class="miljo-stat"><div class="miljo-number">98%</div><div class="miljo-label">Av fordonets vikt återvinns</div></div>
+      <div class="miljo-stat"><div class="miljo-number">1,5t</div><div class="miljo-label">CO₂ sparas per skrotad bil</div></div>
+      <div class="miljo-stat"><div class="miljo-number">0 kr</div><div class="miljo-label">Dumpningsavgift</div></div>
+      <div class="miljo-stat"><div class="miljo-number">100%</div><div class="miljo-label">EU ELV-direktiv</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CERTIFICATIONS ── -->
+<section id="cert" class="section" style="border-top:1px solid var(--border)">
+  <div class="container">
+    <p class="section-label">Tillstånd &amp; certifikat</p>
+    <h2 class="section-heading">AUKTORISERAD I ALLA LED</h2>
+    <div class="cert-grid">
+      <div class="cert-card"><div class="cert-check">✓</div><div class="cert-title">Länsstyrelsen</div><div class="cert-sub">SFS 1997:185</div><p class="cert-desc">Tillstånd för skrothantering och miljöfarlig verksamhet.</p></div>
+      <div class="cert-card"><div class="cert-check">✓</div><div class="cert-title">Naturvårdsverket</div><div class="cert-sub">ELV-hantering</div><p class="cert-desc">Godkänd auktoriserad bilskrotare enligt ELV-förordningen.</p></div>
+      <div class="cert-card"><div class="cert-check">✓</div><div class="cert-title">Transportstyrelsen</div><div class="cert-sub">Digital avregistrering</div><p class="cert-desc">Direktanslutning för omedelbar avregistrering av skrotade fordon.</p></div>
+      <div class="cert-card"><div class="cert-check">✓</div><div class="cert-title">EU ELV-direktiv</div><div class="cert-sub">2000/53/EG</div><p class="cert-desc">Fullständig efterlevnad av EU:s direktiv om uttjänta fordon.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section id="testi" class="section" style="background:var(--bg2);border-top:1px solid var(--border)">
+  <div class="container">
+    <p class="section-label">Kundröster</p>
+    <h2 class="section-heading">VAD SÄGER KUNDERNA?</h2>
+    <div class="testi-grid">
+      <figure class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Professionell hantering, fick betalt på Swish direkt. Enklare än jag trodde."</blockquote>
+        <figcaption class="testi-author"><div class="testi-avatar">L</div><div><div class="testi-name">Lars E.</div><div class="testi-city">Uppsala</div></div></figcaption>
+      </figure>
+      <figure class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Hämtade bilen utan kostnad trots att den inte var körbar. Toppen service."</blockquote>
+        <figcaption class="testi-author"><div class="testi-avatar">A</div><div><div class="testi-name">Anna K.</div><div class="testi-city">Västerås</div></div></figcaption>
+      </figure>
+      <figure class="testi-card">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Bästa priset av tre alternativ. Snabb svarstid och trevlig personal."</blockquote>
+        <figcaption class="testi-author"><div class="testi-avatar">M</div><div><div class="testi-name">Mikael S.</div><div class="testi-city">Stockholm</div></div></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section id="kontakt">
+  <div class="container" style="text-align:center;padding-top:6rem;padding-bottom:6rem">
+    <p style="font-family:var(--fm);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,121,65,.6);margin-bottom:.75rem">Kom igång idag</p>
+    <h2 class="cta-heading">REDO ATT SKROTA SMART?</h2>
+    <p class="cta-sub">Kostnadsfri hämtning · Betalning direkt · Skrotningsintyg samma dag</p>
+    <a href="tel:017121002" class="cta-phone">0171-210 02</a>
+    <div class="cta-btns">
+      <a href="#" class="btn-cu" style="padding:.85rem 2.5rem;font-size:.85rem">Boka online</a>
+      <a href="tel:017121002" class="btn-ghost" style="padding:.85rem 2.5rem;font-size:.85rem">Ring 0171-210 02</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo"><span>RENSONA</span> METALL</div>
+        <p class="footer-tagline">Auktoriserad bildemontering &amp; metallhandel i Enköping sedan 1984. Vi skrotar smart — för dig och miljön.</p>
+        <p class="footer-org">Mercaskroten i Sverige AB · Org.nr 556XXX-XXXX</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tjänster</h4>
+        <ul>
+          <li><a href="#">Bilskrotning</a></li>
+          <li><a href="#">Metallhandel</a></li>
+          <li><a href="#how">Hur det funkar</a></li>
+          <li><a href="#miljo">Miljö</a></li>
+          <li><a href="#pris">Priser</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontakt</h4>
+        <div class="footer-contact-item">📍 <span>Magasingatan 2<br>749 35 Enköping</span></div>
+        <div class="footer-contact-item">📞 <a href="tel:017121002">0171-210 02</a></div>
+        <div class="footer-contact-item">✉️ <a href="mailto:info@rensona.se">info@rensona.se</a></div>
+        <div class="footer-contact-item" style="color:rgba(250,247,243,.3);font-size:.8rem;margin-top:.5rem">Mån–Tors 08–17 · Fre 08–15</div>
+      </div>
+      <div class="footer-col">
+        <h4>Certifikat</h4>
+        <div>
+          <span class="footer-cert-badge">Länsstyrelsen</span>
+          <span class="footer-cert-badge">Naturvårdsverket</span>
+          <span class="footer-cert-badge">Transportstyrelsen</span>
+          <span class="footer-cert-badge">EU ELV 2000/53/EG</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Mercaskroten i Sverige AB · Auktoriserad bildemontering</p>
+      <div class="footer-links">
+        <a href="#">Integritetspolicy</a>
+        <a href="#">Köpvillkor</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Nav scroll effect ─────────────────────────────────────────────────────────
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ── Hero scroll indicator ─────────────────────────────────────────────────────
+const heroScroll = document.getElementById('hero-scroll');
+window.addEventListener('scroll', () => {
+  heroScroll.style.opacity = window.scrollY > 60 ? '0' : '1';
+}, { passive: true });
+
+// ── Three.js copper particle animation ───────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const isMobile = window.innerWidth <= 640;
+  const NP = isMobile ? 400 : 800;
+  const ingotX = isMobile ? 0 : 2.4;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !isMobile, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+  const scene  = new THREE.Scene();
+  const fov    = isMobile ? 55 : 44;
+  const camera = new THREE.PerspectiveCamera(fov, 1, 0.1, 100);
+  camera.position.set(0, 0, isMobile ? 9 : 7.5);
+
+  function resize() {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x1a0a04, 0.8));
+  const key = new THREE.DirectionalLight(0xffcca0, 3.8);
+  key.position.set(3, 4, 2);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0x334466, 0.5);
+  fill.position.set(-3, 0, 2);
+  scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xff7733, 1.5);
+  rim.position.set(-1, -2, -3);
+  scene.add(rim);
+  const pLight = new THREE.PointLight(0xff6622, 4, 12);
+  pLight.position.set(0, 2, 3);
+  scene.add(pLight);
+
+  // ── Ingot mesh builder ────────────────────────────────────────────────────
+  function makeIngot(yOffset) {
+    const bW=1.9,bD=0.8,tW=1.55,tD=0.62,bY=-0.28,tY=0.28;
+    const verts=[], norms=[];
+    function tri(ax,ay,az,bx,by,bz,cx,cy,cz,nx,ny,nz){
+      verts.push(ax,ay,az,bx,by,bz,cx,cy,cz);
+      norms.push(nx,ny,nz,nx,ny,nz,nx,ny,nz);
+    }
+    // bottom
+    tri(-bW/2,bY,-bD/2, bW/2,bY,-bD/2, bW/2,bY,bD/2, 0,-1,0);
+    tri(-bW/2,bY,-bD/2, bW/2,bY,bD/2, -bW/2,bY,bD/2, 0,-1,0);
+    // top
+    tri(-tW/2,tY,-tD/2, tW/2,tY,tD/2, tW/2,tY,-tD/2, 0,1,0);
+    tri(-tW/2,tY,-tD/2, -tW/2,tY,tD/2, tW/2,tY,tD/2, 0,1,0);
+    // front
+    tri(-bW/2,bY,bD/2, bW/2,bY,bD/2, tW/2,tY,tD/2, 0,.15,.99);
+    tri(-bW/2,bY,bD/2, tW/2,tY,tD/2, -tW/2,tY,tD/2, 0,.15,.99);
+    // back
+    tri(bW/2,bY,-bD/2, -bW/2,bY,-bD/2, -tW/2,tY,-tD/2, 0,.15,-.99);
+    tri(bW/2,bY,-bD/2, -tW/2,tY,-tD/2, tW/2,tY,-tD/2, 0,.15,-.99);
+    // right
+    tri(bW/2,bY,bD/2, bW/2,bY,-bD/2, tW/2,tY,-tD/2, .99,.15,0);
+    tri(bW/2,bY,bD/2, tW/2,tY,-tD/2, tW/2,tY,tD/2, .99,.15,0);
+    // left
+    tri(-bW/2,bY,-bD/2, -bW/2,bY,bD/2, -tW/2,tY,tD/2, -.99,.15,0);
+    tri(-bW/2,bY,-bD/2, -tW/2,tY,tD/2, -tW/2,tY,-tD/2, -.99,.15,0);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(verts), 3));
+    geo.setAttribute('normal',   new THREE.BufferAttribute(new Float32Array(norms), 3));
+    const mat = new THREE.MeshStandardMaterial({ color: 0xb06030, metalness: .96, roughness: .26 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.y = yOffset;
+    return mesh;
+  }
+  const ingotGroup = new THREE.Group();
+  ingotGroup.position.x = ingotX;
+  ingotGroup.add(makeIngot(0.3));
+  ingotGroup.add(makeIngot(-0.38));
+  ingotGroup.add(makeIngot(-1.42));
+  scene.add(ingotGroup);
+
+  // ── Particle positions ────────────────────────────────────────────────────
+  function lerp(a,b,t){return a+(b-a)*t}
+  function eio(t){return t<.5?2*t*t:-1+(4-2*t)*t}
+
+  const posIngot   = new Float32Array(NP*3);
+  const posExplode = new Float32Array(NP*3);
+  const posCable   = new Float32Array(NP*3);
+  const posCur     = new Float32Array(NP*3);
+
+  const offsets = [[ingotX,.3,0],[ingotX,-.38,0],[ingotX,-1.42,0]];
+  for (let i=0;i<NP;i++) {
+    const w = i%3, [ox,oy,oz]=offsets[w];
+    // ingot
+    const bW=1.9,bD=0.8,tW=1.55,tD=0.62,bY=-0.28,tY=0.28;
+    const face=Math.floor(Math.random()*6);
+    let x=0,y=0,z=0;
+    if(face===0){x=(Math.random()-.5)*bW;y=bY;z=(Math.random()-.5)*bD}
+    else if(face===1){x=(Math.random()-.5)*tW;y=tY;z=(Math.random()-.5)*tD}
+    else{const t=Math.random(),lW=lerp(bW,tW,t)/2,lD=lerp(bD,tD,t)/2;y=lerp(bY,tY,t);
+      if(face===2){x=lW;z=(Math.random()-.5)*lerp(bD,tD,t)}
+      else if(face===3){x=-lW;z=(Math.random()-.5)*lerp(bD,tD,t)}
+      else if(face===4){z=lD;x=(Math.random()-.5)*lerp(bW,tW,t)}
+      else{z=-lD;x=(Math.random()-.5)*lerp(bW,tW,t)}}
+    posIngot[i*3]=x+ox; posIngot[i*3+1]=y+oy; posIngot[i*3+2]=z+oz;
+    // explode
+    const r=2.8+Math.random()*4,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);
+    posExplode[i*3]=r*Math.sin(ph)*Math.cos(th); posExplode[i*3+1]=r*Math.sin(ph)*Math.sin(th); posExplode[i*3+2]=r*Math.cos(ph);
+    // cable
+    const strand=i%3,yOff=[-0.72,0,.72][strand],turns=9;
+    const ct=(Math.floor(i/3)/Math.floor(NP/3))+Math.random()*.01;
+    const angle=ct*turns*Math.PI*2;
+    posCable[i*3]=lerp(-2.8,2.8,ct)+Math.cos(angle)*.07;
+    posCable[i*3+1]=yOff+Math.sin(angle)*.18;
+    posCable[i*3+2]=Math.cos(angle+Math.PI)*.07;
+  }
+  posIngot.forEach((v,i)=>posCur[i]=v);
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(posCur.slice(), 3));
+  const mat = new THREE.PointsMaterial({ color: 0xd4823a, size: isMobile?.045:.038, sizeAttenuation:true, transparent:true });
+  const particles = new THREE.Points(geo, mat);
+  scene.add(particles);
+
+  // ── Scroll-driven animation ───────────────────────────────────────────────
+  const hero = document.getElementById('hero');
+  let scrollProgress = 0;
+  window.addEventListener('scroll', () => {
+    const max = hero.clientHeight - window.innerHeight;
+    scrollProgress = max>0 ? Math.min(Math.max(window.scrollY/max,0),1) : 0;
+  }, { passive: true });
+
+  // ── Render loop ───────────────────────────────────────────────────────────
+  let t = 0;
+  (function animate() {
+    requestAnimationFrame(animate);
+    t += .016;
+    pLight.intensity = 4 + Math.sin(t*1.8)*.8;
+
+    const p = scrollProgress;
+    let posA, posB, phaseT;
+    if(p<.3){ posA=posIngot; posB=posIngot; phaseT=0; ingotGroup.visible=true; mat.opacity=1-eio(p/.3)*.7; }
+    else if(p<.58){ posA=posIngot; posB=posExplode; phaseT=(p-.3)/.28; ingotGroup.visible=false; mat.opacity=1; }
+    else if(p<.85){ posA=posExplode; posB=posCable; phaseT=(p-.58)/.27; ingotGroup.visible=false; mat.opacity=1; }
+    else { posA=posCable; posB=posCable; phaseT=1; ingotGroup.visible=false; mat.opacity=1; }
+
+    const et = eio(Math.min(phaseT,1));
+    for(let i=0;i<NP*3;i++) posCur[i]=posA[i]+(posB[i]-posA[i])*et;
+    const attr = particles.geometry.getAttribute('position');
+    attr.array.set(posCur); attr.needsUpdate=true;
+
+    renderer.render(scene, camera);
+  })();
+})();
+</script>
+</body>
+</html>
