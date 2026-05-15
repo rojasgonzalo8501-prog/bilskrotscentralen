@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Copper palette ── */
+  --color-cu:     #c87941;
+  --color-cu-b:   #e8964a;
+  --color-cu-dim: #7a4420;
+  --color-cu-bg:  rgba(200,121,65,0.09);
+
+  /* ── Background tones ── */
+  --color-bg:     #f2ede6;
+  --color-bg2:    #ece6dd;
+  --color-panel:  #e6dfd5;
+
+  /* ── Dark sections ── */
+  --color-dark:   #0f0a06;
+  --color-dark2:  #1a1008;
+
+  /* ── Text ── */
+  --color-txt:    #1c1208;
+  --color-txt2:   #6b5c4e;
+  --color-white:  #faf7f3;
+
+  /* ── Border ── */
+  --color-border:  rgba(60,30,10,0.10);
+  --color-border2: rgba(60,30,10,0.18);
+
+  /* ── Fonts ── */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-serif:   'Instrument Serif', serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+}
+
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-txt);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Typography helpers ── */
+.font-display  { font-family: var(--font-display); }
+.font-serif-it { font-family: var(--font-serif); font-style: italic; }
+.font-body     { font-family: var(--font-body); }
+.font-mono     { font-family: var(--font-mono); }
+
+/* ── Copper button ── */
+.btn-cu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: var(--color-cu);
+  color: var(--color-white);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cu:hover { background: var(--color-cu-dim); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  background: transparent;
+  color: var(--color-white);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.3);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.btn-ghost:hover {
+  border-color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.05);
+}
+
+/* ── Scrolling ticker ── */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker 24s linear infinite;
+  width: max-content;
+  display: flex;
+}
+.ticker-track:hover { animation-play-state: paused; }
+
+/* ── Fade-up on scroll ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.6s ease both; }
