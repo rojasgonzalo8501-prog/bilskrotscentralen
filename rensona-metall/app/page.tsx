@@ -1,16 +1,23 @@
 "use client";
+// NOTE: This file is a client boundary because HeroSection uses React hooks.
+// HomePage (default export) itself performs no data-fetching and acts as a
+// pure layout/presentation component — all sections are static markup.
 
+import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
+
+// ─── Dynamic import (client-only, no SSR) ────────────────────────────────────
 
 const HeroCanvas = dynamic(
   () => import("@/components/HeroCanvas").then((m) => m.HeroCanvas),
   { ssr: false }
 );
 
-// ─── HeroSection ─────────────────────────────────────────────────────────────
+// ─── HeroSection — "use client" component ────────────────────────────────────
+// Uses scroll-driven parallax via useRef + useEffect.
 
 export function HeroSection() {
   const heroRef = useRef<HTMLElement>(null);
@@ -33,7 +40,9 @@ export function HeroSection() {
     <section
       ref={heroRef}
       style={{ height: "240vh", position: "relative" }}
+      aria-label="Hero"
     >
+      {/* Sticky viewport — scrolls with parallax canvas behind */}
       <div
         style={{
           position: "sticky",
@@ -43,10 +52,22 @@ export function HeroSection() {
           background: "var(--color-dark)",
         }}
       >
-        {/* Full-bleed canvas */}
+        {/* Full-bleed Three.js canvas */}
         <HeroCanvas scrollProgress={scrollProgress} />
 
-        {/* Overlay */}
+        {/* Gradient overlay so text is always legible */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(to bottom, rgba(15,10,6,0.6) 0%, rgba(15,10,6,0.25) 45%, rgba(15,10,6,0.75) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Centered text overlay */}
         <div
           style={{
             position: "absolute",
@@ -57,10 +78,9 @@ export function HeroSection() {
             justifyContent: "center",
             textAlign: "center",
             padding: "0 1.5rem",
-            background: "linear-gradient(to bottom, rgba(15,10,6,0.55) 0%, rgba(15,10,6,0.3) 50%, rgba(15,10,6,0.7) 100%)",
           }}
         >
-          {/* Ghost "RENSONA" */}
+          {/* Ghost / outlined wordmark */}
           <h1
             className="font-display"
             style={{
@@ -70,13 +90,14 @@ export function HeroSection() {
               color: "transparent",
               WebkitTextStroke: "2px var(--color-cu)",
               margin: 0,
+              userSelect: "none",
             }}
           >
             RENSONA
           </h1>
 
-          {/* Solid "METALL." */}
-          <h1
+          {/* Solid white wordmark */}
+          <div
             className="font-display"
             style={{
               fontSize: "clamp(5rem, 16vw, 14rem)",
@@ -84,12 +105,13 @@ export function HeroSection() {
               letterSpacing: "0.04em",
               color: "var(--color-white)",
               margin: 0,
+              userSelect: "none",
             }}
           >
             METALL.
-          </h1>
+          </div>
 
-          {/* Subheading */}
+          {/* Copper italic subheading */}
           <p
             className="font-serif-it"
             style={{
@@ -103,7 +125,14 @@ export function HeroSection() {
           </p>
 
           {/* CTA buttons */}
-          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
             <Link href="/skrota" className="btn-cu">
               Boka hämtning
             </Link>
@@ -112,69 +141,122 @@ export function HeroSection() {
             </a>
           </div>
         </div>
+
+        {/* Scroll indicator — fades as user scrolls */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            bottom: "2rem",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "0.5rem",
+            opacity: scrollProgress > 0.05 ? 0 : 1,
+            transition: "opacity 0.4s",
+            pointerEvents: "none",
+          }}
+        >
+          <span
+            className="font-mono"
+            style={{
+              fontSize: "0.62rem",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "rgba(250,247,243,0.4)",
+            }}
+          >
+            Scrolla
+          </span>
+          <div
+            style={{
+              width: "1px",
+              height: "2.5rem",
+              background:
+                "linear-gradient(to bottom, rgba(200,121,65,0.6), transparent)",
+            }}
+          />
+        </div>
       </div>
     </section>
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Data constants ───────────────────────────────────────────────────────────
 
 const TICKER_TEXT =
-  "AUKTORISERAD BILDEMONTERING · KOSTNADSFRI HÄMTNING · LME-PRISSÄTTNING · SKROTNINGSINTYG · EU ELV-DIREKTIV · 40 ÅRS ERFARENHET · ";
+  "AUKTORISERAD BILDEMONTERING  ·  KOSTNADSFRI HÄMTNING  ·  LME-PRISSÄTTNING  ·  SKROTNINGSINTYG  ·  EU ELV-DIREKTIV  ·  AUKTORISERAD SEDAN 1984  ·  ";
 
-const TRUST_STATS = [
+const TRUST_STATS: Array<{ number: string; label: string }> = [
   { number: "12 400+", label: "Skrotade bilar" },
-  { number: "98%",     label: "Återvinningsgrad" },
+  { number: "98%", label: "Återvinningsgrad" },
   { number: "3 850 kr", label: "Genomsnittlig skrotpremie" },
-  { number: "24h",     label: "Svarstid" },
+  { number: "24h", label: "Svarstid" },
 ];
 
-const HOW_STEPS = [
+const HOW_STEPS: Array<{ n: string; title: string; desc: string }> = [
   {
     n: "01",
     title: "Ange regnumret",
-    desc: "Autofyll via Transportstyrelsen — fordonets uppgifter hämtas direkt.",
+    desc: "Autofyll via Transportstyrelsen — fordonets uppgifter hämtas direkt utan manuell inmatning.",
   },
   {
     n: "02",
     title: "Få ditt pris",
-    desc: "Realtids LME-prissättning ger dig alltid ett rättvist och transparent erbjudande.",
+    desc: "Realtids LME-prissättning ger dig alltid ett rättvist och transparent erbjudande utan dolda avdrag.",
   },
   {
     n: "03",
     title: "Boka hämtning",
-    desc: "Swish · Bankgiro · Kontant. Vi kommer till dig, du väljer betalningssätt.",
+    desc: "Swish · Bankgiro · Kontant. Vi kör till dig i hela Mälardalen — körbar eller ej.",
   },
 ];
 
-const PROCESS_STEPS = [
-  { title: "Ange regnummer",      desc: "Fyll i ditt registreringsnummer så hämtar vi fordonets data automatiskt." },
-  { title: "Få erbjudande",       desc: "Inom 24 timmar presenterar vi ett pris baserat på vikt och dagens metallkurser." },
-  { title: "Boka upphämtning",    desc: "Välj datum och tid som passar dig — vi finns i hela Mälardalen." },
-  { title: "Vi hämtar bilen",     desc: "Vårt team anländer i tid och tar hand om bilen säkert och professionellt." },
-  { title: "Du får betalt & intyg", desc: "Betalning direkt via Swish, bankgiro eller kontant. Skrotningsintyg skickas digitalt." },
+const PROCESS_STEPS: Array<{ title: string; desc: string }> = [
+  {
+    title: "Ange regnummer",
+    desc: "Fyll i ditt registreringsnummer på vår webbplats eller ring oss. Vi söker upp bilens uppgifter hos Transportstyrelsen automatiskt.",
+  },
+  {
+    title: "Få erbjudande",
+    desc: "Baserat på bilens vikt, skick och aktuellt LME-metallpris beräknas din skrotpremie. Priset presenteras direkt — inga dolda avdrag.",
+  },
+  {
+    title: "Boka upphämtning",
+    desc: "Välj datum och tid som passar dig. Vi hämtar i hela Mälardalen utan kostnad, oavsett om bilen är körbar eller ej.",
+  },
+  {
+    title: "Vi hämtar bilen",
+    desc: "Vår chaufför anländer med bärgningsbil i tid. Du behöver bara lämna nycklarna — vi tar hand om resten.",
+  },
+  {
+    title: "Du får betalt & intyg",
+    desc: "Betalning sker direkt via Swish, Bankgiro eller kontant. Skrotningsintyg och avregistrering hos Transportstyrelsen skickas digitalt.",
+  },
 ];
 
-const FEATURES = [
+const FEATURES: Array<{ icon: string; title: string; desc: string }> = [
   {
     icon: "🚛",
     title: "Gratis hämtning",
-    desc: "Vi kör till dig i hela Mälardalen, oavsett bilens skick.",
+    desc: "Vi kör till dig i hela Mälardalen, oavsett om bilen är körbar.",
   },
   {
     icon: "💰",
     title: "Marknadens bästa pris",
-    desc: "LME-kopplad prissättning, inga dolda avdrag.",
+    desc: "LME-kopplad prissättning uppdaterad dagligen — inga schabloner.",
   },
   {
     icon: "⚡",
     title: "Svar inom 24h",
-    desc: "Ring eller boka online, vi återkommer snabbt.",
+    desc: "Ring eller boka online, vi återkommer alltid snabbt.",
   },
   {
     icon: "📋",
     title: "Vi sköter pappren",
-    desc: "Avregistrering hos Transportstyrelsen ingår alltid.",
+    desc: "Avregistrering hos Transportstyrelsen och skrotningsintyg ingår alltid.",
   },
   {
     icon: "♻️",
@@ -184,25 +266,45 @@ const FEATURES = [
   {
     icon: "🔒",
     title: "Auktoriserad sedan 1984",
-    desc: "Länsstyrelsen, Naturvårdsverket, Transportstyrelsen.",
+    desc: "Länsstyrelsen, Naturvårdsverket och Transportstyrelsen godkända.",
   },
 ];
 
-const ENV_STATS = [
-  { number: "98%",  label: "Av fordonets vikt återvinns" },
-  { number: "1.5t", label: "CO₂ sparas per skrotad bil" },
+const ENV_STATS: Array<{ number: string; label: string }> = [
+  { number: "98%", label: "Av fordonets vikt återvinns" },
+  { number: "1,5t", label: "CO₂ sparas per skrotad bil" },
   { number: "0 kr", label: "Dumpningsavgift" },
   { number: "100%", label: "EU ELV-direktiv" },
 ];
 
-const CERTS = [
-  { title: "Länsstyrelsen",       sub: "SFS 1997:185" },
-  { title: "Naturvårdsverket",    sub: "ELV-hantering" },
-  { title: "Transportstyrelsen",  sub: "Digital avregistrering" },
-  { title: "EU ELV-direktiv",     sub: "2000/53/EG" },
+const CERTS: Array<{ title: string; sub: string; desc: string }> = [
+  {
+    title: "Länsstyrelsen",
+    sub: "SFS 1997:185",
+    desc: "Tillstånd för skrothantering och miljöfarlig verksamhet.",
+  },
+  {
+    title: "Naturvårdsverket",
+    sub: "ELV-hantering",
+    desc: "Godkänd auktoriserad bilskrotare enligt ELV-förordningen.",
+  },
+  {
+    title: "Transportstyrelsen",
+    sub: "Digital avregistrering",
+    desc: "Direktanslutning för omedelbar avregistrering av skrotade fordon.",
+  },
+  {
+    title: "EU ELV-direktiv",
+    sub: "2000/53/EG",
+    desc: "Fullständig efterlevnad av EU:s direktiv om uttjänta fordon.",
+  },
 ];
 
-const TESTIMONIALS = [
+const TESTIMONIALS: Array<{
+  name: string;
+  city: string;
+  text: string;
+}> = [
   {
     name: "Lars E.",
     city: "Uppsala",
@@ -216,25 +318,51 @@ const TESTIMONIALS = [
   {
     name: "Mikael S.",
     city: "Stockholm",
-    text: "Bästa priset av tre alternativ. Snabb svarstid.",
+    text: "Bästa priset av tre alternativ. Snabb svarstid och trevlig personal.",
   },
 ];
 
-const cardStyle: React.CSSProperties = {
+// ─── Shared style helpers ─────────────────────────────────────────────────────
+
+const cardStyle: CSSProperties = {
   background: "var(--color-panel)",
   border: "1px solid rgba(60,30,10,0.1)",
   borderRadius: "12px",
   padding: "2rem",
 };
 
+const sectionLabel: CSSProperties = {
+  fontFamily: "var(--font-mono)",
+  fontSize: "0.68rem",
+  letterSpacing: "0.14em",
+  textTransform: "uppercase",
+  color: "var(--color-cu)",
+  marginBottom: "0.75rem",
+};
+
+const sectionHeading: CSSProperties = {
+  fontFamily: "var(--font-display)",
+  fontSize: "clamp(2.8rem, 7vw, 5rem)",
+  lineHeight: 1,
+  letterSpacing: "0.03em",
+  color: "var(--color-txt)",
+  marginBottom: "3rem",
+};
+
+// ─── Page — root Server-style component (default export) ─────────────────────
+
 export default function HomePage() {
   return (
     <>
       <Navbar />
+
+      {/* ── 1. HERO ─────────────────────────────────────────────────────────── */}
       <HeroSection />
 
-      {/* ── TICKER ────────────────────────────────────────────────────────── */}
+      {/* ── 2. TICKER ───────────────────────────────────────────────────────── */}
       <div
+        role="marquee"
+        aria-label="Nyckelord"
         style={{
           background: "var(--color-dark)",
           borderTop: "1px solid rgba(200,121,65,0.2)",
@@ -262,14 +390,18 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── TRUST BAR ─────────────────────────────────────────────────────── */}
+      {/* ── 3. TRUST BAR ────────────────────────────────────────────────────── */}
       <section
         id="trust"
-        style={{ background: "var(--color-bg)" }}
+        aria-label="Nyckeltal"
+        style={{
+          background: "var(--color-bg)",
+          borderBottom: "1px solid rgba(60,30,10,0.08)",
+        }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {TRUST_STATS.map((s) => (
               <div key={s.label} className="text-center">
                 <div
@@ -300,34 +432,25 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ──────────────────────────────────────────────────── */}
+      {/* ── 4. HOW IT WORKS ─────────────────────────────────────────────────── */}
       <section
         id="how"
-        style={{ background: "var(--color-bg)", borderTop: "1px solid rgba(60,30,10,0.08)" }}
+        aria-labelledby="how-heading"
+        style={{
+          background: "var(--color-bg)",
+          borderTop: "1px solid rgba(60,30,10,0.08)",
+        }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
+          <p style={sectionLabel}>Processen</p>
           <h2
+            id="how-heading"
             className="font-display"
-            style={{
-              fontSize: "clamp(2.8rem, 7vw, 5rem)",
-              color: "var(--color-txt)",
-              letterSpacing: "0.03em",
-              marginBottom: "0.5rem",
-            }}
+            style={sectionHeading}
           >
             SÅ FUNGERAR DET
           </h2>
-          <p
-            className="font-serif-it"
-            style={{
-              fontSize: "1.2rem",
-              color: "var(--color-cu)",
-              marginBottom: "3rem",
-            }}
-          >
-            Tre enkla steg — från regnummer till betalning.
-          </p>
 
           <div className="grid md:grid-cols-3 gap-6 mb-12">
             {HOW_STEPS.map((step) => (
@@ -356,7 +479,12 @@ export default function HomePage() {
                 </h3>
                 <p
                   className="font-body"
-                  style={{ color: "var(--color-txt2)", fontSize: "0.95rem", lineHeight: 1.6 }}
+                  style={{
+                    color: "var(--color-txt2)",
+                    fontSize: "0.95rem",
+                    lineHeight: 1.65,
+                    margin: 0,
+                  }}
                 >
                   {step.desc}
                 </p>
@@ -364,45 +492,44 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="text-center">
+          <div className="flex justify-center">
             <Link href="/skrota" className="btn-cu">
-              Kom igång nu
+              Starta din skrotning
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── PROCESS ───────────────────────────────────────────────────────── */}
+      {/* ── 5. PROCESS TIMELINE ─────────────────────────────────────────────── */}
       <section
         id="process"
-        style={{ background: "var(--color-bg2)", borderTop: "1px solid rgba(60,30,10,0.08)" }}
+        aria-labelledby="process-heading"
+        style={{
+          background: "var(--color-bg2)",
+          borderTop: "1px solid rgba(60,30,10,0.08)",
+        }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
+          <p style={sectionLabel}>Steg för steg</p>
           <h2
+            id="process-heading"
             className="font-display"
-            style={{
-              fontSize: "clamp(2.8rem, 7vw, 5rem)",
-              color: "var(--color-txt)",
-              letterSpacing: "0.03em",
-              marginBottom: "3rem",
-            }}
+            style={sectionHeading}
           >
-            PROCESSEN
+            FRÅN BILNYCKEL TILL INTYG
           </h2>
 
-          <div style={{ position: "relative" }}>
+          <ol style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {PROCESS_STEPS.map((step, idx) => (
-              <div
+              <li
                 key={step.title}
                 style={{
                   display: "flex",
                   gap: "2rem",
-                  marginBottom: idx < PROCESS_STEPS.length - 1 ? "0" : "0",
-                  position: "relative",
                 }}
               >
-                {/* Left: number + line */}
+                {/* Left: circle + connector line */}
                 <div
                   style={{
                     display: "flex",
@@ -426,14 +553,19 @@ export default function HomePage() {
                     }}
                   >
                     <span
-                      className="font-mono"
-                      style={{ color: "var(--color-white)", fontSize: "0.75rem", fontWeight: 700 }}
+                      className="font-display"
+                      style={{
+                        color: "var(--color-white)",
+                        fontSize: "1rem",
+                        lineHeight: 1,
+                      }}
                     >
                       {idx + 1}
                     </span>
                   </div>
                   {idx < PROCESS_STEPS.length - 1 && (
                     <div
+                      aria-hidden
                       style={{
                         width: "2px",
                         flex: 1,
@@ -446,14 +578,19 @@ export default function HomePage() {
                 </div>
 
                 {/* Right: content */}
-                <div style={{ paddingBottom: idx < PROCESS_STEPS.length - 1 ? "2rem" : "0" }}>
+                <div
+                  style={{
+                    paddingBottom:
+                      idx < PROCESS_STEPS.length - 1 ? "2rem" : "0",
+                  }}
+                >
                   <h3
                     className="font-body"
                     style={{
                       fontWeight: 700,
                       fontSize: "1.1rem",
                       color: "var(--color-txt)",
-                      marginBottom: "0.35rem",
+                      margin: "0.4rem 0 0.4rem",
                       lineHeight: "2.5rem",
                     }}
                   >
@@ -464,52 +601,49 @@ export default function HomePage() {
                     style={{
                       color: "var(--color-txt2)",
                       fontSize: "0.95rem",
-                      lineHeight: 1.6,
+                      lineHeight: 1.65,
                       maxWidth: "520px",
+                      margin: 0,
                     }}
                   >
                     {step.desc}
                   </p>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* ── FEATURES ──────────────────────────────────────────────────────── */}
+      {/* ── 6. FEATURES ─────────────────────────────────────────────────────── */}
       <section
         id="features"
-        style={{ background: "var(--color-bg)", borderTop: "1px solid rgba(60,30,10,0.08)" }}
+        aria-labelledby="features-heading"
+        style={{
+          background: "var(--color-bg)",
+          borderTop: "1px solid rgba(60,30,10,0.08)",
+        }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
+          <p style={sectionLabel}>Fördelar</p>
           <h2
+            id="features-heading"
             className="font-display"
-            style={{
-              fontSize: "clamp(2.8rem, 7vw, 5rem)",
-              color: "var(--color-txt)",
-              letterSpacing: "0.03em",
-              marginBottom: "0.5rem",
-            }}
+            style={sectionHeading}
           >
             VARFÖR RENSONA?
           </h2>
-          <p
-            className="font-serif-it"
-            style={{
-              fontSize: "1.2rem",
-              color: "var(--color-cu)",
-              marginBottom: "3rem",
-            }}
-          >
-            Det proffs väljer — och det kunder återkommer till.
-          </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => (
               <div key={f.title} style={cardStyle}>
-                <div style={{ fontSize: "2rem", marginBottom: "0.75rem" }}>{f.icon}</div>
+                <div
+                  aria-hidden
+                  style={{ fontSize: "2rem", marginBottom: "0.75rem" }}
+                >
+                  {f.icon}
+                </div>
                 <h3
                   className="font-body"
                   style={{
@@ -523,7 +657,12 @@ export default function HomePage() {
                 </h3>
                 <p
                   className="font-body"
-                  style={{ color: "var(--color-txt2)", fontSize: "0.9rem", lineHeight: 1.6 }}
+                  style={{
+                    color: "var(--color-txt2)",
+                    fontSize: "0.9rem",
+                    lineHeight: 1.65,
+                    margin: 0,
+                  }}
                 >
                   {f.desc}
                 </p>
@@ -533,26 +672,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PRICING ───────────────────────────────────────────────────────── */}
+      {/* ── 7. PRICING ──────────────────────────────────────────────────────── */}
       <section
         id="pris"
-        style={{ background: "var(--color-bg2)", borderTop: "1px solid rgba(60,30,10,0.08)" }}
+        aria-labelledby="pris-heading"
+        style={{
+          background: "var(--color-bg2)",
+          borderTop: "1px solid rgba(60,30,10,0.08)",
+        }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left */}
+            {/* Left: copy */}
             <div>
+              <p style={sectionLabel}>Prissättning</p>
               <h2
+                id="pris-heading"
                 className="font-display"
                 style={{
-                  fontSize: "clamp(2.8rem, 7vw, 5rem)",
-                  color: "var(--color-txt)",
+                  fontFamily: "var(--font-display)",
+                  fontSize: "clamp(2.8rem, 7vw, 4.5rem)",
+                  lineHeight: 1,
                   letterSpacing: "0.03em",
-                  marginBottom: "1rem",
+                  color: "var(--color-txt)",
+                  marginBottom: "1.25rem",
                 }}
               >
-                PRISSÄTTNING
+                RÄTTVIST PRIS VARJE DAG
               </h2>
               <p
                 className="font-body"
@@ -563,20 +710,21 @@ export default function HomePage() {
                   marginBottom: "1.25rem",
                 }}
               >
-                Vi prissätter varje bil baserat på London Metal Exchange (LME) dagskurs för
-                koppar, aluminium och stål. Det innebär att du alltid får ett marknadsmässigt och
-                transparent pris — inga dolda avdrag eller schabloner.
+                Vi sätter priset baserat på London Metal Exchange (LME) — världsstandarden
+                för metallpriser. Det betyder att du alltid får ett marknadsmässigt och
+                transparent pris utan förhandling eller dolda avdrag.
               </p>
               <p
                 className="font-body"
                 style={{
                   color: "var(--color-txt2)",
                   fontSize: "0.9rem",
-                  lineHeight: 1.6,
+                  lineHeight: 1.65,
                   fontStyle: "italic",
                 }}
               >
-                Slutpris bekräftas vid hämtning baserat på bilens vikt och metallmarknadens dagspris.
+                Faktorer: bilens vikt, metallinnehåll, årsmodell och skick. Priset
+                justeras dagligen enligt LME-noteringar.
               </p>
             </div>
 
@@ -585,7 +733,6 @@ export default function HomePage() {
               style={{
                 ...cardStyle,
                 border: "1px solid rgba(200,121,65,0.3)",
-                textAlign: "center",
               }}
             >
               <p
@@ -595,15 +742,15 @@ export default function HomePage() {
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                   color: "var(--color-txt2)",
-                  marginBottom: "1rem",
+                  marginBottom: "0.75rem",
                 }}
               >
-                Uppskattat prisintervall
+                Typiskt prisintervall
               </p>
               <div
                 className="font-display"
                 style={{
-                  fontSize: "clamp(3rem, 8vw, 5.5rem)",
+                  fontSize: "clamp(2.5rem, 7vw, 4.5rem)",
                   color: "var(--color-cu)",
                   lineHeight: 1,
                   marginBottom: "0.5rem",
@@ -615,34 +762,107 @@ export default function HomePage() {
                 className="font-body"
                 style={{
                   color: "var(--color-txt2)",
-                  fontSize: "0.85rem",
+                  fontSize: "0.82rem",
+                  marginBottom: "1.75rem",
+                  lineHeight: 1.5,
+                }}
+              >
+                Beroende på märke, modell och metallmarknadens dagspris.
+              </p>
+
+              {/* Price breakdown table */}
+              <dl
+                style={{
+                  borderTop: "1px solid rgba(60,30,10,0.1)",
+                  paddingTop: "1.25rem",
                   marginBottom: "1.75rem",
                 }}
               >
-                Beroende på märke, modell, vikt och dagslägets metallkurs.
+                {(
+                  [
+                    ["Personbil (lättvikt)", "2 000 – 3 200 kr"],
+                    ["Personbil (medel)", "3 000 – 4 500 kr"],
+                    ["SUV / MPV", "4 000 – 6 000 kr"],
+                  ] as [string, string][]
+                ).map(([type, range]) => (
+                  <div
+                    key={type}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "0.6rem 0",
+                      borderBottom: "1px solid rgba(60,30,10,0.07)",
+                    }}
+                  >
+                    <dt
+                      className="font-body"
+                      style={{ color: "var(--color-txt2)", fontSize: "0.9rem" }}
+                    >
+                      {type}
+                    </dt>
+                    <dd
+                      className="font-mono"
+                      style={{
+                        color: "var(--color-txt)",
+                        fontSize: "0.85rem",
+                        fontWeight: 700,
+                        margin: 0,
+                      }}
+                    >
+                      {range}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <p
+                className="font-body"
+                style={{
+                  fontSize: "0.78rem",
+                  color: "var(--color-txt2)",
+                  lineHeight: 1.6,
+                  fontStyle: "italic",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                Slutpris bekräftas vid hämtning baserat på bilens vikt och metallmarknadens dagspris.
               </p>
-              <Link href="/skrota" className="btn-cu">
-                Få ditt pris nu
+
+              <Link href="/skrota" className="btn-cu" style={{ width: "100%", textAlign: "center", display: "flex", justifyContent: "center" }}>
+                Beräkna ditt pris
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── ENVIRONMENT ───────────────────────────────────────────────────── */}
+      {/* ── 8. ENVIRONMENT ──────────────────────────────────────────────────── */}
       <section
         id="miljo"
+        aria-labelledby="miljo-heading"
         style={{ background: "var(--color-dark)" }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
+          <p
+            style={{
+              ...sectionLabel,
+              color: "var(--color-cu)",
+            }}
+          >
+            Hållbarhet
+          </p>
           <h2
+            id="miljo-heading"
             className="font-display"
             style={{
+              fontFamily: "var(--font-display)",
               fontSize: "clamp(2.8rem, 7vw, 5rem)",
-              color: "var(--color-white)",
+              lineHeight: 1,
               letterSpacing: "0.03em",
-              marginBottom: "0.75rem",
+              color: "var(--color-white)",
+              marginBottom: "1.25rem",
             }}
           >
             MILJÖANSVAR ÄR KÄRNAN
@@ -654,12 +874,12 @@ export default function HomePage() {
               fontSize: "1rem",
               lineHeight: 1.7,
               maxWidth: "580px",
-              marginBottom: "3.5rem",
+              marginBottom: "4rem",
             }}
           >
-            Vi är certifierade enligt EU:s ELV-direktiv och tar hand om varje fordon med
-            minsta möjliga miljöpåverkan. Vätskor tappas av, farliga material sorteras, och
-            nästintill hela bilen återvinns.
+            Bilskrotning är en av de mest effektiva formerna av återvinning. Vi säkerställer att
+            varje fordon hanteras enligt EU ELV-direktivet — från tömning av vätskor till
+            återvinning av skrotmetall. Inget hamnar på soptipp.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -678,10 +898,10 @@ export default function HomePage() {
                 <div
                   className="font-mono"
                   style={{
-                    fontSize: "0.68rem",
+                    fontSize: "0.65rem",
                     letterSpacing: "0.1em",
                     textTransform: "uppercase",
-                    color: "rgba(250,247,243,0.5)",
+                    color: "rgba(250,247,243,0.45)",
                     marginTop: "0.5rem",
                   }}
                 >
@@ -693,169 +913,255 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── CERTIFICATIONS ────────────────────────────────────────────────── */}
+      {/* ── 9. CERTIFICATIONS ───────────────────────────────────────────────── */}
       <section
         id="cert"
-        style={{ background: "var(--color-bg)", borderTop: "1px solid rgba(60,30,10,0.08)" }}
+        aria-labelledby="cert-heading"
+        style={{
+          background: "var(--color-bg)",
+          borderTop: "1px solid rgba(60,30,10,0.08)",
+        }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
+          <p style={sectionLabel}>Tillstånd &amp; certifikat</p>
           <h2
+            id="cert-heading"
             className="font-display"
             style={{
-              fontSize: "clamp(2.4rem, 5vw, 4rem)",
-              color: "var(--color-txt)",
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
+              lineHeight: 1,
               letterSpacing: "0.03em",
-              marginBottom: "2.5rem",
-              textAlign: "center",
+              color: "var(--color-txt)",
+              marginBottom: "3rem",
             }}
           >
-            CERTIFIERINGAR & TILLSTÅND
+            AUKTORISERAD OCH CERTIFIERAD
           </h2>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {CERTS.map((c) => (
-              <div
-                key={c.title}
-                style={{
-                  ...cardStyle,
-                  textAlign: "center",
-                  padding: "1.75rem 1.25rem",
-                }}
-              >
+              <div key={c.title} style={cardStyle}>
+                {/* Checkmark badge */}
                 <div
+                  aria-hidden
                   style={{
                     width: "2.5rem",
                     height: "2.5rem",
-                    borderRadius: "50%",
-                    background: "var(--color-cu-bg)",
+                    borderRadius: "8px",
+                    background: "rgba(200,121,65,0.09)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    margin: "0 auto 1rem",
+                    marginBottom: "0.75rem",
                   }}
                 >
-                  <span style={{ color: "var(--color-cu)", fontSize: "1.1rem" }}>✓</span>
+                  <span style={{ color: "var(--color-cu)", fontSize: "1.2rem" }}>✓</span>
                 </div>
-                <div
+
+                <h3
                   className="font-body"
-                  style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--color-txt)", marginBottom: "0.35rem" }}
+                  style={{
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                    color: "var(--color-txt)",
+                    margin: "0 0 0.25rem",
+                  }}
                 >
                   {c.title}
-                </div>
-                <div
+                </h3>
+                <span
                   className="font-mono"
-                  style={{ fontSize: "0.65rem", letterSpacing: "0.08em", color: "var(--color-txt2)", textTransform: "uppercase" }}
+                  style={{
+                    fontSize: "0.62rem",
+                    letterSpacing: "0.08em",
+                    color: "var(--color-cu)",
+                    display: "block",
+                    marginBottom: "0.6rem",
+                  }}
                 >
                   {c.sub}
-                </div>
+                </span>
+                <p
+                  className="font-body"
+                  style={{
+                    color: "var(--color-txt2)",
+                    fontSize: "0.85rem",
+                    lineHeight: 1.6,
+                    margin: 0,
+                  }}
+                >
+                  {c.desc}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ──────────────────────────────────────────────────── */}
+      {/* ── 10. TESTIMONIALS ────────────────────────────────────────────────── */}
       <section
         id="testi"
-        style={{ background: "var(--color-bg2)", borderTop: "1px solid rgba(60,30,10,0.08)" }}
+        aria-labelledby="testi-heading"
+        style={{
+          background: "var(--color-bg2)",
+          borderTop: "1px solid rgba(60,30,10,0.08)",
+        }}
         className="py-20"
       >
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
+          <p style={sectionLabel}>Kundrecensioner</p>
           <h2
+            id="testi-heading"
             className="font-display"
-            style={{
-              fontSize: "clamp(2.4rem, 5vw, 4rem)",
-              color: "var(--color-txt)",
-              letterSpacing: "0.03em",
-              marginBottom: "0.5rem",
-            }}
+            style={sectionHeading}
           >
             VAD KUNDERNA SÄGER
           </h2>
-          <p
-            className="font-serif-it"
-            style={{ fontSize: "1.1rem", color: "var(--color-cu)", marginBottom: "2.5rem" }}
-          >
-            Riktiga upplevelser från riktiga kunder.
-          </p>
 
           <div className="grid md:grid-cols-3 gap-6">
             {TESTIMONIALS.map((t) => (
-              <div key={t.name} style={cardStyle}>
-                <div style={{ color: "var(--color-cu)", fontSize: "1rem", marginBottom: "1rem", letterSpacing: "0.05em" }}>
+              <figure key={t.name} style={{ ...cardStyle, margin: 0 }}>
+                {/* Stars */}
+                <div
+                  aria-label="5 av 5 stjärnor"
+                  style={{
+                    color: "var(--color-cu)",
+                    fontSize: "1rem",
+                    letterSpacing: "0.05em",
+                    marginBottom: "1rem",
+                  }}
+                >
                   ★★★★★
                 </div>
-                <p
+
+                <blockquote
                   className="font-body"
                   style={{
                     color: "var(--color-txt)",
                     fontSize: "0.95rem",
                     lineHeight: 1.65,
-                    marginBottom: "1.25rem",
                     fontStyle: "italic",
+                    margin: "0 0 1.25rem",
                   }}
                 >
-                  "{t.text}"
-                </p>
-                <div
-                  className="font-mono"
+                  &ldquo;{t.text}&rdquo;
+                </blockquote>
+
+                <figcaption
                   style={{
-                    fontSize: "0.68rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "var(--color-txt2)",
+                    borderTop: "1px solid rgba(60,30,10,0.08)",
+                    paddingTop: "1rem",
                   }}
                 >
-                  {t.name} — {t.city}
-                </div>
-              </div>
+                  <span
+                    className="font-body"
+                    style={{
+                      fontWeight: 700,
+                      fontSize: "0.9rem",
+                      color: "var(--color-txt)",
+                    }}
+                  >
+                    {t.name}
+                  </span>
+                  <span
+                    className="font-mono"
+                    style={{
+                      fontSize: "0.65rem",
+                      letterSpacing: "0.06em",
+                      color: "var(--color-txt2)",
+                      marginLeft: "0.5rem",
+                    }}
+                  >
+                    {t.city}
+                  </span>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      {/* ── 11. CTA ─────────────────────────────────────────────────────────── */}
       <section
         id="kontakt"
+        aria-labelledby="cta-heading"
         style={{ background: "var(--color-dark)", textAlign: "center" }}
         className="py-20"
       >
-        <div className="max-w-6xl mx-auto px-6 lg:px-10">
+        <div
+          className="max-w-6xl mx-auto px-6 lg:px-10"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "1.25rem",
+          }}
+        >
+          <p
+            className="font-mono"
+            style={{
+              fontSize: "0.68rem",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "var(--color-cu)",
+            }}
+          >
+            Kom igång idag
+          </p>
+
           <h2
+            id="cta-heading"
             className="font-display"
             style={{
+              fontFamily: "var(--font-display)",
               fontSize: "clamp(3rem, 10vw, 8rem)",
-              color: "var(--color-white)",
-              letterSpacing: "0.03em",
               lineHeight: 0.95,
-              marginBottom: "1rem",
+              letterSpacing: "0.03em",
+              color: "var(--color-white)",
+              margin: 0,
             }}
           >
             REDO ATT SKROTA SMART?
           </h2>
+
           <p
             className="font-serif-it"
             style={{
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
               fontSize: "clamp(1.2rem, 3vw, 1.8rem)",
               color: "var(--color-cu)",
-              marginBottom: "1rem",
+              margin: 0,
             }}
           >
-            Enkelt, snabbt och alltid till rätt pris.
+            Vi hämtar din bil, du får ett rättvist pris — redan imorgon.
           </p>
-          <p
+
+          <a
+            href="tel:017121002"
             className="font-mono"
             style={{
               fontSize: "1.1rem",
               color: "rgba(250,247,243,0.6)",
-              letterSpacing: "0.06em",
-              marginBottom: "2.5rem",
+              letterSpacing: "0.08em",
+              textDecoration: "none",
+              transition: "color 0.2s",
             }}
           >
             0171-210 02
-          </p>
-          <div style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
+          </a>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              marginTop: "0.5rem",
+            }}
+          >
             <Link href="/skrota" className="btn-cu">
               Boka online
             </Link>
@@ -866,17 +1172,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FOOTER ────────────────────────────────────────────────────────── */}
+      {/* ── 12 + 13. FOOTER ─────────────────────────────────────────────────── */}
+      {/* 12 = Footer grid columns, 13 = bottom copyright bar */}
       <footer
         style={{
-          background: "var(--color-dark2)",
+          background: "var(--color-dark2, #1a1008)",
           borderTop: "1px solid rgba(200,121,65,0.15)",
         }}
       >
-        {/* Main grid */}
-        <div
-          className="max-w-6xl mx-auto px-6 lg:px-10 py-16 grid sm:grid-cols-2 md:grid-cols-4 gap-10"
-        >
+        {/* Grid: Brand · Tjänster · Kontakt · Certifikat */}
+        <div className="max-w-6xl mx-auto px-6 lg:px-10 py-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Col 1: Brand */}
           <div>
             <div
@@ -892,22 +1197,33 @@ export default function HomePage() {
             </div>
             <p
               className="font-serif-it"
-              style={{ color: "var(--color-cu)", fontSize: "0.95rem", marginBottom: "1rem" }}
+              style={{
+                color: "var(--color-cu)",
+                fontSize: "0.95rem",
+                marginBottom: "1rem",
+              }}
             >
               Vi skrotar smart.
             </p>
             <p
               className="font-body"
-              style={{ color: "rgba(250,247,243,0.45)", fontSize: "0.8rem", lineHeight: 1.65 }}
+              style={{
+                color: "rgba(250,247,243,0.45)",
+                fontSize: "0.8rem",
+                lineHeight: 1.7,
+                margin: 0,
+              }}
             >
-              Mercaskroten i Sverige AB<br />
-              Auktoriserad bildemontering<br />
-              Enköping, Mälardalen
+              Mercaskroten i Sverige AB
+              <br />
+              Org.nr XXXXXX
+              <br />
+              Auktoriserad bilskrotare sedan 1984
             </p>
           </div>
 
           {/* Col 2: Tjänster */}
-          <div>
+          <nav aria-label="Sidfots-navigation Tjänster">
             <h4
               className="font-mono"
               style={{
@@ -920,12 +1236,14 @@ export default function HomePage() {
             >
               Tjänster
             </h4>
-            {[
-              { label: "Bilskrotning", href: "/skrota" },
-              { label: "Metallhandel", href: "/metall" },
-              { label: "Hur det funkar", href: "#how" },
-              { label: "Miljö", href: "#miljo" },
-            ].map((l) => (
+            {(
+              [
+                { label: "Bilskrotning", href: "/skrota" },
+                { label: "Metallhandel", href: "/metall" },
+                { label: "Hur det funkar", href: "#how" },
+                { label: "Miljö", href: "#miljo" },
+              ] as { label: string; href: string }[]
+            ).map((l) => (
               <a
                 key={l.label}
                 href={l.href}
@@ -937,13 +1255,19 @@ export default function HomePage() {
                   textDecoration: "none",
                   transition: "color 0.2s",
                 }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "var(--color-cu-b)")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(250,247,243,0.6)")}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLAnchorElement).style.color =
+                    "var(--color-cu)")
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLAnchorElement).style.color =
+                    "rgba(250,247,243,0.6)")
+                }
               >
                 {l.label}
               </a>
             ))}
-          </div>
+          </nav>
 
           {/* Col 3: Kontakt */}
           <div>
@@ -968,22 +1292,24 @@ export default function HomePage() {
                 lineHeight: 1.8,
               }}
             >
-              Industrigatan 14<br />
-              745 37 Enköping<br />
+              Industrivägen 12, 745 35 Enköping
+              <br />
               <a
                 href="tel:017121002"
                 style={{ color: "var(--color-cu)", textDecoration: "none" }}
               >
                 0171-210 02
-              </a><br />
+              </a>
+              <br />
               <a
-                href="mailto:info@rensona.se"
+                href="mailto:info@rensonametall.se"
                 style={{ color: "var(--color-cu)", textDecoration: "none" }}
               >
-                info@rensona.se
-              </a><br />
+                info@rensonametall.se
+              </a>
+              <br />
               <span style={{ color: "rgba(250,247,243,0.4)", fontSize: "0.8rem" }}>
-                Mån–Fre 07:30–17:00
+                Mån–Fre 07:00–16:30
               </span>
             </address>
           </div>
@@ -1012,14 +1338,29 @@ export default function HomePage() {
                   marginBottom: "0.45rem",
                 }}
               >
-                <span style={{ color: "var(--color-cu)", marginRight: "0.5rem" }}>✓</span>
+                <span
+                  aria-hidden
+                  style={{ color: "var(--color-cu)", marginRight: "0.5rem" }}
+                >
+                  ✓
+                </span>
                 {c.title}
+                <span
+                  className="font-mono"
+                  style={{
+                    fontSize: "0.65rem",
+                    color: "rgba(250,247,243,0.35)",
+                    marginLeft: "0.4rem",
+                  }}
+                >
+                  {c.sub}
+                </span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom copyright bar */}
         <div
           style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
           className="max-w-6xl mx-auto px-6 lg:px-10 py-5 flex flex-wrap items-center justify-between gap-3"
@@ -1027,31 +1368,41 @@ export default function HomePage() {
           <p
             className="font-mono"
             style={{
-              fontSize: "0.65rem",
+              fontSize: "0.62rem",
               letterSpacing: "0.08em",
               color: "rgba(250,247,243,0.3)",
+              margin: 0,
             }}
           >
             © 2026 Mercaskroten i Sverige AB · Org.nr XXXXXX
           </p>
           <div style={{ display: "flex", gap: "1.5rem" }}>
-            {[
-              { label: "Integritetspolicy", href: "/integritet" },
-              { label: "Cookies", href: "/cookies" },
-            ].map((l) => (
+            {(
+              [
+                { label: "Integritetspolicy", href: "/integritetspolicy" },
+                { label: "Cookies", href: "/cookies" },
+                { label: "Villkor", href: "/villkor" },
+              ] as { label: string; href: string }[]
+            ).map((l) => (
               <a
                 key={l.label}
                 href={l.href}
                 className="font-mono"
                 style={{
-                  fontSize: "0.65rem",
+                  fontSize: "0.62rem",
                   letterSpacing: "0.08em",
                   color: "rgba(250,247,243,0.3)",
                   textDecoration: "none",
                   transition: "color 0.2s",
                 }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(250,247,243,0.7)")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLAnchorElement).style.color = "rgba(250,247,243,0.3)")}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLAnchorElement).style.color =
+                    "rgba(250,247,243,0.7)")
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLAnchorElement).style.color =
+                    "rgba(250,247,243,0.3)")
+                }
               >
                 {l.label}
               </a>
