@@ -7,7 +7,6 @@ import type { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Navbar } from "@/components/Navbar";
 
 // ─── Dynamic import (client-only, no SSR) ────────────────────────────────────
 
@@ -354,8 +353,6 @@ const sectionHeading: CSSProperties = {
 export default function HomePage() {
   return (
     <>
-      <Navbar />
-
       {/* ── 1. HERO ─────────────────────────────────────────────────────────── */}
       <HeroSection />
 
