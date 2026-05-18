@@ -276,7 +276,7 @@ export default function MetallPage() {
               </p>
               <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
                 <a href="tel:017121002" className="btn-cu">Ring 0171-210 02</a>
-                <a href="mailto:info@rensona.se" className="btn-ghost">info@rensona.se</a>
+                <a href="mailto:info@rensonametall.se" className="btn-ghost">info@rensonametall.se</a>
               </div>
             </div>
           </div>

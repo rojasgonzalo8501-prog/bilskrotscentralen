@@ -61,8 +61,8 @@ export async function submitSkrotaBokning(
   try {
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: "Rensona Metall <noreply@rensona.se>",
-        to:   ["info@rensona.se"],
+        from: "Rensona Metall <noreply@rensonametall.se>",
+        to:   ["info@rensonametall.se"],
         subject,
         html,
       });

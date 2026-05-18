@@ -37,11 +37,11 @@ export default function IntegritetspolicyPage() {
           >
             <Section title="1. Personuppgiftsansvarig">
               <p>
-                Mercaskroten i Sverige AB, organisationsnummer <strong>[FYLL I ORG.NR]</strong>, Industrivägen 12, 745 35 Enköping,
+                Mercaskroten i Sverige AB, organisationsnummer <strong>556634-0815</strong>, Industrivägen 12, 745 35 Enköping,
                 är personuppgiftsansvarig för den behandling av personuppgifter som beskrivs i denna policy.
               </p>
               <p>
-                Kontakt: <a href="mailto:info@rensona.se" style={{ color: "var(--color-cu)" }}>info@rensona.se</a> · 0171-210 02
+                Kontakt: <a href="mailto:info@rensonametall.se" style={{ color: "var(--color-cu)" }}>info@rensonametall.se</a> · 0171-210 02
               </p>
             </Section>
 
@@ -96,7 +96,7 @@ export default function IntegritetspolicyPage() {
                 <li><strong>Inge klagomål</strong> till Integritetsskyddsmyndigheten (IMY), imy.se</li>
               </ul>
               <p>
-                Kontakta oss på <a href="mailto:info@rensona.se" style={{ color: "var(--color-cu)" }}>info@rensona.se</a> för att utöva dina rättigheter.
+                Kontakta oss på <a href="mailto:info@rensonametall.se" style={{ color: "var(--color-cu)" }}>info@rensonametall.se</a> för att utöva dina rättigheter.
               </p>
             </Section>
 
@@ -109,7 +109,7 @@ export default function IntegritetspolicyPage() {
 
             <Section title="8. Ändringar">
               <p>
-                Vi kan komma att uppdatera denna policy. Den senaste versionen finns alltid tillgänglig på rensona.se/integritetspolicy.
+                Vi kan komma att uppdatera denna policy. Den senaste versionen finns alltid tillgänglig på rensonametall.se/integritetspolicy.
                 Väsentliga ändringar kommuniceras via e-post till berörda registrerade.
               </p>
             </Section>

@@ -1213,7 +1213,7 @@ export default function HomePage() {
             >
               Mercaskroten i Sverige AB
               <br />
-              Org.nr XXXXXX
+              Org.nr 556634-0815
               <br />
               Auktoriserad bilskrotare sedan 1984
             </p>
@@ -1299,10 +1299,10 @@ export default function HomePage() {
               </a>
               <br />
               <a
-                href="mailto:info@rensona.se"
+                href="mailto:info@rensonametall.se"
                 style={{ color: "var(--color-cu)", textDecoration: "none" }}
               >
-                info@rensona.se
+                info@rensonametall.se
               </a>
               <br />
               <span style={{ color: "rgba(250,247,243,0.4)", fontSize: "0.8rem" }}>
@@ -1371,7 +1371,7 @@ export default function HomePage() {
               margin: 0,
             }}
           >
-            © 2026 Mercaskroten i Sverige AB · Org.nr XXXXXX
+            © 2026 Mercaskroten i Sverige AB · Org.nr 556634-0815
           </p>
           <div style={{ display: "flex", gap: "1.5rem" }}>
             {(

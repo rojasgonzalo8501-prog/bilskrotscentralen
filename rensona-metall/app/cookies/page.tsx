@@ -97,7 +97,7 @@ export default function CookiesPage() {
             </h2>
             <p>
               Kontakta oss på{" "}
-              <a href="mailto:info@rensona.se" style={{ color: "var(--color-cu)" }}>info@rensona.se</a>.
+              <a href="mailto:info@rensonametall.se" style={{ color: "var(--color-cu)" }}>info@rensonametall.se</a>.
             </p>
           </div>
 

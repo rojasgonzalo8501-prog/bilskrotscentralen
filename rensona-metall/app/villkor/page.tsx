@@ -32,13 +32,13 @@ export default function VillkorPage() {
             {[
               {
                 title: "1. Om oss",
-                body: `Mercaskroten i Sverige AB (org.nr [FYLL I ORG.NR]), nedan kallat "Rensona Metall",
+                body: `Mercaskroten i Sverige AB (org.nr 556634-0815), nedan kallat "Rensona Metall",
                        driver auktoriserad bilskrotning och metallhandel med säte i Enköping. Vi innehar alla
                        tillstånd som krävs enligt Länsstyrelsen, Naturvårdsverket och EU ELV-direktiv 2000/53/EG.`,
               },
               {
                 title: "2. Bokningsförfrågan",
-                body: `En bokningsförfrågan via rensona.se eller telefon är en intresseanmälan, inte ett bindande
+                body: `En bokningsförfrågan via rensonametall.se eller telefon är en intresseanmälan, inte ett bindande
                        avtal. Avtalet ingås när vi skriftligen eller muntligen bekräftar hämtningstid, pris och
                        betalningssätt. Vi förbehåller oss rätten att neka uppdrag som faller utanför vår
                        geografiska täckning (primärt Mälardalen) eller om fordonet bedöms innebära

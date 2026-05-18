@@ -9,7 +9,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rensona.se"),
+  metadataBase: new URL("https://rensonametall.se"),
   title: {
     default: "Rensona Metall — Auktoriserad bilskrotning & metallhandel",
     template: "%s | Rensona Metall",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "sv_SE",
     siteName: "Rensona Metall",
-    url: "https://rensona.se",
+    url: "https://rensonametall.se",
   },
 };
 
