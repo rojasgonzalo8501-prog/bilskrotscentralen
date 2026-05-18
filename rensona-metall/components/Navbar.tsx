@@ -5,9 +5,10 @@ import Link from "next/link";
 
 const LINKS = [
   { href: "/metall",   label: "Metallhandel" },
+  { href: "/foretag",  label: "Företag" },
   { href: "/#how",     label: "Hur det funkar" },
   { href: "/#pris",    label: "Pris" },
-  { href: "/#kontakt", label: "Kontakt" },
+  { href: "/om-oss",   label: "Om oss" },
 ];
 
 export function Navbar() {
