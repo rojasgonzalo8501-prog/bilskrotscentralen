@@ -1237,8 +1237,8 @@ export default function HomePage() {
               [
                 { label: "Bilskrotning", href: "/skrota" },
                 { label: "Metallhandel", href: "/metall" },
-                { label: "Hur det funkar", href: "#how" },
-                { label: "Miljö", href: "#miljo" },
+                { label: "Hur det funkar", href: "/#how" },
+                { label: "Miljö", href: "/#miljo" },
               ] as { label: string; href: string }[]
             ).map((l) => (
               <a
@@ -1299,10 +1299,10 @@ export default function HomePage() {
               </a>
               <br />
               <a
-                href="mailto:info@rensonametall.se"
+                href="mailto:info@rensona.se"
                 style={{ color: "var(--color-cu)", textDecoration: "none" }}
               >
-                info@rensonametall.se
+                info@rensona.se
               </a>
               <br />
               <span style={{ color: "rgba(250,247,243,0.4)", fontSize: "0.8rem" }}>

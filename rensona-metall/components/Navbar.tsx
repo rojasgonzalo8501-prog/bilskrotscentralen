@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 
 const LINKS = [
-  { href: "#how",      label: "Hur det funkar" },
-  { href: "#pris",     label: "Pris" },
-  { href: "#miljo",    label: "Miljö" },
-  { href: "#kontakt",  label: "Kontakt" },
+  { href: "/metall",   label: "Metallhandel" },
+  { href: "/#how",     label: "Hur det funkar" },
+  { href: "/#pris",    label: "Pris" },
+  { href: "/#kontakt", label: "Kontakt" },
 ];
 
 export function Navbar() {

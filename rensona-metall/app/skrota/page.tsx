@@ -104,8 +104,8 @@ export default function SkrotaPage() {
               {/* Address */}
               <div className="rounded-2xl p-5 border" style={{ background: "var(--color-panel)", borderColor: "var(--color-border)" }}>
                 <div className="text-xs mb-2" style={{ fontFamily: "var(--font-mono)", letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-txt2)" }}>Besöksadress</div>
-                <div className="text-sm font-semibold" style={{ color: "var(--color-txt)" }}>Magasingatan 2</div>
-                <div className="text-sm" style={{ color: "var(--color-txt2)" }}>749 35 Enköping</div>
+                <div className="text-sm font-semibold" style={{ color: "var(--color-txt)" }}>Industrivägen 12</div>
+                <div className="text-sm" style={{ color: "var(--color-txt2)" }}>745 35 Enköping</div>
               </div>
             </div>
           </div>
